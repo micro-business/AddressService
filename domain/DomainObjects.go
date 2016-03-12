@@ -1,0 +1,5 @@
+// Defines domain object used in Address service
+package domain
+
+// Defines how an address should look like
+type Address map[string]string
