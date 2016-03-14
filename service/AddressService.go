@@ -1,4 +1,3 @@
-// The default implementation of the address service.
 package service
 
 import (
@@ -8,7 +7,9 @@ import (
 )
 
 // The address service provides access to add new address and update/retrieve/remove an existing address.
-type AddressService struct{}
+type AddressService struct {
+	UUIDGeneratorService UUIDGeneratorService
+}
 
 // Creates a new address.
 // tenantId: Mandatory. The unique identifier of the tenant owning the address.
@@ -21,7 +22,12 @@ func (AddressService) Create(tenantId UUID, address Address) (UUID, error) {
 		panic("Address does not contain any address part.")
 	}
 
-	return EmptyUUID, nil
+	if addressId, err := RandomUUID(); err != nil {
+		return EmptyUUID, err
+	} else {
+		return addressId, nil
+	}
+
 }
 
 // Updates an existing address.
