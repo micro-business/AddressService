@@ -2,4 +2,6 @@
 package domain
 
 // Defines how an address should look like
-type Address map[string]string
+type Address struct {
+	AddressParts map[string]string
+}

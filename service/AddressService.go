@@ -10,16 +10,14 @@ import (
 // The address service provides access to add new address and update/retrieve/remove an existing address.
 type AddressService struct{}
 
-// Adds a new address.
+// Creates a new address.
 // tenantId: Mandatory. The unique identifier of the tenant owning the address.
 // address: Mandatory. The reference to the new address information.
 // Returns either the unique identifier of the new address or error if something goes wrong.
-func (AddressService) Add(tenantId UUID, address Address) (UUID, error) {
+func (AddressService) Create(tenantId UUID, address Address) (UUID, error) {
 	IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must provided.")
-	IsNotNilOrEmpty(address, "address", "address must provided.")
 
-	// TODO: 20160313: Morteza: Should not do the following checking, it must be done in IsNotNillOrEmpty function!!!
-	if len(address) == 0 {
+	if len(address.AddressParts) == 0 {
 		panic("Address does not contain any address part.")
 	}
 
@@ -28,25 +26,40 @@ func (AddressService) Add(tenantId UUID, address Address) (UUID, error) {
 
 // Updates an existing address.
 // tenantId: Mandatory. The unique identifier of the tenant owning the address.
-// id: Mandatory. The unique identifier of the existing address.
+// addressId: Mandatory. The unique identifier of the existing address.
 // address: Mandatory. The reeference to the updated address information.
 // Returns error if something goes wrong.
-func (AddressService) Update(tenantId UUID, id UUID, address Address) error {
-	panic("Not Implemented")
+func (AddressService) Update(tenantId UUID, addressId UUID, address Address) error {
+	IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must provided.")
+	IsNotNilOrEmpty(addressId, "addressId", "addressId must provided.")
+
+	if len(address.AddressParts) == 0 {
+		panic("Address does not contain any address part.")
+	}
+
+	return nil
 }
 
-// Retrieve an existing address information and returns the detail of it.
+// Retrieves an existing address information and returns the detail of it.
 // tenantId: Mandatory. The unique identifier of the tenant owning the address.
-// id: Mandatory. The unique identifier of the existing address.
+// addressId: Mandatory. The unique identifier of the existing address.
 // Returns either the address information or error if something goes wrong.
-func (AddressService) Get(tenantId UUID, id UUID) (Address, error) {
+func (AddressService) Read(tenantId UUID, addressId UUID) (Address, error) {
+	IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must provided.")
+	IsNotNilOrEmpty(addressId, "addressId", "addressId must provided.")
+
 	panic("Not Implemented")
+
+	return Address{}, nil
 }
 
-// Removes an existing address information.
+// Deletes an existing address information.
 // tenantId: Mandatory. The unique identifier of the tenant owning the address.
-// id: Mandatory. The unique identifier of the existing address to remove.
+// addressId: Mandatory. The unique identifier of the existing address to remove.
 // Returns error if something goes wrong.
-func (AddressService) Remove(tenantId UUID, id UUID) error {
-	panic("Not Implemented")
+func (AddressService) Delete(tenantId UUID, addressId UUID) error {
+	IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must provided.")
+	IsNotNilOrEmpty(addressId, "addressId", "addressId  must provided.")
+
+	return nil
 }

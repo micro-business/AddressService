@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Add method input parameters", func() {
+var _ = Describe("Create method input parameters", func() {
 	var (
 		addressService AddressService
 		tenantId       UUID
@@ -21,30 +21,24 @@ var _ = Describe("Add method input parameters", func() {
 	BeforeEach(func() {
 		addressService = AddressService{}
 		tenantId, _ = RandomUUID()
-		validAddress = Address{"FirstName": "Morteza"}
-		emptyAddress = make(Address)
+		validAddress = Address{AddressParts: map[string]string{"FirstName": "Morteza"}}
+		emptyAddress = Address{}
 	})
 
 	Context("when empty tenant unique identifier provided", func() {
 		It("should panic", func() {
-			Ω(func() { addressService.Add(EmptyUUID, validAddress) }).Should(Panic())
+			Ω(func() { addressService.Create(EmptyUUID, validAddress) }).Should(Panic())
 		})
 	})
 
-	Context("when nil address provided", func() {
+	Context("when address without address parts provided", func() {
 		It("should panic", func() {
-			Ω(func() { addressService.Add(tenantId, nil) }).Should(Panic())
-		})
-	})
-
-	Context("when empty address provided", func() {
-		It("should panic", func() {
-			Ω(func() { addressService.Add(tenantId, emptyAddress) }).Should(Panic())
+			Ω(func() { addressService.Create(tenantId, emptyAddress) }).Should(Panic())
 		})
 	})
 })
 
-func TestAdd(t *testing.T) {
+func TestCreate(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Add method input parameters")
+	RunSpecs(t, "Create method input parameters")
 }
