@@ -3,7 +3,7 @@ package service_test
 import (
 	"testing"
 
-	. "github.com/microbusinesses/AddressService/service"
+	. "github.com/microbusinesses/AddressService/data/service"
 	. "github.com/microbusinesses/Micro-Businesses-Core/system"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -11,14 +11,14 @@ import (
 
 var _ = Describe("Delete method input parameters", func() {
 	var (
-		addressService AddressService
-		tenantId       UUID
-		applicationId  UUID
-		addressId      UUID
+		service       AddressDataService
+		tenantId      UUID
+		applicationId UUID
+		addressId     UUID
 	)
 
 	BeforeEach(func() {
-		addressService = AddressService{}
+		service = AddressDataService{}
 		tenantId, _ = RandomUUID()
 		applicationId, _ = RandomUUID()
 		addressId, _ = RandomUUID()
@@ -26,19 +26,19 @@ var _ = Describe("Delete method input parameters", func() {
 
 	Context("when empty tenant unique identifier provided", func() {
 		It("should panic", func() {
-			Ω(func() { addressService.Delete(EmptyUUID, applicationId, addressId) }).Should(Panic())
+			Ω(func() { service.Delete(EmptyUUID, applicationId, addressId) }).Should(Panic())
 		})
 	})
 
 	Context("when empty application unique identifier provided", func() {
 		It("should panic", func() {
-			Ω(func() { addressService.Delete(tenantId, EmptyUUID, addressId) }).Should(Panic())
+			Ω(func() { service.Delete(tenantId, EmptyUUID, addressId) }).Should(Panic())
 		})
 	})
 
 	Context("when empty address unique identifier provided", func() {
 		It("should panic", func() {
-			Ω(func() { addressService.Delete(tenantId, applicationId, EmptyUUID) }).Should(Panic())
+			Ω(func() { service.Delete(tenantId, applicationId, EmptyUUID) }).Should(Panic())
 		})
 	})
 })

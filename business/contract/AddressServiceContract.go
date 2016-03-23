@@ -1,8 +1,8 @@
-// Defines the Address Service contract.
+// Defines the address service contract.
 package contract
 
 import (
-	. "github.com/microbusinesses/AddressService/domain"
+	. "github.com/microbusinesses/AddressService/business/domain"
 	. "github.com/microbusinesses/Micro-Businesses-Core/system"
 )
 
