@@ -13,24 +13,32 @@ var _ = Describe("Delete method input parameters", func() {
 	var (
 		addressService AddressService
 		tenantId       UUID
+		applicationId  UUID
 		addressId      UUID
 	)
 
 	BeforeEach(func() {
 		addressService = AddressService{}
 		tenantId, _ = RandomUUID()
+		applicationId, _ = RandomUUID()
 		addressId, _ = RandomUUID()
 	})
 
 	Context("when empty tenant unique identifier provided", func() {
 		It("should panic", func() {
-			Ω(func() { addressService.Delete(EmptyUUID, addressId) }).Should(Panic())
+			Ω(func() { addressService.Delete(EmptyUUID, applicationId, addressId) }).Should(Panic())
+		})
+	})
+
+	Context("when empty application unique identifier provided", func() {
+		It("should panic", func() {
+			Ω(func() { addressService.Delete(tenantId, EmptyUUID, addressId) }).Should(Panic())
 		})
 	})
 
 	Context("when empty address unique identifier provided", func() {
 		It("should panic", func() {
-			Ω(func() { addressService.Delete(tenantId, EmptyUUID) }).Should(Panic())
+			Ω(func() { addressService.Delete(tenantId, applicationId, EmptyUUID) }).Should(Panic())
 		})
 	})
 })

@@ -14,6 +14,7 @@ var _ = Describe("Create method input parameters", func() {
 	var (
 		addressService AddressService
 		tenantId       UUID
+		applicationId  UUID
 		validAddress   Address
 		emptyAddress   Address
 	)
@@ -21,19 +22,26 @@ var _ = Describe("Create method input parameters", func() {
 	BeforeEach(func() {
 		addressService = AddressService{}
 		tenantId, _ = RandomUUID()
+		applicationId, _ = RandomUUID()
 		validAddress = Address{AddressParts: map[string]string{"FirstName": "Morteza"}}
 		emptyAddress = Address{}
 	})
 
 	Context("when empty tenant unique identifier provided", func() {
 		It("should panic", func() {
-			Ω(func() { addressService.Create(EmptyUUID, validAddress) }).Should(Panic())
+			Ω(func() { addressService.Create(EmptyUUID, applicationId, validAddress) }).Should(Panic())
+		})
+	})
+
+	Context("when empty application unique identifier provided", func() {
+		It("should panic", func() {
+			Ω(func() { addressService.Create(tenantId, EmptyUUID, validAddress) }).Should(Panic())
 		})
 	})
 
 	Context("when address without address parts provided", func() {
 		It("should panic", func() {
-			Ω(func() { addressService.Create(tenantId, emptyAddress) }).Should(Panic())
+			Ω(func() { addressService.Create(tenantId, applicationId, emptyAddress) }).Should(Panic())
 		})
 	})
 })

@@ -14,6 +14,7 @@ var _ = Describe("Update method input parameters", func() {
 	var (
 		addressService AddressService
 		tenantId       UUID
+		applicationId  UUID
 		addressId      UUID
 		validAddress   Address
 		emptyAddress   Address
@@ -22,6 +23,7 @@ var _ = Describe("Update method input parameters", func() {
 	BeforeEach(func() {
 		addressService = AddressService{}
 		tenantId, _ = RandomUUID()
+		applicationId, _ = RandomUUID()
 		addressId, _ = RandomUUID()
 		validAddress = Address{AddressParts: map[string]string{"FirstName": "Morteza"}}
 		emptyAddress = Address{}
@@ -29,19 +31,25 @@ var _ = Describe("Update method input parameters", func() {
 
 	Context("when empty tenant unique identifier provided", func() {
 		It("should panic", func() {
-			Ω(func() { addressService.Update(EmptyUUID, addressId, validAddress) }).Should(Panic())
+			Ω(func() { addressService.Update(EmptyUUID, applicationId, addressId, validAddress) }).Should(Panic())
+		})
+	})
+
+	Context("when empty application unique identifier provided", func() {
+		It("should panic", func() {
+			Ω(func() { addressService.Update(tenantId, EmptyUUID, addressId, validAddress) }).Should(Panic())
 		})
 	})
 
 	Context("when empty address unique identifier provided", func() {
 		It("should panic", func() {
-			Ω(func() { addressService.Update(tenantId, EmptyUUID, validAddress) }).Should(Panic())
+			Ω(func() { addressService.Update(tenantId, applicationId, EmptyUUID, validAddress) }).Should(Panic())
 		})
 	})
 
 	Context("when address without address parts provided", func() {
 		It("should panic", func() {
-			Ω(func() { addressService.Update(tenantId, addressId, emptyAddress) }).Should(Panic())
+			Ω(func() { addressService.Update(tenantId, applicationId, addressId, emptyAddress) }).Should(Panic())
 		})
 	})
 })
