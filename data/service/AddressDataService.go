@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 
 	"github.com/gocql/gocql"
@@ -13,7 +14,7 @@ import (
 // The address service provides access to add new address and update/retrieve/remove an existing address.
 type AddressDataService struct {
 	UUIDGeneratorService UUIDGeneratorService
-	ClusterConfig        gocql.ClusterConfig
+	ClusterConfig        *gocql.ClusterConfig
 }
 
 // Create creates a new address.
@@ -23,6 +24,7 @@ type AddressDataService struct {
 // Returns either the unique identifier of the new address or error if something goes wrong.
 func (addressDataService *AddressDataService) Create(tenantId system.UUID, applicationId system.UUID, address shared.Address) (system.UUID, error) {
 	diagnostics.IsNotNil(addressDataService.UUIDGeneratorService, "addressDataService.UUIDGeneratorService", "UUIDGeneratorService must be provided.")
+	diagnostics.IsNotNil(addressDataService.ClusterConfig, "addressDataService.ClusterConfig", "ClusterConfig must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
 	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
 
@@ -38,6 +40,12 @@ func (addressDataService *AddressDataService) Create(tenantId system.UUID, appli
 		return system.EmptyUUID, err
 	}
 
+	if addressDataService.ClusterConfig == nil {
+		fmt.Println("Bingooooo<<<<<<<<<<<<<<<<<<<<<<<ooooooooooooooooo")
+	} else {
+		fmt.Println("Bingoooooooooooooooooooooo")
+	}
+
 	session, err := addressDataService.ClusterConfig.CreateSession()
 
 	if err != nil {
@@ -46,30 +54,32 @@ func (addressDataService *AddressDataService) Create(tenantId system.UUID, appli
 
 	defer session.Close()
 
-	errorChannel := make(chan error, addressPartsCount*2)
+	errorChannel := make(chan error, addressPartsCount)
 
 	var waitGroup sync.WaitGroup
 
 	for addressPart, addressValue := range address.AddressParts {
 		waitGroup.Add(1)
-		go addAddressPartsToAddressTable(
-			session,
-			&waitGroup,
-			errorChannel,
-			tenantId,
-			applicationId,
-			addressId,
-			addressPart,
-			addressValue)
 
-		waitGroup.Add(1)
-		go addAddressPartsToAddressIndexedByPartTable(
-			session,
-			&waitGroup,
-			errorChannel,
-			tenantId,
-			applicationId,
-			addressId,
+		go func(tenantId, applicationId, addressId gocql.UUID, addressPart, addressValue string) {
+			defer waitGroup.Done()
+
+			if err := session.Query(
+				"INSERT INTO address (tenant_id, application_id, address_id, address_part, address_value) VALUES(?, ?, ?, ?, ?)",
+				tenantId,
+				applicationId,
+				addressId,
+				addressPart,
+				addressValue).
+				Exec(); err != nil {
+				errorChannel <- err
+			} else {
+				errorChannel <- nil
+			}
+		}(
+			mapSystemUUIDToGocqlUUID(tenantId),
+			mapSystemUUIDToGocqlUUID(applicationId),
+			mapSystemUUIDToGocqlUUID(addressId),
 			addressPart,
 			addressValue)
 	}
@@ -85,6 +95,7 @@ func (addressDataService *AddressDataService) Create(tenantId system.UUID, appli
 	for err := range errorChannel {
 		if err != nil {
 			errorMessage += err.Error()
+			errorMessage += "\n"
 			errorFound = true
 		}
 	}
@@ -143,52 +154,9 @@ func (addressDataService *AddressDataService) Delete(tenantId system.UUID, appli
 	panic("Not Implemented")
 }
 
-func addAddressPartsToAddressTable(
-	session *gocql.Session,
-	waitGroup *sync.WaitGroup,
-	errorChannel chan<- error,
-	tenantId system.UUID,
-	applicationId system.UUID,
-	addressId system.UUID,
-	addressPart string,
-	addressValue string) {
+// mapSystemUUIDToGocqlUUID maps the system type UUID to gocql UUID type
+func mapSystemUUIDToGocqlUUID(uuid system.UUID) gocql.UUID {
+	mappedUUID, _ := gocql.UUIDFromBytes(uuid.Bytes())
 
-	diagnostics.IsNotNil(session, "session", "session must be provided.")
-	diagnostics.IsNotNil(waitGroup, "waitGroup", "waitGroup must be provided.")
-
-	defer waitGroup.Done()
-
-	if err := session.Query(
-		"INSERT INTO address (tenant_id, application_id, address_id, address_part, address_value) VALUES(?, ?, ?, ?, ?)",
-		tenantId, applicationId, addressId, addressPart, addressValue).
-		Exec(); err != nil {
-		errorChannel <- err
-	} else {
-		errorChannel <- nil
-	}
-}
-
-func addAddressPartsToAddressIndexedByPartTable(
-	session *gocql.Session,
-	waitGroup *sync.WaitGroup,
-	errorChannel chan<- error,
-	tenantId system.UUID,
-	applicationId system.UUID,
-	addressId system.UUID,
-	addressPart string,
-	addressValue string) {
-
-	diagnostics.IsNotNil(session, "session", "session must be provided.")
-	diagnostics.IsNotNil(waitGroup, "waitGroup", "waitGroup must be provided.")
-
-	defer waitGroup.Done()
-
-	if err := session.Query(
-		"INSERT INTO AddressIndexedByPart (tenant_id, application_id, address_id, address_part, address_value) VALUES(?, ?, ?, ?, ?)",
-		tenantId, applicationId, addressId, addressPart, addressValue).
-		Exec(); err != nil {
-		errorChannel <- err
-	} else {
-		errorChannel <- nil
-	}
+	return mappedUUID
 }
