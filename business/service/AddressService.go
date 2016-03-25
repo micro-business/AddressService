@@ -4,8 +4,8 @@ import (
 	"github.com/microbusinesses/AddressService/business/domain"
 	dataContract "github.com/microbusinesses/AddressService/data/contract"
 	dataShared "github.com/microbusinesses/AddressService/data/shared"
-	. "github.com/microbusinesses/Micro-Businesses-Core/common/diagnostics"
-	. "github.com/microbusinesses/Micro-Businesses-Core/system"
+	"github.com/microbusinesses/Micro-Businesses-Core/common/diagnostics"
+	"github.com/microbusinesses/Micro-Businesses-Core/system"
 )
 
 // The address service provides access to add new address and update/retrieve/remove an existing address.
@@ -18,10 +18,10 @@ type AddressService struct {
 // applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
 // address: Mandatory. The reference to the new address information.
 // Returns either the unique identifier of the new address or error if something goes wrong.
-func (addressService AddressService) Create(tenantId UUID, applicationId UUID, address domain.Address) (UUID, error) {
-	IsNotNil(addressService.AddressDataService, "addressService.AddressDataService", "AddressDataService must be provided.")
-	IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
-	IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
+func (addressService *AddressService) Create(tenantId system.UUID, applicationId system.UUID, address domain.Address) (system.UUID, error) {
+	diagnostics.IsNotNil(addressService.AddressDataService, "addressService.AddressDataService", "AddressDataService must be provided.")
+	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
+	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
 
 	if len(address.AddressParts) == 0 {
 		panic("Address does not contain any address part.")
@@ -36,11 +36,11 @@ func (addressService AddressService) Create(tenantId UUID, applicationId UUID, a
 // addressId: Mandatory. The unique identifier of the existing address.
 // address: Mandatory. The reeference to the updated address information.
 // Returns error if something goes wrong.
-func (addressService AddressService) Update(tenantId UUID, applicationId UUID, addressId UUID, address domain.Address) error {
-	IsNotNil(addressService.AddressDataService, "addressService.AddressDataService", "AddressDataService must be provided.")
-	IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
-	IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
-	IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
+func (addressService *AddressService) Update(tenantId system.UUID, applicationId system.UUID, addressId system.UUID, address domain.Address) error {
+	diagnostics.IsNotNil(addressService.AddressDataService, "addressService.AddressDataService", "AddressDataService must be provided.")
+	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
+	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
+	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
 
 	if len(address.AddressParts) == 0 {
 		panic("Address does not contain any address part.")
@@ -54,11 +54,11 @@ func (addressService AddressService) Update(tenantId UUID, applicationId UUID, a
 // applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
 // addressId: Mandatory. The unique identifier of the existing address.
 // Returns either the address information or error if something goes wrong.
-func (addressService AddressService) Read(tenantId UUID, applicationId UUID, addressId UUID) (domain.Address, error) {
-	IsNotNil(addressService.AddressDataService, "addressService.AddressDataService", "AddressDataService must be provided.")
-	IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
-	IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
-	IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
+func (addressService *AddressService) Read(tenantId system.UUID, applicationId system.UUID, addressId system.UUID) (domain.Address, error) {
+	diagnostics.IsNotNil(addressService.AddressDataService, "addressService.AddressDataService", "AddressDataService must be provided.")
+	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
+	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
+	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
 
 	if address, err := addressService.AddressDataService.Read(tenantId, applicationId, addressId); err != nil {
 		return domain.Address{}, err
@@ -72,11 +72,11 @@ func (addressService AddressService) Read(tenantId UUID, applicationId UUID, add
 // applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
 // addressId: Mandatory. The unique identifier of the existing address to remove.
 // Returns error if something goes wrong.
-func (addressService AddressService) Delete(tenantId UUID, applicationId UUID, addressId UUID) error {
-	IsNotNil(addressService.AddressDataService, "addressService.AddressDataService", "AddressDataService must be provided.")
-	IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
-	IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
-	IsNotNilOrEmpty(addressId, "addressId", "addressId  must be provided.")
+func (addressService *AddressService) Delete(tenantId system.UUID, applicationId system.UUID, addressId system.UUID) error {
+	diagnostics.IsNotNil(addressService.AddressDataService, "addressService.AddressDataService", "AddressDataService must be provided.")
+	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
+	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
+	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId  must be provided.")
 
 	return addressService.AddressDataService.Delete(tenantId, applicationId, addressId)
 }

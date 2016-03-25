@@ -5,26 +5,26 @@ import (
 
 	"github.com/microbusinesses/AddressService/data/service"
 	"github.com/microbusinesses/AddressService/data/shared"
-	. "github.com/microbusinesses/Micro-Businesses-Core/system"
+	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Update method input parameters", func() {
 	var (
-		addressDataService service.AddressDataService
-		tenantId           UUID
-		applicationId      UUID
-		addressId          UUID
+		addressDataService *service.AddressDataService
+		tenantId           system.UUID
+		applicationId      system.UUID
+		addressId          system.UUID
 		validAddress       shared.Address
 		emptyAddress       shared.Address
 	)
 
 	BeforeEach(func() {
-		addressDataService = service.AddressDataService{}
-		tenantId, _ = RandomUUID()
-		applicationId, _ = RandomUUID()
-		addressId, _ = RandomUUID()
+		addressDataService = &service.AddressDataService{}
+		tenantId, _ = system.RandomUUID()
+		applicationId, _ = system.RandomUUID()
+		addressId, _ = system.RandomUUID()
 		validAddress = shared.Address{AddressParts: map[string]string{"FirstName": "Morteza"}}
 		emptyAddress = shared.Address{}
 	})
@@ -39,19 +39,19 @@ var _ = Describe("Update method input parameters", func() {
 
 	Context("when empty tenant unique identifier provided", func() {
 		It("should panic", func() {
-			Ω(func() { addressDataService.Update(EmptyUUID, applicationId, addressId, validAddress) }).Should(Panic())
+			Ω(func() { addressDataService.Update(system.EmptyUUID, applicationId, addressId, validAddress) }).Should(Panic())
 		})
 	})
 
 	Context("when empty application unique identifier provided", func() {
 		It("should panic", func() {
-			Ω(func() { addressDataService.Update(tenantId, EmptyUUID, addressId, validAddress) }).Should(Panic())
+			Ω(func() { addressDataService.Update(tenantId, system.EmptyUUID, addressId, validAddress) }).Should(Panic())
 		})
 	})
 
 	Context("when empty address unique identifier provided", func() {
 		It("should panic", func() {
-			Ω(func() { addressDataService.Update(tenantId, applicationId, EmptyUUID, validAddress) }).Should(Panic())
+			Ω(func() { addressDataService.Update(tenantId, applicationId, system.EmptyUUID, validAddress) }).Should(Panic())
 		})
 	})
 

@@ -2,8 +2,8 @@ package service
 
 import (
 	"github.com/microbusinesses/AddressService/data/shared"
-	. "github.com/microbusinesses/Micro-Businesses-Core/common/diagnostics"
-	. "github.com/microbusinesses/Micro-Businesses-Core/system"
+	"github.com/microbusinesses/Micro-Businesses-Core/common/diagnostics"
+	"github.com/microbusinesses/Micro-Businesses-Core/system"
 )
 
 // The address service provides access to add new address and update/retrieve/remove an existing address.
@@ -16,10 +16,10 @@ type AddressDataService struct {
 // applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
 // address: Mandatory. The reference to the new address information.
 // Returns either the unique identifier of the new address or error if something goes wrong.
-func (addressDataService AddressDataService) Create(tenantId UUID, applicationId UUID, address shared.Address) (UUID, error) {
-	IsNotNil(addressDataService.UUIDGeneratorService, "addressDataService.UUIDGeneratorService", "UUIDGeneratorService must be provided.")
-	IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
-	IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
+func (addressDataService *AddressDataService) Create(tenantId system.UUID, applicationId system.UUID, address shared.Address) (system.UUID, error) {
+	diagnostics.IsNotNil(addressDataService.UUIDGeneratorService, "addressDataService.UUIDGeneratorService", "UUIDGeneratorService must be provided.")
+	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
+	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
 
 	if len(address.AddressParts) == 0 {
 		panic("Address does not contain any address part.")
@@ -34,10 +34,10 @@ func (addressDataService AddressDataService) Create(tenantId UUID, applicationId
 // addressId: Mandatory. The unique identifier of the existing address.
 // address: Mandatory. The reeference to the updated address information.
 // Returns error if something goes wrong.
-func (addressDataService AddressDataService) Update(tenantId UUID, applicationId UUID, addressId UUID, address shared.Address) error {
-	IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
-	IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
-	IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
+func (addressDataService *AddressDataService) Update(tenantId system.UUID, applicationId system.UUID, addressId system.UUID, address shared.Address) error {
+	diagnostics.IsNotNil(addressDataService.UUIDGeneratorService, "addressDataService.UUIDGeneratorService", "UUIDGeneratorService must be provided.")
+	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
+	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
 
 	if len(address.AddressParts) == 0 {
 		panic("Address does not contain any address part.")
@@ -51,10 +51,11 @@ func (addressDataService AddressDataService) Update(tenantId UUID, applicationId
 // applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
 // addressId: Mandatory. The unique identifier of the existing address.
 // Returns either the address information or error if something goes wrong.
-func (addressDataService AddressDataService) Read(tenantId UUID, applicationId UUID, addressId UUID) (shared.Address, error) {
-	IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
-	IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
-	IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
+func (addressDataService *AddressDataService) Read(tenantId system.UUID, applicationId system.UUID, addressId system.UUID) (shared.Address, error) {
+	diagnostics.IsNotNil(addressDataService.UUIDGeneratorService, "addressDataService.UUIDGeneratorService", "UUIDGeneratorService must be provided.")
+	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
+	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
+	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
 
 	panic("Not Implemented")
 }
@@ -64,10 +65,11 @@ func (addressDataService AddressDataService) Read(tenantId UUID, applicationId U
 // applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
 // addressId: Mandatory. The unique identifier of the existing address to remove.
 // Returns error if something goes wrong.
-func (addressDataService AddressDataService) Delete(tenantId UUID, applicationId UUID, addressId UUID) error {
-	IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
-	IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
-	IsNotNilOrEmpty(addressId, "addressId", "addressId  must be provided.")
+func (addressDataService *AddressDataService) Delete(tenantId system.UUID, applicationId system.UUID, addressId system.UUID) error {
+	diagnostics.IsNotNil(addressDataService.UUIDGeneratorService, "addressDataService.UUIDGeneratorService", "UUIDGeneratorService must be provided.")
+	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
+	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
+	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId  must be provided.")
 
 	panic("Not Implemented")
 }
