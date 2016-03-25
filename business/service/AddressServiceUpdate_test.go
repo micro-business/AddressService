@@ -74,6 +74,34 @@ var _ = Describe("Update method input parameters", func() {
 			Ω(func() { addressService.Update(tenantId, applicationId, addressId, emptyAddress) }).Should(Panic())
 		})
 	})
+})
+
+var _ = Describe("Update method behaviour", func() {
+	var (
+		mockCtrl               *gomock.Controller
+		addressService         *service.AddressService
+		mockAddressDataService *dataServiceMocks.MockAddressDataService
+		tenantId               system.UUID
+		applicationId          system.UUID
+		addressId              system.UUID
+		validAddress           domain.Address
+	)
+
+	BeforeEach(func() {
+		mockCtrl = gomock.NewController(GinkgoT())
+		mockAddressDataService = dataServiceMocks.NewMockAddressDataService(mockCtrl)
+
+		addressService = &service.AddressService{AddressDataService: mockAddressDataService}
+
+		tenantId, _ = system.RandomUUID()
+		applicationId, _ = system.RandomUUID()
+		addressId, _ = system.RandomUUID()
+		validAddress = domain.Address{AddressParts: map[string]string{"FirstName": "Morteza"}}
+	})
+
+	AfterEach(func() {
+		mockCtrl.Finish()
+	})
 
 	It("should call address data service Update function", func() {
 		mappedAddress := dataShared.Address{AddressParts: validAddress.AddressParts}
@@ -119,4 +147,5 @@ var _ = Describe("Update method input parameters", func() {
 func TestUpdate(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Update method input parameters")
+	RunSpecs(t, "Update method behaviour")
 }

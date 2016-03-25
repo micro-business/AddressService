@@ -65,6 +65,32 @@ var _ = Describe("Read method input parameters", func() {
 			Ω(func() { addressService.Read(tenantId, applicationId, system.EmptyUUID) }).Should(Panic())
 		})
 	})
+})
+
+var _ = Describe("Read method behaviour", func() {
+	var (
+		mockCtrl               *gomock.Controller
+		addressService         *service.AddressService
+		mockAddressDataService *dataServiceMocks.MockAddressDataService
+		tenantId               system.UUID
+		applicationId          system.UUID
+		addressId              system.UUID
+	)
+
+	BeforeEach(func() {
+		mockCtrl = gomock.NewController(GinkgoT())
+		mockAddressDataService = dataServiceMocks.NewMockAddressDataService(mockCtrl)
+
+		addressService = &service.AddressService{AddressDataService: mockAddressDataService}
+
+		tenantId, _ = system.RandomUUID()
+		applicationId, _ = system.RandomUUID()
+		addressId, _ = system.RandomUUID()
+	})
+
+	AfterEach(func() {
+		mockCtrl.Finish()
+	})
 
 	It("should call address data service Read function", func() {
 		mockAddressDataService.EXPECT().Read(tenantId, applicationId, addressId)
@@ -116,4 +142,5 @@ var _ = Describe("Read method input parameters", func() {
 func TestRead(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Read method input parameters")
+	RunSpecs(t, "Read method behaviour")
 }

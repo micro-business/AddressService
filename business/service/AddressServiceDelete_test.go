@@ -62,6 +62,32 @@ var _ = Describe("Delete method input parameters", func() {
 			Ω(func() { addressService.Delete(tenantId, applicationId, system.EmptyUUID) }).Should(Panic())
 		})
 	})
+})
+
+var _ = Describe("Delete method behaviour", func() {
+	var (
+		mockCtrl               *gomock.Controller
+		addressService         *service.AddressService
+		mockAddressDataService *dataServiceMocks.MockAddressDataService
+		tenantId               system.UUID
+		applicationId          system.UUID
+		addressId              system.UUID
+	)
+
+	BeforeEach(func() {
+		mockCtrl = gomock.NewController(GinkgoT())
+		mockAddressDataService = dataServiceMocks.NewMockAddressDataService(mockCtrl)
+
+		addressService = &service.AddressService{AddressDataService: mockAddressDataService}
+
+		tenantId, _ = system.RandomUUID()
+		applicationId, _ = system.RandomUUID()
+		addressId, _ = system.RandomUUID()
+	})
+
+	AfterEach(func() {
+		mockCtrl.Finish()
+	})
 
 	It("should call address data service Delete function", func() {
 		mockAddressDataService.EXPECT().Delete(tenantId, applicationId, addressId)
@@ -101,4 +127,5 @@ var _ = Describe("Delete method input parameters", func() {
 func TestDelete(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Delete method input parameters")
+	RunSpecs(t, "Delete method behaviour")
 }

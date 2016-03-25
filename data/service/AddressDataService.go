@@ -25,7 +25,11 @@ func (addressDataService *AddressDataService) Create(tenantId system.UUID, appli
 		panic("Address does not contain any address part.")
 	}
 
-	panic("Not Implemented")
+	if addressId, err := addressDataService.UUIDGeneratorService.GenerateRandomUUID(); err != nil {
+		return system.EmptyUUID, err
+	} else {
+		return addressId, nil
+	}
 }
 
 // Update updates an existing address.

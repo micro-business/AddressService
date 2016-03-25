@@ -67,6 +67,32 @@ var _ = Describe("Create method input parameters", func() {
 			Ω(func() { addressService.Create(tenantId, applicationId, emptyAddress) }).Should(Panic())
 		})
 	})
+})
+
+var _ = Describe("Create method behaviour", func() {
+	var (
+		mockCtrl               *gomock.Controller
+		addressService         *service.AddressService
+		mockAddressDataService *dataServiceMocks.MockAddressDataService
+		tenantId               system.UUID
+		applicationId          system.UUID
+		validAddress           domain.Address
+	)
+
+	BeforeEach(func() {
+		mockCtrl = gomock.NewController(GinkgoT())
+		mockAddressDataService = dataServiceMocks.NewMockAddressDataService(mockCtrl)
+
+		addressService = &service.AddressService{AddressDataService: mockAddressDataService}
+
+		tenantId, _ = system.RandomUUID()
+		applicationId, _ = system.RandomUUID()
+		validAddress = domain.Address{AddressParts: map[string]string{"FirstName": "Morteza"}}
+	})
+
+	AfterEach(func() {
+		mockCtrl.Finish()
+	})
 
 	It("should call address data service Create function", func() {
 		mappedAddress := dataShared.Address{AddressParts: validAddress.AddressParts}
@@ -97,7 +123,7 @@ var _ = Describe("Create method input parameters", func() {
 
 			newAddressId, err := addressService.Create(tenantId, applicationId, domain.Address{AddressParts: addressParts})
 
-			Expect(newAddressId).To(Equal(newAddressId))
+			Expect(expectedAddressId).To(Equal(newAddressId))
 			Expect(err).To(BeNil())
 		})
 	})
@@ -124,4 +150,5 @@ var _ = Describe("Create method input parameters", func() {
 func TestCreate(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Create method input parameters")
+	RunSpecs(t, "Create method behaviour")
 }
