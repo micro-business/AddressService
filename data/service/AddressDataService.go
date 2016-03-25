@@ -1,7 +1,7 @@
 package service
 
 import (
-	. "github.com/microbusinesses/AddressService/data/shared"
+	"github.com/microbusinesses/AddressService/data/shared"
 	. "github.com/microbusinesses/Micro-Businesses-Core/common/diagnostics"
 	. "github.com/microbusinesses/Micro-Businesses-Core/system"
 )
@@ -11,12 +11,12 @@ type AddressDataService struct {
 	UUIDGeneratorService UUIDGeneratorService
 }
 
-// Creates a new address.
+// Create creates a new address.
 // tenantId: Mandatory. The unique identifier of the tenant owning the address.
 // applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
 // address: Mandatory. The reference to the new address information.
 // Returns either the unique identifier of the new address or error if something goes wrong.
-func (addressDataService AddressDataService) Create(tenantId UUID, applicationId UUID, address Address) (UUID, error) {
+func (addressDataService AddressDataService) Create(tenantId UUID, applicationId UUID, address shared.Address) (UUID, error) {
 	IsNotNil(addressDataService.UUIDGeneratorService, "addressDataService.UUIDGeneratorService", "UUIDGeneratorService must be provided.")
 	IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
 	IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
@@ -25,21 +25,16 @@ func (addressDataService AddressDataService) Create(tenantId UUID, applicationId
 		panic("Address does not contain any address part.")
 	}
 
-	if addressId, err := addressDataService.UUIDGeneratorService.GenerateRandomUUID(); err != nil {
-		return EmptyUUID, err
-	} else {
-		return addressId, nil
-	}
-
+	panic("Not Implemented")
 }
 
-// Updates an existing address.
+// Update updates an existing address.
 // tenantId: Mandatory. The unique identifier of the tenant owning the address.
 // applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
 // addressId: Mandatory. The unique identifier of the existing address.
 // address: Mandatory. The reeference to the updated address information.
 // Returns error if something goes wrong.
-func (addressDataService AddressDataService) Update(tenantId UUID, applicationId UUID, addressId UUID, address Address) error {
+func (addressDataService AddressDataService) Update(tenantId UUID, applicationId UUID, addressId UUID, address shared.Address) error {
 	IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
 	IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
 	IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
@@ -48,25 +43,23 @@ func (addressDataService AddressDataService) Update(tenantId UUID, applicationId
 		panic("Address does not contain any address part.")
 	}
 
-	return nil
+	panic("Not Implemented")
 }
 
-// Retrieves an existing address information and returns the detail of it.
+// Read retrieves an existing address information and returns the detail of it.
 // tenantId: Mandatory. The unique identifier of the tenant owning the address.
 // applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
 // addressId: Mandatory. The unique identifier of the existing address.
 // Returns either the address information or error if something goes wrong.
-func (addressDataService AddressDataService) Read(tenantId UUID, applicationId UUID, addressId UUID) (Address, error) {
+func (addressDataService AddressDataService) Read(tenantId UUID, applicationId UUID, addressId UUID) (shared.Address, error) {
 	IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
 	IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
 	IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
 
 	panic("Not Implemented")
-
-	return Address{}, nil
 }
 
-// Deletes an existing address information.
+// Delete deletes an existing address information.
 // tenantId: Mandatory. The unique identifier of the tenant owning the address.
 // applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
 // addressId: Mandatory. The unique identifier of the existing address to remove.
@@ -76,5 +69,5 @@ func (addressDataService AddressDataService) Delete(tenantId UUID, applicationId
 	IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
 	IsNotNilOrEmpty(addressId, "addressId", "addressId  must be provided.")
 
-	return nil
+	panic("Not Implemented")
 }

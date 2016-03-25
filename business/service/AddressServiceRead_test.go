@@ -3,7 +3,7 @@ package service_test
 import (
 	"testing"
 
-	. "github.com/microbusinesses/AddressService/business/service"
+	"github.com/microbusinesses/AddressService/business/service"
 	. "github.com/microbusinesses/Micro-Businesses-Core/system"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -11,34 +11,42 @@ import (
 
 var _ = Describe("Read method input parameters", func() {
 	var (
-		service       AddressService
-		tenantId      UUID
-		applicationId UUID
-		addressId     UUID
+		addressService service.AddressService
+		tenantId       UUID
+		applicationId  UUID
+		addressId      UUID
 	)
 
 	BeforeEach(func() {
-		service = AddressService{}
+		addressService = service.AddressService{}
 		tenantId, _ = RandomUUID()
 		applicationId, _ = RandomUUID()
 		addressId, _ = RandomUUID()
 	})
 
-	Context("when empty tenant unique identifier provided", func() {
+	Context("when address data service not provided", func() {
 		It("should panic", func() {
-			Ω(func() { service.Read(EmptyUUID, applicationId, addressId) }).Should(Panic())
+			addressService.AddressDataService = nil
+
+			Ω(func() { addressService.Read(tenantId, applicationId, addressId) }).Should(Panic())
 		})
 	})
 
 	Context("when empty tenant unique identifier provided", func() {
 		It("should panic", func() {
-			Ω(func() { service.Read(tenantId, EmptyUUID, addressId) }).Should(Panic())
+			Ω(func() { addressService.Read(EmptyUUID, applicationId, addressId) }).Should(Panic())
+		})
+	})
+
+	Context("when empty tenant unique identifier provided", func() {
+		It("should panic", func() {
+			Ω(func() { addressService.Read(tenantId, EmptyUUID, addressId) }).Should(Panic())
 		})
 	})
 
 	Context("when empty address unique identifier provided", func() {
 		It("should panic", func() {
-			Ω(func() { service.Read(tenantId, applicationId, EmptyUUID) }).Should(Panic())
+			Ω(func() { addressService.Read(tenantId, applicationId, EmptyUUID) }).Should(Panic())
 		})
 	})
 })
