@@ -10,7 +10,6 @@ services:
 before_install:
   - docker pull cassandra:latest
   - docker run --name address-cassandra -d cassandra:latest
+  - docker ps
+  - docker inspect address-cassandra
 
-after_install:
-  - docker stop address_cassandra
-  - docker rm address_cassandra
