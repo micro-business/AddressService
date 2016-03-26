@@ -29,14 +29,6 @@ var _ = Describe("Update method input parameters", func() {
 		emptyAddress = shared.Address{}
 	})
 
-	Context("when UUID generator service not provided", func() {
-		It("should panic", func() {
-			addressDataService.UUIDGeneratorService = nil
-
-			Ω(func() { addressDataService.Update(tenantId, applicationId, addressId, validAddress) }).Should(Panic())
-		})
-	})
-
 	Context("when empty tenant unique identifier provided", func() {
 		It("should panic", func() {
 			Ω(func() { addressDataService.Update(system.EmptyUUID, applicationId, addressId, validAddress) }).Should(Panic())

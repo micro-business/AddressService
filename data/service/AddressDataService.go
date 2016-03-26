@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"sync"
 
 	"github.com/gocql/gocql"
@@ -38,12 +37,6 @@ func (addressDataService *AddressDataService) Create(tenantId system.UUID, appli
 
 	if err != nil {
 		return system.EmptyUUID, err
-	}
-
-	if addressDataService.ClusterConfig == nil {
-		fmt.Println("Bingooooo<<<<<<<<<<<<<<<<<<<<<<<ooooooooooooooooo")
-	} else {
-		fmt.Println("Bingoooooooooooooooooooooo")
 	}
 
 	session, err := addressDataService.ClusterConfig.CreateSession()
@@ -115,7 +108,6 @@ func (addressDataService *AddressDataService) Create(tenantId system.UUID, appli
 // address: Mandatory. The reeference to the updated address information.
 // Returns error if something goes wrong.
 func (addressDataService *AddressDataService) Update(tenantId system.UUID, applicationId system.UUID, addressId system.UUID, address shared.Address) error {
-	diagnostics.IsNotNil(addressDataService.UUIDGeneratorService, "addressDataService.UUIDGeneratorService", "UUIDGeneratorService must be provided.")
 	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
 	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
 
@@ -132,7 +124,6 @@ func (addressDataService *AddressDataService) Update(tenantId system.UUID, appli
 // addressId: Mandatory. The unique identifier of the existing address.
 // Returns either the address information or error if something goes wrong.
 func (addressDataService *AddressDataService) Read(tenantId system.UUID, applicationId system.UUID, addressId system.UUID) (shared.Address, error) {
-	diagnostics.IsNotNil(addressDataService.UUIDGeneratorService, "addressDataService.UUIDGeneratorService", "UUIDGeneratorService must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
 	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
 	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
@@ -146,7 +137,6 @@ func (addressDataService *AddressDataService) Read(tenantId system.UUID, applica
 // addressId: Mandatory. The unique identifier of the existing address to remove.
 // Returns error if something goes wrong.
 func (addressDataService *AddressDataService) Delete(tenantId system.UUID, applicationId system.UUID, addressId system.UUID) error {
-	diagnostics.IsNotNil(addressDataService.UUIDGeneratorService, "addressDataService.UUIDGeneratorService", "UUIDGeneratorService must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
 	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
 	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId  must be provided.")

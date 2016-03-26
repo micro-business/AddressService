@@ -24,14 +24,6 @@ var _ = Describe("Read method input parameters", func() {
 		addressId, _ = system.RandomUUID()
 	})
 
-	Context("when UUID generator service not provided", func() {
-		It("should panic", func() {
-			addressDataService.UUIDGeneratorService = nil
-
-			Ω(func() { addressDataService.Read(tenantId, applicationId, addressId) }).Should(Panic())
-		})
-	})
-
 	Context("when empty tenant unique identifier provided", func() {
 		It("should panic", func() {
 			Ω(func() { addressDataService.Read(system.EmptyUUID, applicationId, addressId) }).Should(Panic())
