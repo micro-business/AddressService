@@ -12,4 +12,7 @@ before_install:
   - docker run --name address-cassandra -d cassandra:latest
   - docker ps
   - docker inspect address-cassandra
+  - CASSANDRA_IP_ADDRESS=$(docker inspect -f '{{ .NetworkSettings.IPAddress }}' address-cassandra)
+  - echo $CASSANDRA_IP_ADDRESS
+ 
 
