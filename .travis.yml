@@ -1,4 +1,16 @@
+sudo: required
+
 language: go
 go:
   - 1.6
 
+services:
+  - docker
+
+before_install:
+  - docker pull cassandra:latest
+  - docker run --name address-cassandra -d cassandra:latest
+
+after_install:
+  - docker stop address_cassandra
+  - docker rm address_cassandra
