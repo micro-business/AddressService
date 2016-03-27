@@ -4,7 +4,10 @@ package service_test
 
 import (
 	"errors"
+	"os"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/gocql/gocql"
 	"github.com/golang/mock/gomock"
@@ -16,6 +19,8 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+const databasePreparationMaxTimeout = time.Minute
+
 var _ = Describe("Create method behaviour", func() {
 	var (
 		mockCtrl                 *gomock.Controller
@@ -24,27 +29,70 @@ var _ = Describe("Create method behaviour", func() {
 		tenantId                 system.UUID
 		applicationId            system.UUID
 		validAddress             shared.Address
+		clusterConfig            *gocql.ClusterConfig
+		keyspace                 string
 	)
+
+	BeforeSuite(func() {
+		config := getClusterConfig()
+		config.Timeout = databasePreparationMaxTimeout
+
+		keyspaceRandomValue, _ := system.RandomUUID()
+		keyspace = strings.ToLower("a" + strings.Replace(keyspaceRandomValue.String(), "-", "", -1))
+
+		session, err := config.CreateSession()
+
+		Expect(err).To(BeNil())
+
+		defer session.Close()
+
+		err = session.Query(
+			"CREATE KEYSPACE " +
+				keyspace +
+				" with replication = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };").
+			Exec()
+
+		Expect(err).To(BeNil())
+
+		err = session.Query(
+			"CREATE TABLE " +
+				keyspace +
+				".Address(tenant_id UUID, application_id UUID, address_id UUID, address_part text, address_value text, PRIMARY KEY(tenant_id, application_id, address_id, address_part));").
+			Exec()
+
+		Expect(err).To(BeNil())
+
+		clusterConfig = getClusterConfig()
+		clusterConfig.Keyspace = keyspace
+	})
+
+	AfterSuite(func() {
+		config := getClusterConfig()
+		config.Timeout = databasePreparationMaxTimeout
+		session, err := config.CreateSession()
+
+		Expect(err).To(BeNil())
+
+		defer session.Close()
+
+		err = session.Query("DROP KEYSPACE " + keyspace + " ;").Exec()
+
+		Expect(err).To(BeNil())
+	})
 
 	BeforeEach(func() {
 		mockCtrl = gomock.NewController(GinkgoT())
 		mockUUIDGeneratorService = dataServiceMocks.NewMockUUIDGeneratorService(mockCtrl)
 
-		addressDataService = &service.AddressDataService{UUIDGeneratorService: mockUUIDGeneratorService, ClusterConfig: &gocql.ClusterConfig{}}
+		addressDataService = &service.AddressDataService{UUIDGeneratorService: mockUUIDGeneratorService, ClusterConfig: clusterConfig}
 
 		tenantId, _ = system.RandomUUID()
 		applicationId, _ = system.RandomUUID()
-		validAddress = shared.Address{AddressParts: map[string]string{"FirstName": "Morteza"}}
+		validAddress = shared.Address{AddressParts: map[string]string{"City": "Christchurch"}}
 	})
 
 	AfterEach(func() {
 		mockCtrl.Finish()
-	})
-
-	It("should call UUID generator service to create the address unique identifier", func() {
-		mockUUIDGeneratorService.EXPECT().GenerateRandomUUID()
-
-		addressDataService.Create(tenantId, applicationId, validAddress)
 	})
 
 	Context("when UUID generator service succeeds to create the new UUID", func() {
@@ -78,6 +126,14 @@ var _ = Describe("Create method behaviour", func() {
 		})
 	})
 })
+
+func getClusterConfig() *gocql.ClusterConfig {
+	config := gocql.NewCluster(os.Getenv("CASSANDRA_IP_ADDRESS"))
+	config.ProtoVersion = 4
+	config.Consistency = gocql.Quorum
+
+	return config
+}
 
 func TestCreateIntegration(t *testing.T) {
 	RegisterFailHandler(Fail)

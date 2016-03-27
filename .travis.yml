@@ -2,7 +2,7 @@ sudo: required
 
 language: go
 go:
-  - 1.6
+  - tip
 
 services:
   - docker
@@ -14,5 +14,7 @@ before_install:
   - docker inspect address-cassandra
   - CASSANDRA_IP_ADDRESS=$(docker inspect -f '{{ .NetworkSettings.IPAddress }}' address-cassandra)
   - echo $CASSANDRA_IP_ADDRESS
- 
+  - export CASSANDRA_IP_ADDRESS
+
+scrip: go test -v -tags=integration ./...
 

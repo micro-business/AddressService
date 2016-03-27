@@ -34,7 +34,7 @@ var _ = Describe("Create method input parameters", func() {
 
 		tenantId, _ = system.RandomUUID()
 		applicationId, _ = system.RandomUUID()
-		validAddress = domain.Address{AddressParts: map[string]string{"FirstName": "Morteza"}}
+		validAddress = domain.Address{AddressParts: map[string]string{"City": "Christchurch"}}
 		emptyAddress = domain.Address{}
 	})
 
