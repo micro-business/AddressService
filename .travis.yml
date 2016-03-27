@@ -1,17 +1,13 @@
-sudo: required
-
 language: go
 go:
  - 1.6
  - tip
 
 services:
-  - docker
   - cassandra
 
 before_install:
   - CASSANDRA_IP_ADDRESS=127.0.0.1
-  - echo $CASSANDRA_IP_ADDRESS
   - export CASSANDRA_IP_ADDRESS
 
 script:
