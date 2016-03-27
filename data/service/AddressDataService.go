@@ -21,7 +21,7 @@ type AddressDataService struct {
 // applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
 // address: Mandatory. The reference to the new address information.
 // Returns either the unique identifier of the new address or error if something goes wrong.
-func (addressDataService *AddressDataService) Create(tenantId system.UUID, applicationId system.UUID, address shared.Address) (system.UUID, error) {
+func (addressDataService *AddressDataService) Create(tenantId, applicationId system.UUID, address shared.Address) (system.UUID, error) {
 	diagnostics.IsNotNil(addressDataService.UUIDGeneratorService, "addressDataService.UUIDGeneratorService", "UUIDGeneratorService must be provided.")
 	diagnostics.IsNotNil(addressDataService.ClusterConfig, "addressDataService.ClusterConfig", "ClusterConfig must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
@@ -49,19 +49,23 @@ func (addressDataService *AddressDataService) Create(tenantId system.UUID, appli
 
 	errorChannel := make(chan error, addressPartsCount)
 
+	mappedTenantId := mapSystemUUIDToGocqlUUID(tenantId)
+	mappedApplicationId := mapSystemUUIDToGocqlUUID(applicationId)
+	mappedAddressId := mapSystemUUIDToGocqlUUID(addressId)
+
 	var waitGroup sync.WaitGroup
 
 	for addressPart, addressValue := range address.AddressParts {
 		waitGroup.Add(1)
 
-		go func(tenantId, applicationId, addressId gocql.UUID, addressPart, addressValue string) {
+		go func(addressPart, addressValue string) {
 			defer waitGroup.Done()
 
 			if err := session.Query(
 				"INSERT INTO address (tenant_id, application_id, address_id, address_part, address_value) VALUES(?, ?, ?, ?, ?)",
-				tenantId,
-				applicationId,
-				addressId,
+				mappedTenantId,
+				mappedApplicationId,
+				mappedAddressId,
 				addressPart,
 				addressValue).
 				Exec(); err != nil {
@@ -70,9 +74,6 @@ func (addressDataService *AddressDataService) Create(tenantId system.UUID, appli
 				errorChannel <- nil
 			}
 		}(
-			mapSystemUUIDToGocqlUUID(tenantId),
-			mapSystemUUIDToGocqlUUID(applicationId),
-			mapSystemUUIDToGocqlUUID(addressId),
 			addressPart,
 			addressValue)
 	}
@@ -107,7 +108,7 @@ func (addressDataService *AddressDataService) Create(tenantId system.UUID, appli
 // addressId: Mandatory. The unique identifier of the existing address.
 // address: Mandatory. The reeference to the updated address information.
 // Returns error if something goes wrong.
-func (addressDataService *AddressDataService) Update(tenantId system.UUID, applicationId system.UUID, addressId system.UUID, address shared.Address) error {
+func (addressDataService *AddressDataService) Update(tenantId, applicationId, addressId system.UUID, address shared.Address) error {
 	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
 	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
 
@@ -123,7 +124,7 @@ func (addressDataService *AddressDataService) Update(tenantId system.UUID, appli
 // applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
 // addressId: Mandatory. The unique identifier of the existing address.
 // Returns either the address information or error if something goes wrong.
-func (addressDataService *AddressDataService) Read(tenantId system.UUID, applicationId system.UUID, addressId system.UUID) (shared.Address, error) {
+func (addressDataService *AddressDataService) Read(tenantId, applicationId, addressId system.UUID) (shared.Address, error) {
 	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
 	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
 	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
@@ -136,7 +137,7 @@ func (addressDataService *AddressDataService) Read(tenantId system.UUID, applica
 // applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
 // addressId: Mandatory. The unique identifier of the existing address to remove.
 // Returns error if something goes wrong.
-func (addressDataService *AddressDataService) Delete(tenantId system.UUID, applicationId system.UUID, addressId system.UUID) error {
+func (addressDataService *AddressDataService) Delete(tenantId, applicationId, addressId system.UUID) error {
 	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
 	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
 	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId  must be provided.")
