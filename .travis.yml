@@ -11,5 +11,5 @@ before_install:
   - export CASSANDRA_IP_ADDRESS
 
 script:
- - go vet
+ - go test -v ./...
  - go test -v -tags=integration ./...
