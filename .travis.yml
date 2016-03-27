@@ -18,7 +18,6 @@ before_install:
   - export CASSANDRA_IP_ADDRESS
 
 script:
- - go get -t -v ./...
  - go vet
  - go test -v -tags=integration ./...
 
