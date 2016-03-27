@@ -2,7 +2,8 @@ sudo: required
 
 language: go
 go:
-  - tip
+ - 1.6
+ - tip
 
 services:
   - docker
@@ -16,5 +17,8 @@ before_install:
   - echo $CASSANDRA_IP_ADDRESS
   - export CASSANDRA_IP_ADDRESS
 
-scrip: go test -v -tags=integration ./...
+script:
+ - go get -t -v ./...
+ - go vet
+ - go test -v -tags=integration ./...
 
