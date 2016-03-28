@@ -12,4 +12,5 @@ before_install:
 
 script:
  - go test -v ./...
+ - netstat -nl
  - go test -v data/service/AddressDataServiceCreateIntegration_test.go
