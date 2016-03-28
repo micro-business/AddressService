@@ -12,6 +12,7 @@ before_install:
   - export CASSANDRA_IP_ADDRESS
   - sudo apt-get update
   - sudo apt-get install -y net-tools
+  - sleep 60
 
 script:
  - go test -v ./...
