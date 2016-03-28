@@ -5,6 +5,7 @@ package service_test
 import (
 	"errors"
 	"os"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -128,8 +129,22 @@ var _ = Describe("Create method behaviour", func() {
 })
 
 func getClusterConfig() *gocql.ClusterConfig {
-	config := gocql.NewCluster(os.Getenv("CASSANDRA_IP_ADDRESS"))
-	config.ProtoVersion = 4
+	cassandraIPAddress := os.Getenv("CASSANDRA_IP_ADDRESS")
+
+	if len(cassandraIPAddress) == 0 {
+		cassandraIPAddress = "127.0.0.1"
+	}
+
+	config := gocql.NewCluster(cassandraIPAddress)
+
+	cassandraProtocolVersion := os.Getenv("CASSANDRA_PROTOCOL_VERSION")
+
+	if len(cassandraProtocolVersion) != 0 {
+		if protocolVersion, err := strconv.Atoi(cassandraProtocolVersion); err == nil {
+			config.ProtoVersion = protocolVersion
+		}
+	}
+
 	config.Consistency = gocql.Quorum
 
 	return config
