@@ -23,8 +23,8 @@ func (addressService *AddressService) Create(tenantId, applicationId system.UUID
 	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
 	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
 
-	if len(address.AddressParts) == 0 {
-		panic("Address does not contain any address part.")
+	if len(address.AddressKeysValues) == 0 {
+		panic("Address does not contain any address key.")
 	}
 
 	return addressService.AddressDataService.Create(tenantId, applicationId, mapToDataAddress(address))
@@ -42,8 +42,8 @@ func (addressService *AddressService) Update(tenantId, applicationId, addressId 
 	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
 	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
 
-	if len(address.AddressParts) == 0 {
-		panic("Address does not contain any address part.")
+	if len(address.AddressKeysValues) == 0 {
+		panic("Address does not contain any address key.")
 	}
 
 	return addressService.AddressDataService.Update(tenantId, applicationId, addressId, mapToDataAddress(address))
@@ -85,12 +85,12 @@ func (addressService *AddressService) Delete(tenantId, applicationId, addressId 
 // address: Mandatory. The address domain object
 // Returns the converted address object used in data layer
 func mapToDataAddress(address domain.Address) dataShared.Address {
-	return dataShared.Address{AddressParts: address.AddressParts}
+	return dataShared.Address{AddressKeysValues: address.AddressKeysValues}
 }
 
 // mapFromDataAddress Maps the address object used in data layer to the Address domain object.
 // address: Mandatory. The address object used in data layer
 // Returns the converted address domain object
 func mapFromDataAddress(address dataShared.Address) domain.Address {
-	return domain.Address{AddressParts: address.AddressParts}
+	return domain.Address{AddressKeysValues: address.AddressKeysValues}
 }

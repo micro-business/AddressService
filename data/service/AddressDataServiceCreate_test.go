@@ -32,7 +32,7 @@ var _ = Describe("Create method input parameters", func() {
 
 		tenantId, _ = system.RandomUUID()
 		applicationId, _ = system.RandomUUID()
-		validAddress = shared.Address{AddressParts: map[string]string{"City": "Christchurch"}}
+		validAddress = shared.Address{AddressKeysValues: map[string]string{"City": "Christchurch"}}
 		emptyAddress = shared.Address{}
 	})
 
@@ -68,7 +68,7 @@ var _ = Describe("Create method input parameters", func() {
 		})
 	})
 
-	Context("when address without address parts provided", func() {
+	Context("when address without address key provided", func() {
 		It("should panic", func() {
 			Ω(func() { addressDataService.Create(tenantId, applicationId, emptyAddress) }).Should(Panic())
 		})

@@ -58,7 +58,15 @@ var _ = Describe("Create method behaviour", func() {
 		err = session.Query(
 			"CREATE TABLE " +
 				keyspace +
-				".Address(tenant_id UUID, application_id UUID, address_id UUID, address_part text, address_value text, PRIMARY KEY(tenant_id, application_id, address_id, address_part));").
+				".address(tenant_id UUID, application_id UUID, address_id UUID, address_key text, address_value text, PRIMARY KEY(tenant_id, application_id, address_id, address_key));").
+			Exec()
+
+		Expect(err).To(BeNil())
+
+		err = session.Query(
+			"CREATE TABLE " +
+				keyspace +
+				".address_indexed_by_address_key(tenant_id UUID, application_id UUID, address_id UUID, address_key text, address_value text, PRIMARY KEY(tenant_id, application_id, address_key, address_id));").
 			Exec()
 
 		Expect(err).To(BeNil())
@@ -89,7 +97,7 @@ var _ = Describe("Create method behaviour", func() {
 
 		tenantId, _ = system.RandomUUID()
 		applicationId, _ = system.RandomUUID()
-		validAddress = shared.Address{AddressParts: map[string]string{"City": "Christchurch"}}
+		validAddress = shared.Address{AddressKeysValues: map[string]string{"City": "Christchurch"}}
 	})
 
 	AfterEach(func() {

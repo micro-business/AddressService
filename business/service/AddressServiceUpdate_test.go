@@ -35,7 +35,7 @@ var _ = Describe("Update method input parameters", func() {
 		tenantId, _ = system.RandomUUID()
 		applicationId, _ = system.RandomUUID()
 		addressId, _ = system.RandomUUID()
-		validAddress = domain.Address{AddressParts: map[string]string{"City": "Christchurch"}}
+		validAddress = domain.Address{AddressKeysValues: map[string]string{"City": "Christchurch"}}
 		emptyAddress = domain.Address{}
 	})
 
@@ -69,7 +69,7 @@ var _ = Describe("Update method input parameters", func() {
 		})
 	})
 
-	Context("when address without address parts provided", func() {
+	Context("when address without address key provided", func() {
 		It("should panic", func() {
 			Ω(func() { addressService.Update(tenantId, applicationId, addressId, emptyAddress) }).Should(Panic())
 		})
@@ -96,7 +96,7 @@ var _ = Describe("Update method behaviour", func() {
 		tenantId, _ = system.RandomUUID()
 		applicationId, _ = system.RandomUUID()
 		addressId, _ = system.RandomUUID()
-		validAddress = domain.Address{AddressParts: map[string]string{"FirstName": "Morteza"}}
+		validAddress = domain.Address{AddressKeysValues: map[string]string{"City": "Christchurch"}}
 	})
 
 	AfterEach(func() {
@@ -104,7 +104,7 @@ var _ = Describe("Update method behaviour", func() {
 	})
 
 	It("should call address data service Update function", func() {
-		mappedAddress := dataShared.Address{AddressParts: validAddress.AddressParts}
+		mappedAddress := dataShared.Address{AddressKeysValues: validAddress.AddressKeysValues}
 
 		mockAddressDataService.EXPECT().Update(tenantId, applicationId, addressId, mappedAddress)
 
@@ -113,7 +113,7 @@ var _ = Describe("Update method behaviour", func() {
 
 	Context("when address data service succeeds to update the requested address", func() {
 		It("should return no error", func() {
-			mappedAddress := dataShared.Address{AddressParts: validAddress.AddressParts}
+			mappedAddress := dataShared.Address{AddressKeysValues: validAddress.AddressKeysValues}
 
 			mockAddressDataService.
 				EXPECT().
@@ -128,7 +128,7 @@ var _ = Describe("Update method behaviour", func() {
 
 	Context("when address data service fails to update the requested address", func() {
 		It("should return the error returned by address data service", func() {
-			mappedAddress := dataShared.Address{AddressParts: validAddress.AddressParts}
+			mappedAddress := dataShared.Address{AddressKeysValues: validAddress.AddressKeysValues}
 
 			expectedErrorId, _ := system.RandomUUID()
 			expectedError := errors.New(expectedErrorId.String())

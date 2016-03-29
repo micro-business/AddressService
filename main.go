@@ -11,9 +11,8 @@ import (
 func main() {
 	uuidGeneratorService := service.UUIDGeneratorServiceImpl{}
 
-	cluster := gocql.NewCluster("172.17.0.2")
+	cluster := gocql.NewCluster("cassandra-test")
 	cluster.Keyspace = "address"
-	cluster.ProtoVersion = 4
 	cluster.Consistency = gocql.Quorum
 
 	addressDataService := service.AddressDataService{UUIDGeneratorService: &uuidGeneratorService, ClusterConfig: cluster}
@@ -21,7 +20,7 @@ func main() {
 	tenantId, _ := uuidGeneratorService.GenerateRandomUUID()
 	applicationId, _ := uuidGeneratorService.GenerateRandomUUID()
 
-	address := shared.Address{AddressParts: map[string]string{"Address Line 1": "32 Hope st", "Address Line 2": "Shirley", "Town/City": "Christchurch", "Postcode": "8013", "Country": "New Zealand"}}
+	address := shared.Address{AddressKeysValues: map[string]string{"Address Line 1": "32 Hope st", "Address Line 2": "Shirley", "Town/City": "Christchurch", "Postcode": "8013", "Country": "New Zealand"}}
 
 	if addressId, err := addressDataService.Create(tenantId, applicationId, address); err != nil {
 		fmt.Println(err)

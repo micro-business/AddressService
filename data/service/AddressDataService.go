@@ -27,10 +27,10 @@ func (addressDataService *AddressDataService) Create(tenantId, applicationId sys
 	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
 	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
 
-	addressPartsCount := len(address.AddressParts)
+	addressKeysValuesCount := len(address.AddressKeysValues)
 
-	if addressPartsCount == 0 {
-		panic("Address does not contain any address part.")
+	if addressKeysValuesCount == 0 {
+		panic("Address does not contain any address key.")
 	}
 
 	addressId, err := addressDataService.UUIDGeneratorService.GenerateRandomUUID()
@@ -47,7 +47,7 @@ func (addressDataService *AddressDataService) Create(tenantId, applicationId sys
 
 	defer session.Close()
 
-	errorChannel := make(chan error, addressPartsCount)
+	errorChannel := make(chan error, addressKeysValuesCount)
 
 	mappedTenantId := mapSystemUUIDToGocqlUUID(tenantId)
 	mappedApplicationId := mapSystemUUIDToGocqlUUID(applicationId)
@@ -55,27 +55,27 @@ func (addressDataService *AddressDataService) Create(tenantId, applicationId sys
 
 	var waitGroup sync.WaitGroup
 
-	for addressPart, addressValue := range address.AddressParts {
+	for key, value := range address.AddressKeysValues {
 		waitGroup.Add(1)
 
-		go func(addressPart, addressValue string) {
+		go func(key, value string) {
 			defer waitGroup.Done()
 
 			if err := session.Query(
-				"INSERT INTO address (tenant_id, application_id, address_id, address_part, address_value) VALUES(?, ?, ?, ?, ?)",
+				"INSERT INTO address (tenant_id, application_id, address_id, address_key, address_value) VALUES(?, ?, ?, ?, ?)",
 				mappedTenantId,
 				mappedApplicationId,
 				mappedAddressId,
-				addressPart,
-				addressValue).
+				key,
+				value).
 				Exec(); err != nil {
 				errorChannel <- err
 			} else {
 				errorChannel <- nil
 			}
 		}(
-			addressPart,
-			addressValue)
+			key,
+			value)
 	}
 
 	go func() {
@@ -111,8 +111,8 @@ func (addressDataService *AddressDataService) Update(tenantId, applicationId, ad
 	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
 	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
 
-	if len(address.AddressParts) == 0 {
-		panic("Address does not contain any address part.")
+	if len(address.AddressKeysValues) == 0 {
+		panic("Address does not contain any address key.")
 	}
 
 	panic("Not Implemented")

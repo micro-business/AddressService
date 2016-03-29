@@ -100,20 +100,20 @@ var _ = Describe("Read method behaviour", func() {
 
 	Context("when address data service succeeds to read the requested address", func() {
 		It("should return no error", func() {
-			addressParts := make(map[string]string)
+			addressKeysValues := make(map[string]string)
 
 			for idx := 0; idx < rand.Intn(10); idx++ {
-				addressPartKey, _ := system.RandomUUID()
-				addressPartValue, _ := system.RandomUUID()
+				key, _ := system.RandomUUID()
+				value, _ := system.RandomUUID()
 
-				addressParts[addressPartKey.String()] = addressPartValue.String()
+				addressKeysValues[key.String()] = value.String()
 			}
 
-			expectedAddress := domain.Address{AddressParts: addressParts}
+			expectedAddress := domain.Address{AddressKeysValues: addressKeysValues}
 			mockAddressDataService.
 				EXPECT().
 				Read(tenantId, applicationId, addressId).
-				Return(dataShared.Address{AddressParts: expectedAddress.AddressParts}, nil)
+				Return(dataShared.Address{AddressKeysValues: expectedAddress.AddressKeysValues}, nil)
 
 			address, err := addressService.Read(tenantId, applicationId, addressId)
 
