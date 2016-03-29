@@ -7,7 +7,4 @@ services:
   - cassandra
 
 script:
- - go get github.com/onsi/ginkgo/ginkgo
- - go get github.com/onsi/gomega
  - go test -v -tags=integratio ./...
- - ginkgo -r -tags=integration
