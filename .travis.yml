@@ -10,4 +10,4 @@ script:
  - go get github.com/onsi/ginkgo/ginkgo
  - go get github.com/onsi/gomega
  - go test -v ./...
- - ginkgo -v -r -tags=integration
+ - ginkgo -r -tags=integration
