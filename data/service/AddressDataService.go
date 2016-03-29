@@ -47,7 +47,7 @@ func (addressDataService *AddressDataService) Create(tenantId, applicationId sys
 
 	defer session.Close()
 
-	errorChannel := make(chan error, addressKeysValuesCount)
+	errorChannel := make(chan error, addressKeysValuesCount*2)
 
 	mappedTenantId := mapSystemUUIDToGocqlUUID(tenantId)
 	mappedApplicationId := mapSystemUUIDToGocqlUUID(applicationId)
@@ -58,22 +58,25 @@ func (addressDataService *AddressDataService) Create(tenantId, applicationId sys
 	for key, value := range address.AddressKeysValues {
 		waitGroup.Add(1)
 
-		go func(key, value string) {
-			defer waitGroup.Done()
+		go addToAddressTable(
+			session,
+			errorChannel,
+			&waitGroup,
+			mappedTenantId,
+			mappedApplicationId,
+			mappedAddressId,
+			key,
+			value)
 
-			if err := session.Query(
-				"INSERT INTO address (tenant_id, application_id, address_id, address_key, address_value) VALUES(?, ?, ?, ?, ?)",
-				mappedTenantId,
-				mappedApplicationId,
-				mappedAddressId,
-				key,
-				value).
-				Exec(); err != nil {
-				errorChannel <- err
-			} else {
-				errorChannel <- nil
-			}
-		}(
+		waitGroup.Add(1)
+
+		go addToAddressIndexByAddressKeyTable(
+			session,
+			errorChannel,
+			&waitGroup,
+			mappedTenantId,
+			mappedApplicationId,
+			mappedAddressId,
 			key,
 			value)
 	}
@@ -149,4 +152,56 @@ func mapSystemUUIDToGocqlUUID(uuid system.UUID) gocql.UUID {
 	mappedUUID, _ := gocql.UUIDFromBytes(uuid.Bytes())
 
 	return mappedUUID
+}
+
+// addToAddressTable adds new address key/value to address table using provided address unique identifier.
+func addToAddressTable(
+	session *gocql.Session,
+	errorChannel chan<- error,
+	waitGroup *sync.WaitGroup,
+	tenantId, applicationId, addressId gocql.UUID,
+	key, value string) {
+
+	defer waitGroup.Done()
+
+	if err := session.Query(
+		"INSERT INTO address"+
+			" (tenant_id, application_id, address_id, address_key, address_value)"+
+			" VALUES(?, ?, ?, ?, ?)",
+		tenantId,
+		applicationId,
+		addressId,
+		key,
+		value).
+		Exec(); err != nil {
+		errorChannel <- err
+	} else {
+		errorChannel <- nil
+	}
+}
+
+// addToAddressIndexByAddressKeyTable adds address key/value to index table, so running query on address key will be faster.
+func addToAddressIndexByAddressKeyTable(
+	session *gocql.Session,
+	errorChannel chan<- error,
+	waitGroup *sync.WaitGroup,
+	tenantId, applicationId, addressId gocql.UUID,
+	key, value string) {
+
+	defer waitGroup.Done()
+
+	if err := session.Query(
+		"INSERT INTO address_indexed_by_address_key"+
+			" (tenant_id, application_id, address_id, address_key, address_value)"+
+			" VALUES(?, ?, ?, ?, ?)",
+		tenantId,
+		applicationId,
+		addressId,
+		key,
+		value).
+		Exec(); err != nil {
+		errorChannel <- err
+	} else {
+		errorChannel <- nil
+	}
 }
