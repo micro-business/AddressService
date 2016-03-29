@@ -99,7 +99,6 @@ func (addressDataService *AddressDataService) Create(tenantId, applicationId sys
 	}
 
 	return addressId, nil
-
 }
 
 // Update updates an existing address.
