@@ -4,6 +4,7 @@ package service_test
 
 import (
 	"errors"
+	"math/rand"
 	"os"
 	"strconv"
 	"strings"
@@ -29,6 +30,7 @@ var _ = Describe("Create method behaviour", func() {
 		mockUUIDGeneratorService *dataServiceMocks.MockUUIDGeneratorService
 		tenantId                 system.UUID
 		applicationId            system.UUID
+		addressId                system.UUID
 		validAddress             shared.Address
 		clusterConfig            *gocql.ClusterConfig
 		keyspace                 string
@@ -47,29 +49,7 @@ var _ = Describe("Create method behaviour", func() {
 
 		defer session.Close()
 
-		err = session.Query(
-			"CREATE KEYSPACE " +
-				keyspace +
-				" with replication = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };").
-			Exec()
-
-		Expect(err).To(BeNil())
-
-		err = session.Query(
-			"CREATE TABLE " +
-				keyspace +
-				".address(tenant_id UUID, application_id UUID, address_id UUID, address_key text, address_value text, PRIMARY KEY(tenant_id, application_id, address_id, address_key));").
-			Exec()
-
-		Expect(err).To(BeNil())
-
-		err = session.Query(
-			"CREATE TABLE " +
-				keyspace +
-				".address_indexed_by_address_key(tenant_id UUID, application_id UUID, address_id UUID, address_key text, address_value text, PRIMARY KEY(tenant_id, application_id, address_key, address_id));").
-			Exec()
-
-		Expect(err).To(BeNil())
+		createAddressKeyspaceAndAllRequiredTables(session, keyspace)
 
 		clusterConfig = getClusterConfig()
 		clusterConfig.Keyspace = keyspace
@@ -97,6 +77,7 @@ var _ = Describe("Create method behaviour", func() {
 
 		tenantId, _ = system.RandomUUID()
 		applicationId, _ = system.RandomUUID()
+		addressId, _ = system.RandomUUID()
 		validAddress = shared.Address{AddressKeysValues: map[string]string{"City": "Christchurch"}}
 	})
 
@@ -134,6 +115,109 @@ var _ = Describe("Create method behaviour", func() {
 			Expect(err).To(Equal(expectedError))
 		})
 	})
+
+	Context("when creating new address", func() {
+		It("should insert the record into address table", func() {
+			mockUUIDGeneratorService.
+				EXPECT().
+				GenerateRandomUUID().
+				Return(addressId, nil)
+
+			expectedAddressKeysValues := make(map[string]string)
+
+			for idx := 0; idx < rand.Intn(10)+1; idx++ {
+				key, _ := system.RandomUUID()
+				value, _ := system.RandomUUID()
+
+				expectedAddressKeysValues[key.String()] = value.String()
+			}
+
+			addressDataService.Create(tenantId, applicationId, shared.Address{AddressKeysValues: expectedAddressKeysValues})
+
+			config := getClusterConfig()
+			config.Keyspace = keyspace
+
+			session, err := config.CreateSession()
+
+			Expect(err).To(BeNil())
+
+			defer session.Close()
+
+			iter := session.Query(
+				"SELECT address_key, address_value"+
+					" FROM address"+
+					" WHERE"+
+					" tenant_id = ?"+
+					" AND application_id = ?"+
+					" AND address_id = ?",
+				tenantId.String(),
+				applicationId.String(),
+				addressId.String()).Iter()
+
+			var key string
+			var value string
+
+			addressKeysValues := make(map[string]string)
+
+			for iter.Scan(&key, &value) {
+				addressKeysValues[key] = value
+			}
+
+			err = iter.Close()
+
+			Expect(err).To(BeNil())
+
+			Expect(expectedAddressKeysValues).To(Equal(addressKeysValues))
+		})
+
+		It("should insert the record into address_indexed_by_address_key table", func() {
+			mockUUIDGeneratorService.
+				EXPECT().
+				GenerateRandomUUID().
+				Return(addressId, nil)
+
+			expectedAddressKeysValues := make(map[string]string)
+
+			for idx := 0; idx < rand.Intn(10)+1; idx++ {
+				key, _ := system.RandomUUID()
+				value, _ := system.RandomUUID()
+
+				expectedAddressKeysValues[key.String()] = value.String()
+			}
+
+			addressDataService.Create(tenantId, applicationId, shared.Address{AddressKeysValues: expectedAddressKeysValues})
+
+			config := getClusterConfig()
+			config.Keyspace = keyspace
+
+			session, err := config.CreateSession()
+
+			Expect(err).To(BeNil())
+
+			defer session.Close()
+
+			for key, value := range expectedAddressKeysValues {
+				var id gocql.UUID
+				var addressValue string
+
+				err = session.Query(
+					"SELECT address_id, address_value"+
+						" FROM address_indexed_by_address_key"+
+						" WHERE"+
+						" tenant_id = ?"+
+						" AND application_id = ?"+
+						" AND address_key = ?",
+					tenantId.String(),
+					applicationId.String(),
+					key).Scan(&id, &addressValue)
+
+				Expect(err).To(BeNil())
+
+				Expect(addressId).To(Equal(mapGocqlUUIDToSystemUUID(id)))
+				Expect(value).To(Equal(addressValue))
+			}
+		})
+	})
 })
 
 func getClusterConfig() *gocql.ClusterConfig {
@@ -156,6 +240,40 @@ func getClusterConfig() *gocql.ClusterConfig {
 	config.Consistency = gocql.Quorum
 
 	return config
+}
+
+func createAddressKeyspaceAndAllRequiredTables(session *gocql.Session, keyspace string) {
+	Expect(session.Query(
+		"CREATE KEYSPACE " +
+			keyspace +
+			" with replication = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };").
+		Exec()).To(BeNil())
+
+	Expect(session.Query(
+		"CREATE TABLE " +
+			keyspace +
+			".address(tenant_id UUID, application_id UUID, address_id UUID, address_key text, address_value text," +
+			" PRIMARY KEY(tenant_id, application_id, address_id, address_key));").
+		Exec()).To(BeNil())
+
+	Expect(session.Query(
+		"CREATE TABLE " +
+			keyspace +
+			".address_indexed_by_address_key(tenant_id UUID, application_id UUID, address_id UUID, address_key text, address_value text," +
+			" PRIMARY KEY(tenant_id, application_id, address_key, address_id));").
+		Exec()).To(BeNil())
+}
+
+func mapSystemUUIDToGocqlUUID(uuid system.UUID) gocql.UUID {
+	mappedUUID, _ := gocql.UUIDFromBytes(uuid.Bytes())
+
+	return mappedUUID
+}
+
+func mapGocqlUUIDToSystemUUID(uuid gocql.UUID) system.UUID {
+	mappedUUID, _ := system.UUIDFromBytes(uuid.Bytes())
+
+	return mappedUUID
 }
 
 func TestCreateIntegration(t *testing.T) {

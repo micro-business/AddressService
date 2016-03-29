@@ -102,7 +102,7 @@ var _ = Describe("Read method behaviour", func() {
 		It("should return no error", func() {
 			addressKeysValues := make(map[string]string)
 
-			for idx := 0; idx < rand.Intn(10); idx++ {
+			for idx := 0; idx < rand.Intn(10)+1; idx++ {
 				key, _ := system.RandomUUID()
 				value, _ := system.RandomUUID()
 

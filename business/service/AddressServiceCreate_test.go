@@ -106,7 +106,7 @@ var _ = Describe("Create method behaviour", func() {
 		It("should return the returned address unique identifier by address data service and no error", func() {
 			addressKeysValues := make(map[string]string)
 
-			for idx := 0; idx < rand.Intn(10); idx++ {
+			for idx := 0; idx < rand.Intn(10)+1; idx++ {
 				key, _ := system.RandomUUID()
 				value, _ := system.RandomUUID()
 
