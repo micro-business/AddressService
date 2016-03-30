@@ -4,7 +4,6 @@ package service_test
 
 import (
 	"errors"
-	"math/rand"
 	"testing"
 
 	"github.com/gocql/gocql"
@@ -33,7 +32,7 @@ var _ = Describe("Create method behaviour", func() {
 	BeforeEach(func() {
 		keyspace = createRandomKeyspace()
 
-		createAddressKeyspaceAndAllRequiredTablesForCreateTest(keyspace)
+		createAddressKeyspaceAndAllRequiredTables(keyspace)
 
 		clusterConfig = getClusterConfig()
 		clusterConfig.Keyspace = keyspace
@@ -92,14 +91,7 @@ var _ = Describe("Create method behaviour", func() {
 				GenerateRandomUUID().
 				Return(addressId, nil)
 
-			expectedAddressKeysValues := make(map[string]string)
-
-			for idx := 0; idx < rand.Intn(10)+1; idx++ {
-				key, _ := system.RandomUUID()
-				value, _ := system.RandomUUID()
-
-				expectedAddressKeysValues[key.String()] = value.String()
-			}
+			expectedAddressKeysValues := createRandomAddressKeyValues()
 
 			returnedAddressId, err := addressDataService.Create(
 				tenantId,
@@ -151,14 +143,7 @@ var _ = Describe("Create method behaviour", func() {
 				GenerateRandomUUID().
 				Return(addressId, nil)
 
-			expectedAddressKeysValues := make(map[string]string)
-
-			for idx := 0; idx < rand.Intn(10)+1; idx++ {
-				key, _ := system.RandomUUID()
-				value, _ := system.RandomUUID()
-
-				expectedAddressKeysValues[key.String()] = value.String()
-			}
+			expectedAddressKeysValues := createRandomAddressKeyValues()
 
 			addressDataService.Create(tenantId, applicationId, shared.Address{AddressKeysValues: expectedAddressKeysValues})
 
@@ -194,36 +179,6 @@ var _ = Describe("Create method behaviour", func() {
 		})
 	})
 })
-
-func createAddressKeyspaceAndAllRequiredTablesForCreateTest(keyspace string) {
-	config := getClusterConfig()
-	config.Timeout = databasePreparationMaxTimeout
-	session, err := config.CreateSession()
-
-	Expect(err).To(BeNil())
-
-	defer session.Close()
-
-	Expect(session.Query(
-		"CREATE KEYSPACE " +
-			keyspace +
-			" with replication = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };").
-		Exec()).To(BeNil())
-
-	Expect(session.Query(
-		"CREATE TABLE " +
-			keyspace +
-			".address(tenant_id UUID, application_id UUID, address_id UUID, address_key text, address_value text," +
-			" PRIMARY KEY(tenant_id, application_id, address_id, address_key));").
-		Exec()).To(BeNil())
-
-	Expect(session.Query(
-		"CREATE TABLE " +
-			keyspace +
-			".address_indexed_by_address_key(tenant_id UUID, application_id UUID, address_id UUID, address_key text, address_value text," +
-			" PRIMARY KEY(tenant_id, application_id, address_key, address_id));").
-		Exec()).To(BeNil())
-}
 
 func TestCreateBehaviour(t *testing.T) {
 	RegisterFailHandler(Fail)
