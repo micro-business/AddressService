@@ -23,7 +23,6 @@ var _ = Describe("Delete method behaviour", func() {
 		tenantId                 system.UUID
 		applicationId            system.UUID
 		addressId                system.UUID
-		validAddress             shared.Address
 		clusterConfig            *gocql.ClusterConfig
 		keyspace                 string
 	)
@@ -44,7 +43,6 @@ var _ = Describe("Delete method behaviour", func() {
 		tenantId, _ = system.RandomUUID()
 		applicationId, _ = system.RandomUUID()
 		addressId, _ = system.RandomUUID()
-		validAddress = shared.Address{AddressKeysValues: map[string]string{"City": "Christchurch"}}
 	})
 
 	AfterEach(func() {
@@ -53,7 +51,7 @@ var _ = Describe("Delete method behaviour", func() {
 	})
 
 	Context("when deleting existing address", func() {
-		It("should remove the record from address table", func() {
+		It("should remove the records from address table", func() {
 			mockUUIDGeneratorService.
 				EXPECT().
 				GenerateRandomUUID().
@@ -87,7 +85,7 @@ var _ = Describe("Delete method behaviour", func() {
 			var key string
 			var value string
 
-			Expect(session.Query(
+			iter := session.Query(
 				"SELECT address_key, address_value"+
 					" FROM address"+
 					" WHERE"+
@@ -96,7 +94,11 @@ var _ = Describe("Delete method behaviour", func() {
 					" AND address_id = ?",
 				tenantId.String(),
 				applicationId.String(),
-				returnedAddressId.String()).Iter().Scan(&key, &value)).To(BeFalse())
+				returnedAddressId.String()).Iter()
+
+			defer iter.Close()
+
+			Expect(iter.Scan(&key, &value)).To(BeFalse())
 		})
 
 		It("should remove all the index records from address_indexed_by_address_key table", func() {
@@ -134,7 +136,7 @@ var _ = Describe("Delete method behaviour", func() {
 				var id gocql.UUID
 				var addressValue string
 
-				Expect(session.Query(
+				iter := session.Query(
 					"SELECT address_id, address_value"+
 						" FROM address_indexed_by_address_key"+
 						" WHERE"+
@@ -143,7 +145,11 @@ var _ = Describe("Delete method behaviour", func() {
 						" AND address_key = ?",
 					tenantId.String(),
 					applicationId.String(),
-					key).Iter().Scan(&id, &addressValue)).To(BeFalse())
+					key).Iter()
+
+				defer iter.Close()
+
+				Expect(iter.Scan(&id, &addressValue)).To(BeFalse())
 
 			}
 		})

@@ -23,7 +23,6 @@ var _ = Describe("Read method behaviour", func() {
 		tenantId                 system.UUID
 		applicationId            system.UUID
 		addressId                system.UUID
-		validAddress             shared.Address
 		clusterConfig            *gocql.ClusterConfig
 		keyspace                 string
 	)
@@ -44,7 +43,6 @@ var _ = Describe("Read method behaviour", func() {
 		tenantId, _ = system.RandomUUID()
 		applicationId, _ = system.RandomUUID()
 		addressId, _ = system.RandomUUID()
-		validAddress = shared.Address{AddressKeysValues: map[string]string{"City": "Christchurch"}}
 	})
 
 	AfterEach(func() {
