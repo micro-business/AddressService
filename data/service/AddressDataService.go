@@ -47,6 +47,116 @@ func (addressDataService *AddressDataService) Create(tenantId, applicationId sys
 
 	defer session.Close()
 
+	if err = addNewAddress(tenantId, applicationId, address, addressId, session); err != nil {
+		return system.EmptyUUID, err
+	}
+
+	return addressId, nil
+}
+
+// Update updates an existing address.
+// tenantId: Mandatory. The unique identifier of the tenant owning the address.
+// applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
+// addressId: Mandatory. The unique identifier of the existing address.
+// address: Mandatory. The reeference to the updated address information.
+// Returns error if something goes wrong.
+func (addressDataService *AddressDataService) Update(tenantId, applicationId, addressId system.UUID, address shared.Address) error {
+	err := addressDataService.Delete(tenantId, applicationId, addressId)
+
+	if err != nil {
+		return err
+	}
+
+	session, err := addressDataService.ClusterConfig.CreateSession()
+
+	if err != nil {
+		return err
+	}
+
+	defer session.Close()
+
+	return addNewAddress(tenantId, applicationId, address, addressId, session)
+}
+
+// Read retrieves an existing address information and returns the detail of it.
+// tenantId: Mandatory. The unique identifier of the tenant owning the address.
+// applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
+// addressId: Mandatory. The unique identifier of the existing address.
+// Returns either the address information or error if something goes wrong.
+func (addressDataService *AddressDataService) Read(tenantId, applicationId, addressId system.UUID) (shared.Address, error) {
+	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
+	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
+	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
+
+	session, err := addressDataService.ClusterConfig.CreateSession()
+
+	if err != nil {
+		return shared.Address{}, err
+	}
+
+	defer session.Close()
+
+	iter := session.Query(
+		"SELECT address_key, address_value"+
+			" FROM address"+
+			" WHERE"+
+			" tenant_id = ?"+
+			" AND application_id = ?"+
+			" AND address_id = ?",
+		tenantId.String(),
+		applicationId.String(),
+		addressId.String()).Iter()
+
+	var key string
+	var value string
+
+	address := shared.Address{AddressKeysValues: make(map[string]string)}
+
+	for iter.Scan(&key, &value) {
+		address.AddressKeysValues[key] = value
+	}
+
+	return address, nil
+}
+
+// Delete deletes an existing address information.
+// tenantId: Mandatory. The unique identifier of the tenant owning the address.
+// applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
+// addressId: Mandatory. The unique identifier of the existing address to remove.
+// Returns error if something goes wrong.
+func (addressDataService *AddressDataService) Delete(tenantId, applicationId, addressId system.UUID) error {
+	address, err := addressDataService.Read(tenantId, applicationId, addressId)
+
+	if err != nil {
+		return err
+	}
+
+	session, err := addressDataService.ClusterConfig.CreateSession()
+
+	if err != nil {
+		return err
+	}
+
+	defer session.Close()
+
+	return removeExistingAddress(tenantId, applicationId, address, addressId, session)
+}
+
+// mapSystemUUIDToGocqlUUID maps the system type UUID to gocql UUID type
+func mapSystemUUIDToGocqlUUID(uuid system.UUID) gocql.UUID {
+	mappedUUID, _ := gocql.UUIDFromBytes(uuid.Bytes())
+
+	return mappedUUID
+}
+
+// addNewAddress adds new address to address table
+func addNewAddress(
+	tenantId, applicationId system.UUID,
+	address shared.Address,
+	addressId system.UUID,
+	session *gocql.Session) error {
+	addressKeysValuesCount := len(address.AddressKeysValues)
+
 	errorChannel := make(chan error, addressKeysValuesCount*2)
 
 	mappedTenantId := mapSystemUUIDToGocqlUUID(tenantId)
@@ -98,60 +208,73 @@ func (addressDataService *AddressDataService) Create(tenantId, applicationId sys
 	}
 
 	if errorFound {
-		return system.EmptyUUID, errors.New(errorMessage)
+		return errors.New(errorMessage)
 	}
 
-	return addressId, nil
+	return nil
+
 }
 
-// Update updates an existing address.
-// tenantId: Mandatory. The unique identifier of the tenant owning the address.
-// applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
-// addressId: Mandatory. The unique identifier of the existing address.
-// address: Mandatory. The reeference to the updated address information.
-// Returns error if something goes wrong.
-func (addressDataService *AddressDataService) Update(tenantId, applicationId, addressId system.UUID, address shared.Address) error {
-	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
-	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
+// addNewAddress adds new address to address table
+func removeExistingAddress(
+	tenantId, applicationId system.UUID,
+	address shared.Address,
+	addressId system.UUID,
+	session *gocql.Session) error {
+	addressKeysValuesCount := len(address.AddressKeysValues)
 
-	if len(address.AddressKeysValues) == 0 {
-		panic("Address does not contain any address key.")
+	errorChannel := make(chan error, addressKeysValuesCount+1)
+
+	mappedTenantId := mapSystemUUIDToGocqlUUID(tenantId)
+	mappedApplicationId := mapSystemUUIDToGocqlUUID(applicationId)
+	mappedAddressId := mapSystemUUIDToGocqlUUID(addressId)
+
+	var waitGroup sync.WaitGroup
+
+	waitGroup.Add(1)
+
+	go removeFromAddressTable(
+		session,
+		errorChannel,
+		&waitGroup,
+		mappedTenantId,
+		mappedApplicationId,
+		mappedAddressId)
+
+	for key, _ := range address.AddressKeysValues {
+		waitGroup.Add(1)
+
+		go removeFromIndexByAddressKeyTable(
+			session,
+			errorChannel,
+			&waitGroup,
+			mappedTenantId,
+			mappedApplicationId,
+			mappedAddressId,
+			key)
 	}
 
-	panic("Not Implemented")
-}
+	go func() {
+		waitGroup.Wait()
+		close(errorChannel)
+	}()
 
-// Read retrieves an existing address information and returns the detail of it.
-// tenantId: Mandatory. The unique identifier of the tenant owning the address.
-// applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
-// addressId: Mandatory. The unique identifier of the existing address.
-// Returns either the address information or error if something goes wrong.
-func (addressDataService *AddressDataService) Read(tenantId, applicationId, addressId system.UUID) (shared.Address, error) {
-	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
-	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
-	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
+	errorMessage := ""
+	errorFound := false
 
-	panic("Not Implemented")
-}
+	for err := range errorChannel {
+		if err != nil {
+			errorMessage += err.Error()
+			errorMessage += "\n"
+			errorFound = true
+		}
+	}
 
-// Delete deletes an existing address information.
-// tenantId: Mandatory. The unique identifier of the tenant owning the address.
-// applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
-// addressId: Mandatory. The unique identifier of the existing address to remove.
-// Returns error if something goes wrong.
-func (addressDataService *AddressDataService) Delete(tenantId, applicationId, addressId system.UUID) error {
-	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
-	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
-	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId  must be provided.")
+	if errorFound {
+		return errors.New(errorMessage)
+	}
 
-	panic("Not Implemented")
-}
-
-// mapSystemUUIDToGocqlUUID maps the system type UUID to gocql UUID type
-func mapSystemUUIDToGocqlUUID(uuid system.UUID) gocql.UUID {
-	mappedUUID, _ := gocql.UUIDFromBytes(uuid.Bytes())
-
-	return mappedUUID
+	return nil
 }
 
 // addToAddressTable adds new address key/value to address table using provided address unique identifier.
@@ -199,6 +322,58 @@ func addToAddressIndexByAddressKeyTable(
 		addressId,
 		key,
 		value).
+		Exec(); err != nil {
+		errorChannel <- err
+	} else {
+		errorChannel <- nil
+	}
+}
+
+// removeFromAddressTable removes an existing address from address table using provided address unique identifier.
+func removeFromAddressTable(
+	session *gocql.Session,
+	errorChannel chan<- error,
+	waitGroup *sync.WaitGroup,
+	tenantId, applicationId, addressId gocql.UUID) {
+
+	defer waitGroup.Done()
+
+	if err := session.Query(
+		"DELETE address WHERE"+
+			" tenant_id = ?"+
+			" AND application_id = ?"+
+			" AND address_id = ?)",
+		tenantId,
+		applicationId,
+		addressId).
+		Exec(); err != nil {
+		errorChannel <- err
+	} else {
+		errorChannel <- nil
+	}
+}
+
+// removeFromIndexByAddressKeyTable removes an address key from index table.
+func removeFromIndexByAddressKeyTable(
+	session *gocql.Session,
+	errorChannel chan<- error,
+	waitGroup *sync.WaitGroup,
+	tenantId, applicationId, addressId gocql.UUID,
+	key string) {
+
+	defer waitGroup.Done()
+
+	if err := session.Query(
+		"DELETE address_indexed_by_address_key"+
+			" WHERE"+
+			" tenant_id = ? "+
+			" AND application_id = ?"+
+			" AND address_id = ?"+
+			" AND address_key = ?)",
+		tenantId,
+		applicationId,
+		addressId,
+		key).
 		Exec(); err != nil {
 		errorChannel <- err
 	} else {
