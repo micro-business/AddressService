@@ -61,6 +61,15 @@ func (addressDataService *AddressDataService) Create(tenantId, applicationId sys
 // address: Mandatory. The reeference to the updated address information.
 // Returns error if something goes wrong.
 func (addressDataService *AddressDataService) Update(tenantId, applicationId, addressId system.UUID, address shared.Address) error {
+	diagnostics.IsNotNil(addressDataService.ClusterConfig, "addressDataService.ClusterConfig", "ClusterConfig must be provided.")
+	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
+	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
+	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
+
+	if len(address.AddressKeysValues) == 0 {
+		panic("Address does not contain any address key.")
+	}
+
 	err := addressDataService.Delete(tenantId, applicationId, addressId)
 
 	if err != nil {
@@ -84,6 +93,7 @@ func (addressDataService *AddressDataService) Update(tenantId, applicationId, ad
 // addressId: Mandatory. The unique identifier of the existing address.
 // Returns either the address information or error if something goes wrong.
 func (addressDataService *AddressDataService) Read(tenantId, applicationId, addressId system.UUID) (shared.Address, error) {
+	diagnostics.IsNotNil(addressDataService.ClusterConfig, "addressDataService.ClusterConfig", "ClusterConfig must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
 	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
 	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
@@ -125,6 +135,11 @@ func (addressDataService *AddressDataService) Read(tenantId, applicationId, addr
 // addressId: Mandatory. The unique identifier of the existing address to remove.
 // Returns error if something goes wrong.
 func (addressDataService *AddressDataService) Delete(tenantId, applicationId, addressId system.UUID) error {
+	diagnostics.IsNotNil(addressDataService.ClusterConfig, "addressDataService.ClusterConfig", "ClusterConfig must be provided.")
+	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
+	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
+	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
+
 	address, err := addressDataService.Read(tenantId, applicationId, addressId)
 
 	if err != nil {
@@ -339,10 +354,11 @@ func removeFromAddressTable(
 	defer waitGroup.Done()
 
 	if err := session.Query(
-		"DELETE address WHERE"+
+		"DELETE FROM address"+
+			" WHERE"+
 			" tenant_id = ?"+
 			" AND application_id = ?"+
-			" AND address_id = ?)",
+			" AND address_id = ?",
 		tenantId,
 		applicationId,
 		addressId).
@@ -364,12 +380,12 @@ func removeFromIndexByAddressKeyTable(
 	defer waitGroup.Done()
 
 	if err := session.Query(
-		"DELETE address_indexed_by_address_key"+
+		"DELETE FROM address_indexed_by_address_key"+
 			" WHERE"+
 			" tenant_id = ? "+
 			" AND application_id = ?"+
 			" AND address_id = ?"+
-			" AND address_key = ?)",
+			" AND address_key = ?",
 		tenantId,
 		applicationId,
 		addressId,

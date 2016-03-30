@@ -10,10 +10,11 @@ import (
 	"github.com/microbusinesses/AddressService/data/shared"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Create method input parameters", func() {
+var _ = Describe("Create method input parameters and dependency test", func() {
 	var (
 		mockCtrl                 *gomock.Controller
 		addressDataService       *service.AddressDataService
@@ -56,26 +57,16 @@ var _ = Describe("Create method input parameters", func() {
 		})
 	})
 
-	Context("when empty tenant unique identifier provided", func() {
-		It("should panic", func() {
-			Ω(func() { addressDataService.Create(system.EmptyUUID, applicationId, validAddress) }).Should(Panic())
-		})
-	})
-
-	Context("when empty application unique identifier provided", func() {
-		It("should panic", func() {
-			Ω(func() { addressDataService.Create(tenantId, system.EmptyUUID, validAddress) }).Should(Panic())
-		})
-	})
-
-	Context("when address without address key provided", func() {
-		It("should panic", func() {
-			Ω(func() { addressDataService.Create(tenantId, applicationId, emptyAddress) }).Should(Panic())
-		})
-	})
+	DescribeTable("Input Parameters",
+		func(tenantId, applicationId system.UUID, address shared.Address) {
+			Ω(func() { addressDataService.Create(tenantId, applicationId, address) }).Should(Panic())
+		},
+		Entry("should panic when empty tenant unique identifier provided", system.EmptyUUID, applicationId, validAddress),
+		Entry("should panic when empty application unique identifier provided", tenantId, system.EmptyUUID, validAddress),
+		Entry("should panic when address without address key provided", tenantId, applicationId, emptyAddress))
 })
 
 func TestCreate(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Create method input parameters")
+	RunSpecs(t, "Create method input parameters and dependency test")
 }

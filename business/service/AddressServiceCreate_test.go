@@ -12,10 +12,11 @@ import (
 	dataShared "github.com/microbusinesses/AddressService/data/shared"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Create method input parameters", func() {
+var _ = Describe("Create method input parameters and dependency test", func() {
 	var (
 		mockCtrl               *gomock.Controller
 		addressService         *service.AddressService
@@ -50,23 +51,13 @@ var _ = Describe("Create method input parameters", func() {
 		})
 	})
 
-	Context("when empty tenant unique identifier provided", func() {
-		It("should panic", func() {
-			Ω(func() { addressService.Create(system.EmptyUUID, applicationId, validAddress) }).Should(Panic())
-		})
-	})
-
-	Context("when empty application unique identifier provided", func() {
-		It("should panic", func() {
-			Ω(func() { addressService.Create(tenantId, system.EmptyUUID, validAddress) }).Should(Panic())
-		})
-	})
-
-	Context("when address without address key provided", func() {
-		It("should panic", func() {
-			Ω(func() { addressService.Create(tenantId, applicationId, emptyAddress) }).Should(Panic())
-		})
-	})
+	DescribeTable("Input Parameters",
+		func(tenantId, applicationId system.UUID, address domain.Address) {
+			Ω(func() { addressService.Create(tenantId, applicationId, address) }).Should(Panic())
+		},
+		Entry("should panic when empty tenant unique identifier provided", system.EmptyUUID, applicationId, validAddress),
+		Entry("should panic when empty application unique identifier provided", tenantId, system.EmptyUUID, validAddress),
+		Entry("should panic when address without address key provided", tenantId, applicationId, emptyAddress))
 })
 
 var _ = Describe("Create method behaviour", func() {
@@ -149,6 +140,6 @@ var _ = Describe("Create method behaviour", func() {
 
 func TestCreate(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Create method input parameters")
+	RunSpecs(t, "Create method input parameters and dependency test")
 	RunSpecs(t, "Create method behaviour")
 }

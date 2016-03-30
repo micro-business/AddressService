@@ -3,13 +3,15 @@ package service_test
 import (
 	"testing"
 
+	"github.com/gocql/gocql"
 	"github.com/microbusinesses/AddressService/data/service"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Read method input parameters", func() {
+var _ = Describe("Read method input parameters and dependency test", func() {
 	var (
 		addressDataService *service.AddressDataService
 		tenantId           system.UUID
@@ -18,32 +20,32 @@ var _ = Describe("Read method input parameters", func() {
 	)
 
 	BeforeEach(func() {
+		addressDataService = &service.AddressDataService{ClusterConfig: &gocql.ClusterConfig{}}
+
 		addressDataService = &service.AddressDataService{}
 		tenantId, _ = system.RandomUUID()
 		applicationId, _ = system.RandomUUID()
 		addressId, _ = system.RandomUUID()
 	})
 
-	Context("when empty tenant unique identifier provided", func() {
+	Context("when cluster configuration not provided", func() {
 		It("should panic", func() {
-			Ω(func() { addressDataService.Read(system.EmptyUUID, applicationId, addressId) }).Should(Panic())
+			addressDataService.ClusterConfig = nil
+
+			Ω(func() { addressDataService.Read(tenantId, applicationId, addressId) }).Should(Panic())
 		})
 	})
 
-	Context("when empty tenant unique identifier provided", func() {
-		It("should panic", func() {
-			Ω(func() { addressDataService.Read(tenantId, system.EmptyUUID, addressId) }).Should(Panic())
-		})
-	})
-
-	Context("when empty address unique identifier provided", func() {
-		It("should panic", func() {
-			Ω(func() { addressDataService.Read(tenantId, applicationId, system.EmptyUUID) }).Should(Panic())
-		})
-	})
+	DescribeTable("Input Parameters",
+		func(tenantId, applicationId, addressId system.UUID) {
+			Ω(func() { addressDataService.Read(tenantId, applicationId, addressId) }).Should(Panic())
+		},
+		Entry("should panic when empty tenant unique identifier provided", system.EmptyUUID, applicationId, addressId),
+		Entry("should panic when empty application unique identifier provided", tenantId, system.EmptyUUID, addressId),
+		Entry("should panic when empty address unique identifier provided", tenantId, applicationId, system.EmptyUUID))
 })
 
 func TestRead(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Read method input parameters")
+	RunSpecs(t, "Read method input parameters and dependency test")
 }

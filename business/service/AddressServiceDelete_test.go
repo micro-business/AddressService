@@ -9,10 +9,11 @@ import (
 	dataServiceMocks "github.com/microbusinesses/AddressService/data/contract/mocks"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Delete method input parameters", func() {
+var _ = Describe("Delete method input parameters and dependency test", func() {
 	var (
 		mockCtrl               *gomock.Controller
 		addressService         *service.AddressService
@@ -45,23 +46,13 @@ var _ = Describe("Delete method input parameters", func() {
 		})
 	})
 
-	Context("when empty tenant unique identifier provided", func() {
-		It("should panic", func() {
-			Ω(func() { addressService.Delete(system.EmptyUUID, applicationId, addressId) }).Should(Panic())
-		})
-	})
-
-	Context("when empty application unique identifier provided", func() {
-		It("should panic", func() {
-			Ω(func() { addressService.Delete(tenantId, system.EmptyUUID, addressId) }).Should(Panic())
-		})
-	})
-
-	Context("when empty address unique identifier provided", func() {
-		It("should panic", func() {
-			Ω(func() { addressService.Delete(tenantId, applicationId, system.EmptyUUID) }).Should(Panic())
-		})
-	})
+	DescribeTable("Input Parameters",
+		func(tenantId, applicationId, addressId system.UUID) {
+			Ω(func() { addressService.Delete(tenantId, applicationId, addressId) }).Should(Panic())
+		},
+		Entry("should panic when empty tenant unique identifier provided", system.EmptyUUID, applicationId, addressId),
+		Entry("should panic when empty application unique identifier provided", tenantId, system.EmptyUUID, addressId),
+		Entry("should panic when empty address unique identifier provided", tenantId, applicationId, system.EmptyUUID))
 })
 
 var _ = Describe("Delete method behaviour", func() {
@@ -126,6 +117,6 @@ var _ = Describe("Delete method behaviour", func() {
 
 func TestDelete(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Delete method input parameters")
+	RunSpecs(t, "Delete method input parameters and dependency test")
 	RunSpecs(t, "Delete method behaviour")
 }

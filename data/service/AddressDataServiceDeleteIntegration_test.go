@@ -3,7 +3,6 @@
 package service_test
 
 import (
-	"errors"
 	"math/rand"
 	"testing"
 
@@ -17,7 +16,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Create method behaviour", func() {
+var _ = Describe("Delete method behaviour", func() {
 	var (
 		mockCtrl                 *gomock.Controller
 		addressDataService       *service.AddressDataService
@@ -33,7 +32,7 @@ var _ = Describe("Create method behaviour", func() {
 	BeforeEach(func() {
 		keyspace = createRandomKeyspace()
 
-		createAddressKeyspaceAndAllRequiredTablesForCreateTest(keyspace)
+		createAddressKeyspaceAndAllRequiredTablesForDeleteTest(keyspace)
 
 		clusterConfig = getClusterConfig()
 		clusterConfig.Keyspace = keyspace
@@ -54,39 +53,8 @@ var _ = Describe("Create method behaviour", func() {
 		dropKeyspace(keyspace)
 	})
 
-	Context("when UUID generator service succeeds to create the new UUID", func() {
-		It("should return the new UUID as address uniuqe identifier and no error", func() {
-			expectedAddressId, _ := system.RandomUUID()
-			mockUUIDGeneratorService.
-				EXPECT().
-				GenerateRandomUUID().
-				Return(expectedAddressId, nil)
-
-			newAddressId, err := addressDataService.Create(tenantId, applicationId, validAddress)
-
-			Expect(newAddressId).To(Equal(newAddressId))
-			Expect(err).To(BeNil())
-		})
-	})
-
-	Context("when UUID generator service fails to create the new UUID", func() {
-		It("should return address unique identifier as empty UUID and the returned error by address data service", func() {
-			expectedErrorId, _ := system.RandomUUID()
-			expectedError := errors.New(expectedErrorId.String())
-			mockUUIDGeneratorService.
-				EXPECT().
-				GenerateRandomUUID().
-				Return(system.EmptyUUID, expectedError)
-
-			newAddressId, err := addressDataService.Create(tenantId, applicationId, validAddress)
-
-			Expect(newAddressId).To(Equal(system.EmptyUUID))
-			Expect(err).To(Equal(expectedError))
-		})
-	})
-
-	Context("when creating new address", func() {
-		It("should insert the record into address table", func() {
+	Context("when deleting existing address", func() {
+		It("should remove the record from address table", func() {
 			mockUUIDGeneratorService.
 				EXPECT().
 				GenerateRandomUUID().
@@ -106,7 +74,13 @@ var _ = Describe("Create method behaviour", func() {
 				applicationId,
 				shared.Address{AddressKeysValues: expectedAddressKeysValues})
 
-			Expect(addressId).To(Equal(returnedAddressId))
+			Expect(err).To(BeNil())
+
+			err = addressDataService.Delete(
+				tenantId,
+				applicationId,
+				returnedAddressId)
+
 			Expect(err).To(BeNil())
 
 			config := getClusterConfig()
@@ -118,7 +92,10 @@ var _ = Describe("Create method behaviour", func() {
 
 			defer session.Close()
 
-			iter := session.Query(
+			var key string
+			var value string
+
+			Expect(session.Query(
 				"SELECT address_key, address_value"+
 					" FROM address"+
 					" WHERE"+
@@ -127,25 +104,10 @@ var _ = Describe("Create method behaviour", func() {
 					" AND address_id = ?",
 				tenantId.String(),
 				applicationId.String(),
-				addressId.String()).Iter()
-
-			var key string
-			var value string
-
-			addressKeysValues := make(map[string]string)
-
-			for iter.Scan(&key, &value) {
-				addressKeysValues[key] = value
-			}
-
-			err = iter.Close()
-
-			Expect(err).To(BeNil())
-
-			Expect(expectedAddressKeysValues).To(Equal(addressKeysValues))
+				returnedAddressId.String()).Iter().Scan(&key, &value)).To(BeFalse())
 		})
 
-		It("should insert the record into address_indexed_by_address_key table", func() {
+		It("should remove all the index records from address_indexed_by_address_key table", func() {
 			mockUUIDGeneratorService.
 				EXPECT().
 				GenerateRandomUUID().
@@ -160,7 +122,19 @@ var _ = Describe("Create method behaviour", func() {
 				expectedAddressKeysValues[key.String()] = value.String()
 			}
 
-			addressDataService.Create(tenantId, applicationId, shared.Address{AddressKeysValues: expectedAddressKeysValues})
+			returnedAddressId, err := addressDataService.Create(
+				tenantId,
+				applicationId,
+				shared.Address{AddressKeysValues: expectedAddressKeysValues})
+
+			Expect(err).To(BeNil())
+
+			err = addressDataService.Delete(
+				tenantId,
+				applicationId,
+				returnedAddressId)
+
+			Expect(err).To(BeNil())
 
 			config := getClusterConfig()
 			config.Keyspace = keyspace
@@ -171,11 +145,11 @@ var _ = Describe("Create method behaviour", func() {
 
 			defer session.Close()
 
-			for key, value := range expectedAddressKeysValues {
+			for key, _ := range expectedAddressKeysValues {
 				var id gocql.UUID
 				var addressValue string
 
-				err = session.Query(
+				Expect(session.Query(
 					"SELECT address_id, address_value"+
 						" FROM address_indexed_by_address_key"+
 						" WHERE"+
@@ -184,18 +158,14 @@ var _ = Describe("Create method behaviour", func() {
 						" AND address_key = ?",
 					tenantId.String(),
 					applicationId.String(),
-					key).Scan(&id, &addressValue)
+					key).Iter().Scan(&id, &addressValue)).To(BeFalse())
 
-				Expect(err).To(BeNil())
-
-				Expect(addressId).To(Equal(mapGocqlUUIDToSystemUUID(id)))
-				Expect(value).To(Equal(addressValue))
 			}
 		})
 	})
 })
 
-func createAddressKeyspaceAndAllRequiredTablesForCreateTest(keyspace string) {
+func createAddressKeyspaceAndAllRequiredTablesForDeleteTest(keyspace string) {
 	config := getClusterConfig()
 	config.Timeout = databasePreparationMaxTimeout
 	session, err := config.CreateSession()
@@ -225,7 +195,7 @@ func createAddressKeyspaceAndAllRequiredTablesForCreateTest(keyspace string) {
 		Exec()).To(BeNil())
 }
 
-func TestCreateBehaviour(t *testing.T) {
+func TestDeleteBehaviour(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Create method behaviour")
+	RunSpecs(t, "Delete method behaviour")
 }
