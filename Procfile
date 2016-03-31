@@ -1,0 +1,1 @@
+web: AddressService -listening-port=8080 -cassandra-address=mortezaalizadeh.no-ip.biz
