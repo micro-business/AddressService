@@ -21,7 +21,7 @@ type AddressDataService struct {
 // applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
 // address: Mandatory. The reference to the new address information.
 // Returns either the unique identifier of the new address or error if something goes wrong.
-func (addressDataService *AddressDataService) Create(tenantId, applicationId system.UUID, address shared.Address) (system.UUID, error) {
+func (addressDataService AddressDataService) Create(tenantId, applicationId system.UUID, address shared.Address) (system.UUID, error) {
 	diagnostics.IsNotNil(addressDataService.UUIDGeneratorService, "addressDataService.UUIDGeneratorService", "UUIDGeneratorService must be provided.")
 	diagnostics.IsNotNil(addressDataService.ClusterConfig, "addressDataService.ClusterConfig", "ClusterConfig must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
@@ -60,7 +60,7 @@ func (addressDataService *AddressDataService) Create(tenantId, applicationId sys
 // addressId: Mandatory. The unique identifier of the existing address.
 // address: Mandatory. The reeference to the updated address information.
 // Returns error if something goes wrong.
-func (addressDataService *AddressDataService) Update(tenantId, applicationId, addressId system.UUID, address shared.Address) error {
+func (addressDataService AddressDataService) Update(tenantId, applicationId, addressId system.UUID, address shared.Address) error {
 	diagnostics.IsNotNil(addressDataService.ClusterConfig, "addressDataService.ClusterConfig", "ClusterConfig must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
 	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
@@ -92,7 +92,7 @@ func (addressDataService *AddressDataService) Update(tenantId, applicationId, ad
 // applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
 // addressId: Mandatory. The unique identifier of the existing address.
 // Returns either the address information or error if something goes wrong.
-func (addressDataService *AddressDataService) Read(tenantId, applicationId, addressId system.UUID) (shared.Address, error) {
+func (addressDataService AddressDataService) Read(tenantId, applicationId, addressId system.UUID) (shared.Address, error) {
 	diagnostics.IsNotNil(addressDataService.ClusterConfig, "addressDataService.ClusterConfig", "ClusterConfig must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
 	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
@@ -134,7 +134,7 @@ func (addressDataService *AddressDataService) Read(tenantId, applicationId, addr
 // applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
 // addressId: Mandatory. The unique identifier of the existing address to remove.
 // Returns error if something goes wrong.
-func (addressDataService *AddressDataService) Delete(tenantId, applicationId, addressId system.UUID) error {
+func (addressDataService AddressDataService) Delete(tenantId, applicationId, addressId system.UUID) error {
 	diagnostics.IsNotNil(addressDataService.ClusterConfig, "addressDataService.ClusterConfig", "ClusterConfig must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
 	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
