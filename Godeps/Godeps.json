@@ -1,0 +1,81 @@
+{
+	"ImportPath": "github.com/microbusinesses/AddressService",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v60",
+	"Deps": [
+		{
+			"ImportPath": "github.com/go-kit/kit/endpoint",
+			"Rev": "f2622b97da066cf274990ab46a68213e4d213265"
+		},
+		{
+			"ImportPath": "github.com/go-kit/kit/log",
+			"Rev": "f2622b97da066cf274990ab46a68213e4d213265"
+		},
+		{
+			"ImportPath": "github.com/go-kit/kit/transport/http",
+			"Rev": "f2622b97da066cf274990ab46a68213e4d213265"
+		},
+		{
+			"ImportPath": "github.com/go-logfmt/logfmt",
+			"Comment": "v0.1.0",
+			"Rev": "08ab82a63ef462ac643ec79e659f023891f588f5"
+		},
+		{
+			"ImportPath": "github.com/gocql/gocql",
+			"Comment": "pre-node-events-249-g2659724",
+			"Rev": "2659724a40b177e741232309c9fd64f007d84c11"
+		},
+		{
+			"ImportPath": "github.com/gocql/gocql/internal/lru",
+			"Comment": "pre-node-events-249-g2659724",
+			"Rev": "2659724a40b177e741232309c9fd64f007d84c11"
+		},
+		{
+			"ImportPath": "github.com/gocql/gocql/internal/murmur",
+			"Comment": "pre-node-events-249-g2659724",
+			"Rev": "2659724a40b177e741232309c9fd64f007d84c11"
+		},
+		{
+			"ImportPath": "github.com/gocql/gocql/internal/streams",
+			"Comment": "pre-node-events-249-g2659724",
+			"Rev": "2659724a40b177e741232309c9fd64f007d84c11"
+		},
+		{
+			"ImportPath": "github.com/golang/snappy",
+			"Rev": "5f1c01d9f64b941dd9582c638279d046eda6ca31"
+		},
+		{
+			"ImportPath": "github.com/hailocab/go-hostpool",
+			"Rev": "e80d13ce29ede4452c43dea11e79b9bc8a15b478"
+		},
+		{
+			"ImportPath": "github.com/kr/logfmt",
+			"Rev": "b84e30acd515aadc4b783ad4ff83aff3299bdfe0"
+		},
+		{
+			"ImportPath": "github.com/microbusinesses/Micro-Businesses-Core/common/diagnostics",
+			"Rev": "5135b13b26fef4a80a0cdecd93cfc963a406bfaa"
+		},
+		{
+			"ImportPath": "github.com/microbusinesses/Micro-Businesses-Core/system",
+			"Rev": "5135b13b26fef4a80a0cdecd93cfc963a406bfaa"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "31df19d69da8728e9220def59b80ee577c3e48bf"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context/ctxhttp",
+			"Rev": "31df19d69da8728e9220def59b80ee577c3e48bf"
+		},
+		{
+			"ImportPath": "gopkg.in/inf.v0",
+			"Rev": "3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4"
+		},
+		{
+			"ImportPath": "gopkg.in/stack.v1",
+			"Comment": "v1.4.0",
+			"Rev": "0585967eab0016c8e4e2d55ac20585b469574cec"
+		}
+	]
+}
