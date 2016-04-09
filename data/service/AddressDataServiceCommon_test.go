@@ -17,7 +17,7 @@ import (
 const databasePreparationMaxTimeout = time.Minute
 
 func getClusterConfig() *gocql.ClusterConfig {
-	cassandraIPAddress := os.Getenv("CASSANDRA_IP_ADDRESS")
+	cassandraIPAddress := os.Getenv("CASSANDRA_ADDRESS")
 
 	if len(cassandraIPAddress) == 0 {
 		cassandraIPAddress = "127.0.0.1"

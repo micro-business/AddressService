@@ -4,7 +4,6 @@ go:
 
 services:
   - cassandra
-  - docker
 
 script:
  - go test -v -tags=integration ./...
