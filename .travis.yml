@@ -7,9 +7,6 @@ go:
 services:
  - docker
 
-script:
- - go test -v -tags=integration ./...
-
 after_success:
   - CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build main.go
   - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
