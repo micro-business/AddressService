@@ -1,9 +1,12 @@
+sudo: required
+
 language: go
 go:
  - 1.6
 
 services:
-  - cassandra
+ - docker
+ - cassandra
 
 script:
  - go test -v -tags=integration ./...
