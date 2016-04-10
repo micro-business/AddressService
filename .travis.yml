@@ -10,7 +10,7 @@ services:
 after_success:
   - CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build main.go
   - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-  - export REPO=microbusinesses/AddressService
+  - export REPO=microbusinesses/address-service
   - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
   - docker build -f Dockerfile -t $REPO:$COMMIT .
   - docker tag $REPO:$COMMIT $REPO:$TAG
