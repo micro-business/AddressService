@@ -7,18 +7,20 @@ import (
 
 	httptransport "github.com/go-kit/kit/transport/http"
 	businessService "github.com/microbusinesses/AddressService/business/service"
+	"github.com/microbusinesses/AddressService/config"
 	"github.com/microbusinesses/AddressService/endpoint/transport"
 	"github.com/microbusinesses/Micro-Businesses-Core/common/diagnostics"
 	"golang.org/x/net/context"
 )
 
 type Endpoint struct {
-	ListeningPort  int
-	AddressService businessService.AddressService
+	ConfigurationReader config.ConfigurationReader
+	AddressService      businessService.AddressService
 }
 
 func (endpoint Endpoint) StartServer() {
 	diagnostics.IsNotNil(endpoint.AddressService, "endpoint.AddressService", "AddressService must be provided.")
+	diagnostics.IsNotNil(endpoint.ConfigurationReader, "endpoint.ConfigurationReader", "ConfigurationReader must be provided.")
 
 	ctx := context.Background()
 
@@ -29,7 +31,11 @@ func (endpoint Endpoint) StartServer() {
 			http.Handle(pattern, handler)
 		}
 
-		log.Fatal(http.ListenAndServe(":"+strconv.Itoa(endpoint.ListeningPort), nil))
+		if listeningPort, err := endpoint.ConfigurationReader.GetListeningPort(); err != nil {
+			log.Fatal(err.Error())
+		} else {
+			log.Fatal(http.ListenAndServe(":"+strconv.Itoa(listeningPort), nil))
+		}
 	}
 }
 

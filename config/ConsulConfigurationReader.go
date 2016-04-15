@@ -1,6 +1,8 @@
 package config
 
 import (
+	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -8,18 +10,29 @@ import (
 )
 
 type ConsulConfigurationReader struct {
-	ConsulAddress string
-	ConsulScheme  string
+	ConsulAddress                      string
+	ConsulScheme                       string
+	ListeningPortToOverride            int
+	CassandraHostsToOverride           []string
+	CassandraKeyspaceToOverride        string
+	CassandraProtocolVersionToOverride int
+}
+
+func (consul ConsulConfigurationReader) GetListeningPort() (int, error) {
+	if consul.ListeningPortToOverride != 0 {
+		return consul.ListeningPortToOverride, nil
+
+	} else {
+		return getInt(consul, "services/address-service/endpoint/listening-port")
+	}
 }
 
 func (consul ConsulConfigurationReader) GetCassandraHosts() ([]string, error) {
-	kv, err := getKV(consul)
-
-	if err != nil {
-		return nil, err
+	if len(consul.CassandraHostsToOverride) != 0 {
+		return consul.CassandraHostsToOverride, nil
 	}
 
-	keyPair, _, err := kv.Get("services/address-service/data/cassandra/hosts", nil)
+	keyPair, err := getKeyPair(consul, "services/address-service/data/cassandra/hosts")
 
 	if err != nil {
 		return nil, err
@@ -29,62 +42,19 @@ func (consul ConsulConfigurationReader) GetCassandraHosts() ([]string, error) {
 }
 
 func (consul ConsulConfigurationReader) GetCassandraKeyspace() (string, error) {
-	kv, err := getKV(consul)
-
-	if err != nil {
-		return "", err
-	}
-
-	keyPair, _, err := kv.Get("services/address-service/data/cassandra/keyspace", nil)
-
-	if err != nil {
-		return "", err
-	}
-
-	keyspace := ""
-
-	if keyPair == nil {
-		keyspace = "address"
+	if len(consul.CassandraKeyspaceToOverride) != 0 {
+		return consul.CassandraKeyspaceToOverride, nil
 	} else {
-		keyspace = string(keyPair.Value)
-
-		if len(keyspace) == 0 {
-			keyspace = "address"
-		}
+		return getString(consul, "services/address-service/data/cassandra/keyspace")
 	}
-
-	return keyspace, nil
 }
 
 func (consul ConsulConfigurationReader) GetCassandraProtocolVersion() (int, error) {
-	kv, err := getKV(consul)
-
-	if err != nil {
-		return 0, err
+	if consul.CassandraProtocolVersionToOverride != 0 {
+		return consul.CassandraProtocolVersionToOverride, nil
+	} else {
+		return getInt(consul, "services/address-service/data/cassandra/protocol-version")
 	}
-
-	keyPair, _, err := kv.Get("services/address-service/data/cassandra/protocol-version", nil)
-
-	if err != nil {
-		return 0, err
-	}
-
-	protocolVersion := 4
-
-	if keyPair != nil {
-		protocolVersionInString := string(keyPair.Value)
-
-		if len(protocolVersionInString) != 0 {
-			protocolVersion, err = strconv.Atoi(protocolVersionInString)
-
-			if err != nil {
-				return 0, err
-			}
-
-		}
-	}
-
-	return protocolVersion, nil
 }
 
 func getKV(consul ConsulConfigurationReader) (*api.KV, error) {
@@ -100,4 +70,64 @@ func getKV(consul ConsulConfigurationReader) (*api.KV, error) {
 	} else {
 		return client.KV(), nil
 	}
+}
+
+func getKeyPair(consul ConsulConfigurationReader, configKeyPath string) (*api.KVPair, error) {
+	kv, err := getKV(consul)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if keyPair, _, err := kv.Get(configKeyPath, nil); err != nil {
+		return nil, err
+	} else {
+		return keyPair, nil
+	}
+}
+
+func getInt(consul ConsulConfigurationReader, keyPath string) (int, error) {
+	keyPair, err := getKeyPair(consul, keyPath)
+
+	if err != nil {
+		return 0, err
+	}
+
+	if keyPair == nil {
+		return 0, errors.New(fmt.Sprintf("Consul key %s does not exist.", keyPath))
+
+	}
+
+	valueInString := string(keyPair.Value)
+
+	if len(valueInString) == 0 {
+		return 0, errors.New(fmt.Sprintf("Consul key %s is empty.", keyPath))
+
+	}
+
+	if value, err := strconv.Atoi(valueInString); err != nil {
+		return 0, err
+	} else {
+		if value == 0 {
+			return 0, errors.New(fmt.Sprintf("Consul key %s is zero.", keyPath))
+		}
+
+		return value, nil
+	}
+}
+
+func getString(consul ConsulConfigurationReader, keyPath string) (string, error) {
+	keyPair, err := getKeyPair(consul, keyPath)
+
+	if err != nil {
+		return "", err
+	}
+
+	if keyPair == nil {
+		return "", errors.New(fmt.Sprintf("Consul key %s does not exist.", keyPath))
+
+	}
+
+	return string(keyPair.Value), nil
+
 }
