@@ -6,52 +6,55 @@ import (
 	"strconv"
 
 	httptransport "github.com/go-kit/kit/transport/http"
-	"github.com/gocql/gocql"
 	businessService "github.com/microbusinesses/AddressService/business/service"
-	dataService "github.com/microbusinesses/AddressService/data/service"
 	"github.com/microbusinesses/AddressService/endpoint/transport"
+	"github.com/microbusinesses/Micro-Businesses-Core/common/diagnostics"
 	"golang.org/x/net/context"
 )
 
-var ListeningPort int
-var CassandraAddress string
+type Endpoint struct {
+	ListeningPort  int
+	AddressService businessService.AddressService
+}
 
-func StartServer() {
+func (endpoint Endpoint) StartServer() {
+	diagnostics.IsNotNil(endpoint.AddressService, "endpoint.AddressService", "AddressService must be provided.")
+
 	ctx := context.Background()
 
-	if handlers, err := getHandlers(ctx); err != nil {
+	if handlers, err := getHandlers(endpoint, ctx); err != nil {
 		log.Fatal(err.Error())
 	} else {
 		for pattern, handler := range handlers {
 			http.Handle(pattern, handler)
 		}
 
-		log.Fatal(http.ListenAndServe(":"+strconv.Itoa(ListeningPort), nil))
+		log.Fatal(http.ListenAndServe(":"+strconv.Itoa(endpoint.ListeningPort), nil))
 	}
 }
 
-func getHandlers(ctx context.Context) (map[string]http.Handler, error) {
+func getHandlers(endpoint Endpoint, ctx context.Context) (map[string]http.Handler, error) {
 	handlers := make(map[string]http.Handler)
 
-	if handler, err := createCreateAddressRequestHandler(ctx); err != nil {
+	if handler, err := createCreateAddressRequestHandler(endpoint, ctx); err != nil {
 		return map[string]http.Handler{}, err
 	} else {
 		handlers["/CreateAddress"] = handler
 	}
 
-	if handler, err := createUpdateAddressRequestHandler(ctx); err != nil {
+	if handler, err := createUpdateAddressRequestHandler(endpoint, ctx); err != nil {
 		return map[string]http.Handler{}, err
 	} else {
 		handlers["/UpdateAddress"] = handler
 	}
 
-	if handler, err := createReadAddressRequestHandler(ctx); err != nil {
+	if handler, err := createReadAddressRequestHandler(endpoint, ctx); err != nil {
 		return map[string]http.Handler{}, err
 	} else {
 		handlers["/ReadAddress"] = handler
 	}
 
-	if handler, err := createDeleteAddressRequestHandler(ctx); err != nil {
+	if handler, err := createDeleteAddressRequestHandler(endpoint, ctx); err != nil {
 		return map[string]http.Handler{}, err
 	} else {
 		handlers["/DeleteAddress"] = handler
@@ -60,70 +63,34 @@ func getHandlers(ctx context.Context) (map[string]http.Handler, error) {
 	return handlers, nil
 }
 
-func createCreateAddressRequestHandler(ctx context.Context) (http.Handler, error) {
-	uuidGeneratorService := dataService.UUIDGeneratorServiceImpl{}
-
-	cluster := gocql.NewCluster(CassandraAddress)
-	cluster.Keyspace = "address"
-	cluster.Consistency = gocql.Quorum
-
-	addressDataService := dataService.AddressDataService{UUIDGeneratorService: &uuidGeneratorService, ClusterConfig: cluster}
-	addressService := businessService.AddressService{AddressDataService: &addressDataService}
-
+func createCreateAddressRequestHandler(endpoint Endpoint, ctx context.Context) (http.Handler, error) {
 	return httptransport.NewServer(
 		ctx,
-		createCreateAddressEndpoint(addressService),
+		createCreateAddressEndpoint(endpoint.AddressService),
 		transport.DecodeCreateAddressRequest,
 		transport.EncodeCreateAddressResponse), nil
 }
 
-func createUpdateAddressRequestHandler(ctx context.Context) (http.Handler, error) {
-	uuidGeneratorService := dataService.UUIDGeneratorServiceImpl{}
-
-	cluster := gocql.NewCluster(CassandraAddress)
-	cluster.Keyspace = "address"
-	cluster.Consistency = gocql.Quorum
-
-	addressDataService := dataService.AddressDataService{UUIDGeneratorService: &uuidGeneratorService, ClusterConfig: cluster}
-	addressService := businessService.AddressService{AddressDataService: &addressDataService}
-
+func createUpdateAddressRequestHandler(endpoint Endpoint, ctx context.Context) (http.Handler, error) {
 	return httptransport.NewServer(
 		ctx,
-		createUpdateAddressEndpoint(addressService),
+		createUpdateAddressEndpoint(endpoint.AddressService),
 		transport.DecodeUpdateAddressRequest,
 		transport.EncodeUpdateAddressResponse), nil
 }
 
-func createReadAddressRequestHandler(ctx context.Context) (http.Handler, error) {
-	uuidGeneratorService := dataService.UUIDGeneratorServiceImpl{}
-
-	cluster := gocql.NewCluster(CassandraAddress)
-	cluster.Keyspace = "address"
-	cluster.Consistency = gocql.Quorum
-
-	addressDataService := dataService.AddressDataService{UUIDGeneratorService: &uuidGeneratorService, ClusterConfig: cluster}
-	addressService := businessService.AddressService{AddressDataService: &addressDataService}
-
+func createReadAddressRequestHandler(endpoint Endpoint, ctx context.Context) (http.Handler, error) {
 	return httptransport.NewServer(
 		ctx,
-		createReadAddressEndpoint(addressService),
+		createReadAddressEndpoint(endpoint.AddressService),
 		transport.DecodeReadAddressRequest,
 		transport.EncodeReadAddressResponse), nil
 }
 
-func createDeleteAddressRequestHandler(ctx context.Context) (http.Handler, error) {
-	uuidGeneratorService := dataService.UUIDGeneratorServiceImpl{}
-
-	cluster := gocql.NewCluster(CassandraAddress)
-	cluster.Keyspace = "address"
-	cluster.Consistency = gocql.Quorum
-
-	addressDataService := dataService.AddressDataService{UUIDGeneratorService: &uuidGeneratorService, ClusterConfig: cluster}
-	addressService := businessService.AddressService{AddressDataService: &addressDataService}
-
+func createDeleteAddressRequestHandler(endpoint Endpoint, ctx context.Context) (http.Handler, error) {
 	return httptransport.NewServer(
 		ctx,
-		createDeleteAddressEndpoint(addressService),
+		createDeleteAddressEndpoint(endpoint.AddressService),
 		transport.DecodeDeleteAddressRequest,
 		transport.EncodeDeleteAddressResponse), nil
 }
