@@ -18,12 +18,17 @@ type ConsulConfigurationReader struct {
 	CassandraProtocolVersionToOverride int
 }
 
+const serviceListeningPortKey = "services/address-service/endpoint/listening-port"
+const cassandraHostsKey = "services/address-service/data/cassandra/hosts"
+const cassandraKeyspaceKey = "services/address-service/data/cassandra/keyspace"
+const cassandraProtocolVersionKey = "services/address-service/data/cassandra/protocol-version"
+
 func (consul ConsulConfigurationReader) GetListeningPort() (int, error) {
 	if consul.ListeningPortToOverride != 0 {
 		return consul.ListeningPortToOverride, nil
 
 	} else {
-		return getInt(consul, "services/address-service/endpoint/listening-port")
+		return getInt(consul, serviceListeningPortKey)
 	}
 }
 
@@ -32,10 +37,22 @@ func (consul ConsulConfigurationReader) GetCassandraHosts() ([]string, error) {
 		return consul.CassandraHostsToOverride, nil
 	}
 
-	keyPair, err := getKeyPair(consul, "services/address-service/data/cassandra/hosts")
+	keyPair, err := getKeyPair(consul, cassandraHostsKey)
 
 	if err != nil {
 		return nil, err
+	}
+
+	if keyPair == nil {
+		return nil, errors.New(fmt.Sprintf("Consul key %s does not exist.", cassandraHostsKey))
+
+	}
+
+	valueInString := string(keyPair.Value)
+
+	if len(valueInString) == 0 {
+		return nil, errors.New(fmt.Sprintf("Consul key %s is empty.", cassandraHostsKey))
+
 	}
 
 	return strings.Split(string(keyPair.Value), ","), nil
@@ -45,7 +62,7 @@ func (consul ConsulConfigurationReader) GetCassandraKeyspace() (string, error) {
 	if len(consul.CassandraKeyspaceToOverride) != 0 {
 		return consul.CassandraKeyspaceToOverride, nil
 	} else {
-		return getString(consul, "services/address-service/data/cassandra/keyspace")
+		return getString(consul, cassandraKeyspaceKey)
 	}
 }
 
@@ -53,7 +70,7 @@ func (consul ConsulConfigurationReader) GetCassandraProtocolVersion() (int, erro
 	if consul.CassandraProtocolVersionToOverride != 0 {
 		return consul.CassandraProtocolVersionToOverride, nil
 	} else {
-		return getInt(consul, "services/address-service/data/cassandra/protocol-version")
+		return getInt(consul, cassandraProtocolVersionKey)
 	}
 }
 
