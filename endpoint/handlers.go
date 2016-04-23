@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	httptransport "github.com/go-kit/kit/transport/http"
-	businessService "github.com/microbusinesses/AddressService/business/service"
+	businessContract "github.com/microbusinesses/AddressService/business/contract"
 	"github.com/microbusinesses/AddressService/config"
 	"github.com/microbusinesses/AddressService/endpoint/transport"
 	"github.com/microbusinesses/Micro-Businesses-Core/common/diagnostics"
@@ -15,7 +15,7 @@ import (
 
 type Endpoint struct {
 	ConfigurationReader config.ConfigurationReader
-	AddressService      businessService.AddressService
+	AddressService      businessContract.AddressService
 }
 
 func (endpoint Endpoint) StartServer() {
@@ -42,25 +42,25 @@ func (endpoint Endpoint) StartServer() {
 func getHandlers(endpoint Endpoint, ctx context.Context) (map[string]http.Handler, error) {
 	handlers := make(map[string]http.Handler)
 
-	if handler, err := createCreateAddressRequestHandler(endpoint, ctx); err != nil {
+	if handler, err := createCreateAddressHandler(endpoint, ctx); err != nil {
 		return map[string]http.Handler{}, err
 	} else {
 		handlers["/CreateAddress"] = handler
 	}
 
-	if handler, err := createUpdateAddressRequestHandler(endpoint, ctx); err != nil {
+	if handler, err := createUpdateAddressHandler(endpoint, ctx); err != nil {
 		return map[string]http.Handler{}, err
 	} else {
 		handlers["/UpdateAddress"] = handler
 	}
 
-	if handler, err := createReadAddressRequestHandler(endpoint, ctx); err != nil {
+	if handler, err := createReadAddressHandler(endpoint, ctx); err != nil {
 		return map[string]http.Handler{}, err
 	} else {
 		handlers["/ReadAddress"] = handler
 	}
 
-	if handler, err := createDeleteAddressRequestHandler(endpoint, ctx); err != nil {
+	if handler, err := createDeleteAddressHandler(endpoint, ctx); err != nil {
 		return map[string]http.Handler{}, err
 	} else {
 		handlers["/DeleteAddress"] = handler
@@ -69,7 +69,7 @@ func getHandlers(endpoint Endpoint, ctx context.Context) (map[string]http.Handle
 	return handlers, nil
 }
 
-func createCreateAddressRequestHandler(endpoint Endpoint, ctx context.Context) (http.Handler, error) {
+func createCreateAddressHandler(endpoint Endpoint, ctx context.Context) (http.Handler, error) {
 	return httptransport.NewServer(
 		ctx,
 		createCreateAddressEndpoint(endpoint.AddressService),
@@ -77,7 +77,7 @@ func createCreateAddressRequestHandler(endpoint Endpoint, ctx context.Context) (
 		transport.EncodeCreateAddressResponse), nil
 }
 
-func createUpdateAddressRequestHandler(endpoint Endpoint, ctx context.Context) (http.Handler, error) {
+func createUpdateAddressHandler(endpoint Endpoint, ctx context.Context) (http.Handler, error) {
 	return httptransport.NewServer(
 		ctx,
 		createUpdateAddressEndpoint(endpoint.AddressService),
@@ -85,7 +85,7 @@ func createUpdateAddressRequestHandler(endpoint Endpoint, ctx context.Context) (
 		transport.EncodeUpdateAddressResponse), nil
 }
 
-func createReadAddressRequestHandler(endpoint Endpoint, ctx context.Context) (http.Handler, error) {
+func createReadAddressHandler(endpoint Endpoint, ctx context.Context) (http.Handler, error) {
 	return httptransport.NewServer(
 		ctx,
 		createReadAddressEndpoint(endpoint.AddressService),
@@ -93,7 +93,7 @@ func createReadAddressRequestHandler(endpoint Endpoint, ctx context.Context) (ht
 		transport.EncodeReadAddressResponse), nil
 }
 
-func createDeleteAddressRequestHandler(endpoint Endpoint, ctx context.Context) (http.Handler, error) {
+func createDeleteAddressHandler(endpoint Endpoint, ctx context.Context) (http.Handler, error) {
 	return httptransport.NewServer(
 		ctx,
 		createDeleteAddressEndpoint(endpoint.AddressService),
