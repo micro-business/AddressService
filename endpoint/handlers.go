@@ -1,6 +1,7 @@
 package endpoint
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -27,6 +28,8 @@ func (endpoint Endpoint) StartServer() {
 	if handlers, err := getHandlers(endpoint, ctx); err != nil {
 		log.Fatal(err.Error())
 	} else {
+		http.HandleFunc("/CheckHealth", checkHealthHandleFunc)
+
 		for pattern, handler := range handlers {
 			http.Handle(pattern, handler)
 		}
@@ -67,6 +70,10 @@ func getHandlers(endpoint Endpoint, ctx context.Context) (map[string]http.Handle
 	}
 
 	return handlers, nil
+}
+
+func checkHealthHandleFunc(writer http.ResponseWriter, request *http.Request) {
+	fmt.Fprintln(writer, "Alive")
 }
 
 func createCreateAddressHandler(endpoint Endpoint, ctx context.Context) (http.Handler, error) {
