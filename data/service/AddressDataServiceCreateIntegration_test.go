@@ -63,7 +63,7 @@ var _ = Describe("Create method behaviour", func() {
 
 			newAddressId, err := addressDataService.Create(tenantId, applicationId, validAddress)
 
-			Expect(newAddressId).To(Equal(newAddressId))
+			Expect(expectedAddressId).To(Equal(newAddressId))
 			Expect(err).To(BeNil())
 		})
 	})
