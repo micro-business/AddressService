@@ -3,10 +3,9 @@ package config
 import (
 	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 
-	"github.com/hashicorp/consul/api"
+	"github.com/microbusinesses/Micro-Businesses-Core/config"
 )
 
 type ConsulConfigurationReader struct {
@@ -28,7 +27,8 @@ func (consul ConsulConfigurationReader) GetListeningPort() (int, error) {
 		return consul.ListeningPortToOverride, nil
 
 	} else {
-		return getInt(consul, serviceListeningPortKey)
+		consulHelper := config.ConsulHelper{ConsulAddress: consul.ConsulAddress, ConsulScheme: consul.ConsulScheme}
+		return consulHelper.GetInt(serviceListeningPortKey)
 	}
 }
 
@@ -37,7 +37,9 @@ func (consul ConsulConfigurationReader) GetCassandraHosts() ([]string, error) {
 		return consul.CassandraHostsToOverride, nil
 	}
 
-	keyPair, err := getKeyPair(consul, cassandraHostsKey)
+	consulHelper := config.ConsulHelper{ConsulAddress: consul.ConsulAddress, ConsulScheme: consul.ConsulScheme}
+
+	keyPair, err := consulHelper.GetKeyPair(cassandraHostsKey)
 
 	if err != nil {
 		return nil, err
@@ -62,7 +64,9 @@ func (consul ConsulConfigurationReader) GetCassandraKeyspace() (string, error) {
 	if len(consul.CassandraKeyspaceToOverride) != 0 {
 		return consul.CassandraKeyspaceToOverride, nil
 	} else {
-		return getString(consul, cassandraKeyspaceKey)
+		consulHelper := config.ConsulHelper{ConsulAddress: consul.ConsulAddress, ConsulScheme: consul.ConsulScheme}
+
+		return consulHelper.GetString(cassandraKeyspaceKey)
 	}
 }
 
@@ -70,81 +74,8 @@ func (consul ConsulConfigurationReader) GetCassandraProtocolVersion() (int, erro
 	if consul.CassandraProtocolVersionToOverride != 0 {
 		return consul.CassandraProtocolVersionToOverride, nil
 	} else {
-		return getInt(consul, cassandraProtocolVersionKey)
+		consulHelper := config.ConsulHelper{ConsulAddress: consul.ConsulAddress, ConsulScheme: consul.ConsulScheme}
+
+		return consulHelper.GetInt(cassandraProtocolVersionKey)
 	}
-}
-
-func getKV(consul ConsulConfigurationReader) (*api.KV, error) {
-	config := api.DefaultConfig()
-
-	if len(consul.ConsulAddress) != 0 && len(consul.ConsulScheme) != 0 {
-		config.Address = consul.ConsulAddress
-		config.Scheme = consul.ConsulScheme
-	}
-
-	if client, err := api.NewClient(config); err != nil {
-		return nil, err
-	} else {
-		return client.KV(), nil
-	}
-}
-
-func getKeyPair(consul ConsulConfigurationReader, configKeyPath string) (*api.KVPair, error) {
-	kv, err := getKV(consul)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if keyPair, _, err := kv.Get(configKeyPath, nil); err != nil {
-		return nil, err
-	} else {
-		return keyPair, nil
-	}
-}
-
-func getInt(consul ConsulConfigurationReader, keyPath string) (int, error) {
-	keyPair, err := getKeyPair(consul, keyPath)
-
-	if err != nil {
-		return 0, err
-	}
-
-	if keyPair == nil {
-		return 0, errors.New(fmt.Sprintf("Consul key %s does not exist.", keyPath))
-
-	}
-
-	valueInString := string(keyPair.Value)
-
-	if len(valueInString) == 0 {
-		return 0, errors.New(fmt.Sprintf("Consul key %s is empty.", keyPath))
-
-	}
-
-	if value, err := strconv.Atoi(valueInString); err != nil {
-		return 0, err
-	} else {
-		if value == 0 {
-			return 0, errors.New(fmt.Sprintf("Consul key %s is zero.", keyPath))
-		}
-
-		return value, nil
-	}
-}
-
-func getString(consul ConsulConfigurationReader, keyPath string) (string, error) {
-	keyPair, err := getKeyPair(consul, keyPath)
-
-	if err != nil {
-		return "", err
-	}
-
-	if keyPair == nil {
-		return "", errors.New(fmt.Sprintf("Consul key %s does not exist.", keyPath))
-
-	}
-
-	return string(keyPair.Value), nil
-
 }
