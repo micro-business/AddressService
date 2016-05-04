@@ -28,6 +28,7 @@ func (consul ConsulConfigurationReader) GetListeningPort() (int, error) {
 
 	} else {
 		consulHelper := config.ConsulHelper{ConsulAddress: consul.ConsulAddress, ConsulScheme: consul.ConsulScheme}
+
 		return consulHelper.GetInt(serviceListeningPortKey)
 	}
 }
@@ -38,7 +39,6 @@ func (consul ConsulConfigurationReader) GetCassandraHosts() ([]string, error) {
 	}
 
 	consulHelper := config.ConsulHelper{ConsulAddress: consul.ConsulAddress, ConsulScheme: consul.ConsulScheme}
-
 	keyPair, err := consulHelper.GetKeyPair(cassandraHostsKey)
 
 	if err != nil {
