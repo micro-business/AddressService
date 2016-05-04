@@ -8,6 +8,10 @@ services:
  - docker
 
 after_success:
+  - go get github.com/mattn/goveralls
+  - go get github.com/modocache/gover
+  - ./coverage.bash
+  - goveralls -coverprofile gover.coverprofile -service drone.io -repotoken $COVERALLS_TOKEN
   - CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o AddressService main.go
   - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
   - export REPO_NAME_EXTENSION=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo ""; else echo -$TRAVIS_BRANCH ; fi`
