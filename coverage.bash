@@ -38,7 +38,6 @@ function clean {
 
 report
 combine
-clean
 
 if [ -n "${WEB+x}" ]
 then

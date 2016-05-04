@@ -1,4 +1,4 @@
-# AddressService
+# Address Service
 
 [![Build Status](https://travis-ci.org/microbusinesses/AddressService.png)](https://travis-ci.org/microbusinesses/AddressService)
 [![Drone.io](https://drone.io/github.com/microbusinesses/AddressService/status.png)](https://drone.io/github.com/microbusinesses/AddressService/latest)
