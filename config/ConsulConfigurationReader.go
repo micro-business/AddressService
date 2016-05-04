@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/microbusinesses/Micro-Businesses-Core/config"
+	"github.com/microbusinesses/Micro-Businesses-Core/common/config"
 )
 
 type ConsulConfigurationReader struct {
