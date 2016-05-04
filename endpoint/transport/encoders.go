@@ -7,38 +7,38 @@ import (
 	"golang.org/x/net/context"
 )
 
-func EncodeCreateAddressResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST")
-	w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
+func EncodeCreateAddressResponse(context context.Context, writer http.ResponseWriter, response interface{}) error {
+	writer.Header().Set("Content-Type", "application/json; charset=utf-8")
+	writer.Header().Set("Access-Control-Allow-Origin", "*")
+	writer.Header().Set("Access-Control-Allow-Methods", "POST")
+	writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
 
-	return json.NewEncoder(w).Encode(response)
+	return json.NewEncoder(writer).Encode(response)
 }
 
-func EncodeUpdateAddressResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST")
-	w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
+func EncodeUpdateAddressResponse(context context.Context, writer http.ResponseWriter, response interface{}) error {
+	writer.Header().Set("Content-Type", "application/json; charset=utf-8")
+	writer.Header().Set("Access-Control-Allow-Origin", "*")
+	writer.Header().Set("Access-Control-Allow-Methods", "POST")
+	writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
 
-	return json.NewEncoder(w).Encode(response)
+	return json.NewEncoder(writer).Encode(response)
 }
 
-func EncodeReadAddressResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST")
-	w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
+func EncodeReadAddressResponse(context context.Context, writer http.ResponseWriter, response interface{}) error {
+	writer.Header().Set("Content-Type", "application/json; charset=utf-8")
+	writer.Header().Set("Access-Control-Allow-Origin", "*")
+	writer.Header().Set("Access-Control-Allow-Methods", "POST")
+	writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
 
-	return json.NewEncoder(w).Encode(response)
+	return json.NewEncoder(writer).Encode(response)
 }
 
-func EncodeDeleteAddressResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST")
-	w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
+func EncodeDeleteAddressResponse(context context.Context, writer http.ResponseWriter, response interface{}) error {
+	writer.Header().Set("Content-Type", "application/json; charset=utf-8")
+	writer.Header().Set("Access-Control-Allow-Origin", "*")
+	writer.Header().Set("Access-Control-Allow-Methods", "POST")
+	writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
 
-	return json.NewEncoder(w).Encode(response)
+	return json.NewEncoder(writer).Encode(response)
 }
