@@ -3,9 +3,11 @@ package transport
 import (
 	"encoding/json"
 	"net/http"
+
+	"golang.org/x/net/context"
 )
 
-func EncodeCreateAddressResponse(w http.ResponseWriter, response interface{}) error {
+func EncodeCreateAddressResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
@@ -14,7 +16,7 @@ func EncodeCreateAddressResponse(w http.ResponseWriter, response interface{}) er
 	return json.NewEncoder(w).Encode(response)
 }
 
-func EncodeUpdateAddressResponse(w http.ResponseWriter, response interface{}) error {
+func EncodeUpdateAddressResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
@@ -23,7 +25,7 @@ func EncodeUpdateAddressResponse(w http.ResponseWriter, response interface{}) er
 	return json.NewEncoder(w).Encode(response)
 }
 
-func EncodeReadAddressResponse(w http.ResponseWriter, response interface{}) error {
+func EncodeReadAddressResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
@@ -32,7 +34,7 @@ func EncodeReadAddressResponse(w http.ResponseWriter, response interface{}) erro
 	return json.NewEncoder(w).Encode(response)
 }
 
-func EncodeDeleteAddressResponse(w http.ResponseWriter, response interface{}) error {
+func EncodeDeleteAddressResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "POST")

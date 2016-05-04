@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"golang.org/x/net/context"
+
 	"github.com/microbusinesses/AddressService/endpoint/message"
 )
 
-func DecodeCreateAddressRequest(httpRequest *http.Request) (interface{}, error) {
+func DecodeCreateAddressRequest(_ context.Context, httpRequest *http.Request) (interface{}, error) {
 	var request message.CreateAddressRequest
 
 	if err := json.NewDecoder(httpRequest.Body).Decode(&request); err != nil {
@@ -17,7 +19,7 @@ func DecodeCreateAddressRequest(httpRequest *http.Request) (interface{}, error) 
 	return request, nil
 }
 
-func DecodeUpdateAddressRequest(httpRequest *http.Request) (interface{}, error) {
+func DecodeUpdateAddressRequest(_ context.Context, httpRequest *http.Request) (interface{}, error) {
 	var request message.UpdateAddressRequest
 
 	if err := json.NewDecoder(httpRequest.Body).Decode(&request); err != nil {
@@ -27,7 +29,7 @@ func DecodeUpdateAddressRequest(httpRequest *http.Request) (interface{}, error) 
 	return request, nil
 }
 
-func DecodeReadAddressRequest(httpRequest *http.Request) (interface{}, error) {
+func DecodeReadAddressRequest(_ context.Context, httpRequest *http.Request) (interface{}, error) {
 	var request message.ReadAddressRequest
 
 	if err := json.NewDecoder(httpRequest.Body).Decode(&request); err != nil {
@@ -37,7 +39,7 @@ func DecodeReadAddressRequest(httpRequest *http.Request) (interface{}, error) {
 	return request, nil
 }
 
-func DecodeDeleteAddressRequest(httpRequest *http.Request) (interface{}, error) {
+func DecodeDeleteAddressRequest(_ context.Context, httpRequest *http.Request) (interface{}, error) {
 	var request message.DeleteAddressRequest
 
 	if err := json.NewDecoder(httpRequest.Body).Decode(&request); err != nil {
