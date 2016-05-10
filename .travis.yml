@@ -1,5 +1,14 @@
 sudo: required
 
+before_install:
+ - echo "deb http://debian.datastax.com/community stable main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
+ - curl -L http://debian.datastax.com/debian/repo_key | sudo apt-key add -
+ - sudo apt-get update
+ - sudo apt-get -y install dsc20=2.0.11-1 cassandra=2.0.11
+ - sudo service cassandra stop
+ - sudo rm -rf /var/lib/cassandra/data/system/*
+ - sudo service cassandra start
+
 language: go
 go:
  - 1.6
@@ -8,7 +17,6 @@ services:
  - docker
 
 after_success:
-  - java -version
   - go get github.com/mattn/goveralls
   - go get github.com/modocache/gover
   - ./coverage.bash
