@@ -9,5 +9,7 @@ type ConfigurationReader interface {
 
 	GetCassandraKeyspace() (string, error)
 
+	// GetCassandraProtocolVersion returns the cassandra procotol version.
+	// Returns either the cassandra protcol version or error if something goes wrong.
 	GetCassandraProtocolVersion() (int, error)
 }
