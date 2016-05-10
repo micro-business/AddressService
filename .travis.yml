@@ -8,6 +8,7 @@ services:
  - docker
 
 after_success:
+  - java -version
   - go get github.com/mattn/goveralls
   - go get github.com/modocache/gover
   - ./coverage.bash
