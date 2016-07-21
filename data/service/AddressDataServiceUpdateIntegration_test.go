@@ -57,12 +57,12 @@ var _ = Describe("Update method behaviour", func() {
 				GenerateRandomUUID().
 				Return(addressId, nil)
 
-			addressKeysValuesToAdd := createRandomAddressKeyValues()
+			addressKeysValuesToAdd := createRandomAddressDetails()
 
 			returnedAddressId, err := addressDataService.Create(
 				tenantId,
 				applicationId,
-				shared.Address{AddressKeysValues: addressKeysValuesToAdd})
+				shared.Address{AddressDetails: addressKeysValuesToAdd})
 
 			Expect(err).To(BeNil())
 
@@ -70,7 +70,7 @@ var _ = Describe("Update method behaviour", func() {
 				tenantId,
 				applicationId,
 				returnedAddressId,
-				shared.Address{AddressKeysValues: createRandomAddressKeyValues()})
+				shared.Address{AddressDetails: createRandomAddressDetails()})
 
 			config := getClusterConfig()
 			config.Keyspace = keyspace
@@ -110,12 +110,12 @@ var _ = Describe("Update method behaviour", func() {
 				GenerateRandomUUID().
 				Return(addressId, nil)
 
-			addressKeysValuesToAdd := createRandomAddressKeyValues()
+			addressKeysValuesToAdd := createRandomAddressDetails()
 
 			returnedAddressId, err := addressDataService.Create(
 				tenantId,
 				applicationId,
-				shared.Address{AddressKeysValues: addressKeysValuesToAdd})
+				shared.Address{AddressDetails: addressKeysValuesToAdd})
 
 			Expect(err).To(BeNil())
 
@@ -123,7 +123,7 @@ var _ = Describe("Update method behaviour", func() {
 				tenantId,
 				applicationId,
 				returnedAddressId,
-				shared.Address{AddressKeysValues: createRandomAddressKeyValues()})
+				shared.Address{AddressDetails: createRandomAddressDetails()})
 
 			config := getClusterConfig()
 			config.Keyspace = keyspace
@@ -165,17 +165,17 @@ var _ = Describe("Update method behaviour", func() {
 			returnedAddressId, err := addressDataService.Create(
 				tenantId,
 				applicationId,
-				shared.Address{AddressKeysValues: createRandomAddressKeyValues()})
+				shared.Address{AddressDetails: createRandomAddressDetails()})
 
 			Expect(err).To(BeNil())
 
-			expectedAddressKeysValues := createRandomAddressKeyValues()
+			expectedAddressDetails := createRandomAddressDetails()
 
 			err = addressDataService.Update(
 				tenantId,
 				applicationId,
 				returnedAddressId,
-				shared.Address{AddressKeysValues: expectedAddressKeysValues})
+				shared.Address{AddressDetails: expectedAddressDetails})
 
 			Expect(err).To(BeNil())
 
@@ -210,7 +210,7 @@ var _ = Describe("Update method behaviour", func() {
 				addressKeysValues[key] = value
 			}
 
-			Expect(expectedAddressKeysValues).To(Equal(addressKeysValues))
+			Expect(expectedAddressDetails).To(Equal(addressKeysValues))
 		})
 
 		It("should update the records in address_indexed_by_address_key table", func() {
@@ -222,17 +222,17 @@ var _ = Describe("Update method behaviour", func() {
 			returnedAddressId, err := addressDataService.Create(
 				tenantId,
 				applicationId,
-				shared.Address{AddressKeysValues: createRandomAddressKeyValues()})
+				shared.Address{AddressDetails: createRandomAddressDetails()})
 
 			Expect(err).To(BeNil())
 
-			expectedAddressKeysValues := createRandomAddressKeyValues()
+			expectedAddressDetails := createRandomAddressDetails()
 
 			err = addressDataService.Update(
 				tenantId,
 				applicationId,
 				returnedAddressId,
-				shared.Address{AddressKeysValues: expectedAddressKeysValues})
+				shared.Address{AddressDetails: expectedAddressDetails})
 
 			Expect(err).To(BeNil())
 
@@ -245,7 +245,7 @@ var _ = Describe("Update method behaviour", func() {
 
 			defer session.Close()
 
-			for key, value := range expectedAddressKeysValues {
+			for key, value := range expectedAddressDetails {
 				var id gocql.UUID
 				var addressValue string
 

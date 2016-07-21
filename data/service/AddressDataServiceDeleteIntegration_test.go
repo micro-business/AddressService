@@ -57,12 +57,12 @@ var _ = Describe("Delete method behaviour", func() {
 				GenerateRandomUUID().
 				Return(addressId, nil)
 
-			expectedAddressKeysValues := createRandomAddressKeyValues()
+			expectedAddressDetails := createRandomAddressDetails()
 
 			returnedAddressId, err := addressDataService.Create(
 				tenantId,
 				applicationId,
-				shared.Address{AddressKeysValues: expectedAddressKeysValues})
+				shared.Address{AddressDetails: expectedAddressDetails})
 
 			Expect(err).To(BeNil())
 
@@ -107,12 +107,12 @@ var _ = Describe("Delete method behaviour", func() {
 				GenerateRandomUUID().
 				Return(addressId, nil)
 
-			expectedAddressKeysValues := createRandomAddressKeyValues()
+			expectedAddressDetails := createRandomAddressDetails()
 
 			returnedAddressId, err := addressDataService.Create(
 				tenantId,
 				applicationId,
-				shared.Address{AddressKeysValues: expectedAddressKeysValues})
+				shared.Address{AddressDetails: expectedAddressDetails})
 
 			Expect(err).To(BeNil())
 
@@ -132,7 +132,7 @@ var _ = Describe("Delete method behaviour", func() {
 
 			defer session.Close()
 
-			for key, _ := range expectedAddressKeysValues {
+			for key, _ := range expectedAddressDetails {
 				var id gocql.UUID
 				var addressValue string
 

@@ -45,7 +45,7 @@ var _ = Describe("Create method behaviour", func() {
 		tenantId, _ = system.RandomUUID()
 		applicationId, _ = system.RandomUUID()
 		addressId, _ = system.RandomUUID()
-		validAddress = shared.Address{AddressKeysValues: map[string]string{"City": "Christchurch"}}
+		validAddress = shared.Address{AddressDetails: map[string]string{"City": "Christchurch"}}
 	})
 
 	AfterEach(func() {
@@ -91,12 +91,12 @@ var _ = Describe("Create method behaviour", func() {
 				GenerateRandomUUID().
 				Return(addressId, nil)
 
-			expectedAddressKeysValues := createRandomAddressKeyValues()
+			expectedAddressDetails := createRandomAddressDetails()
 
 			returnedAddressId, err := addressDataService.Create(
 				tenantId,
 				applicationId,
-				shared.Address{AddressKeysValues: expectedAddressKeysValues})
+				shared.Address{AddressDetails: expectedAddressDetails})
 
 			Expect(addressId).To(Equal(returnedAddressId))
 			Expect(err).To(BeNil())
@@ -132,7 +132,7 @@ var _ = Describe("Create method behaviour", func() {
 				addressKeysValues[key] = value
 			}
 
-			Expect(expectedAddressKeysValues).To(Equal(addressKeysValues))
+			Expect(expectedAddressDetails).To(Equal(addressKeysValues))
 		})
 
 		It("should insert the records into address_indexed_by_address_key table", func() {
@@ -141,9 +141,9 @@ var _ = Describe("Create method behaviour", func() {
 				GenerateRandomUUID().
 				Return(addressId, nil)
 
-			expectedAddressKeysValues := createRandomAddressKeyValues()
+			expectedAddressDetails := createRandomAddressDetails()
 
-			addressDataService.Create(tenantId, applicationId, shared.Address{AddressKeysValues: expectedAddressKeysValues})
+			addressDataService.Create(tenantId, applicationId, shared.Address{AddressDetails: expectedAddressDetails})
 
 			config := getClusterConfig()
 			config.Keyspace = keyspace
@@ -154,7 +154,7 @@ var _ = Describe("Create method behaviour", func() {
 
 			defer session.Close()
 
-			for key, value := range expectedAddressKeysValues {
+			for key, value := range expectedAddressDetails {
 				var id gocql.UUID
 				var addressValue string
 

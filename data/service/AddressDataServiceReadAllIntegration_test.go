@@ -56,9 +56,9 @@ var _ = Describe("ReadAll method behaviour", func() {
 			GenerateRandomUUID().
 			Return(addressId, nil)
 
-		expectedAddressKeysValues := createRandomAddressKeyValues()
+		expectedAddressDetails := createRandomAddressDetails()
 
-		expectedAddress := shared.Address{AddressKeysValues: expectedAddressKeysValues}
+		expectedAddress := shared.Address{AddressDetails: expectedAddressDetails}
 		returnedAddressId, err := addressDataService.Create(
 			tenantId,
 			applicationId,

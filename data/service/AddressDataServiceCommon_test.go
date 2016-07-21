@@ -100,15 +100,15 @@ func mapGocqlUUIDToSystemUUID(uuid gocql.UUID) system.UUID {
 	return mappedUUID
 }
 
-func createRandomAddressKeyValues() map[string]string {
-	keyValues := make(map[string]string)
+func createRandomAddressDetails() map[string]string {
+	details := make(map[string]string)
 
 	for idx := 0; idx < rand.Intn(10)+1; idx++ {
 		key, _ := system.RandomUUID()
 		value, _ := system.RandomUUID()
 
-		keyValues[key.String()] = value.String()
+		details[key.String()] = value.String()
 	}
 
-	return keyValues
+	return details
 }
