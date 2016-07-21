@@ -5,24 +5,13 @@ import (
 	"github.com/microbusinesses/AddressService/business/contract"
 	"github.com/microbusinesses/AddressService/business/domain"
 	"github.com/microbusinesses/AddressService/endpoint/message"
-	"github.com/microbusinesses/Micro-Businesses-Core/common/query"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	"golang.org/x/net/context"
 )
 
 func createApiEndpoint(service contract.AddressService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		requestQuery := request.(query.RequestQuery)
-		tenantId, _ := system.ParseUUID("02365c33-43d5-4bf8-b220-25563443960b")
-		applicationId, _ := system.ParseUUID("02365c33-43d5-4bf8-b220-25563443960c")
-
-		responseQuery, err := service.ProcessQuery(tenantId, applicationId, requestQuery)
-
-		if err != nil {
-			return nil, err
-		} else {
-			return responseQuery, nil
-		}
+		return message.ApiResponse{Error: ""}, nil
 	}
 }
 

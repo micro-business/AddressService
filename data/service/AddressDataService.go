@@ -87,7 +87,17 @@ func (addressDataService AddressDataService) Update(tenantId, applicationId, add
 	return addNewAddress(tenantId, applicationId, address, addressId, session)
 }
 
-// Read retrieves an existing address information and returns the detail of it.
+// Read retrieves an existing address information and returns only the detail which the keys provided by the detailsKeys.
+// tenantId: Mandatory. The unique identifier of the tenant owning the address.
+// applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
+// addressId: Mandatory. The unique identifier of the existing address.
+// detailsKeys: Mandatory. The interested address details keys to return.
+// Returns either the address information or error if something goes wrong.
+func (addressDataService AddressDataService) Read(tenantId, applicationId, addressId system.UUID, detailsKeys map[string]string) (shared.Address, error) {
+	panic("Not implemented")
+}
+
+// ReadAll retrieves an existing address information and returns all the detail of it.
 // tenantId: Mandatory. The unique identifier of the tenant owning the address.
 // applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
 // addressId: Mandatory. The unique identifier of the existing address.

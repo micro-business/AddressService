@@ -1,7 +1,16 @@
 // Defines all reply messages used in address service
 package message
 
-import "github.com/microbusinesses/Micro-Businesses-Core/system"
+import (
+	"github.com/microbusinesses/Micro-Businesses-Core/common/query"
+	"github.com/microbusinesses/Micro-Businesses-Core/system"
+)
+
+// ApiResponse defines the message that contains the result of API call
+type ApiResponse struct {
+	ResponseQuery query.ResponseQuery `json:ResponseQuery`
+	Error         string              `json:"error,omitempty"`
+}
 
 // CreateAddressResponse defines the message that contains the result of creating a new address
 type CreateAddressResponse struct {

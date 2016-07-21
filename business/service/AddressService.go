@@ -5,27 +5,12 @@ import (
 	dataContract "github.com/microbusinesses/AddressService/data/contract"
 	dataShared "github.com/microbusinesses/AddressService/data/shared"
 	"github.com/microbusinesses/Micro-Businesses-Core/common/diagnostics"
-	"github.com/microbusinesses/Micro-Businesses-Core/common/query"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 )
 
 // The address service provides access to add new address and update/retrieve/remove an existing address.
 type AddressService struct {
 	AddressDataService dataContract.AddressDataService
-}
-
-// ProcessQuery processes the provided query through API interface.
-// tenantId: Mandatory. The unique identifier of the tenant owning the address.
-// applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
-// requestQuery: Mandatory. The reference to the request query.
-
-func (addressService AddressService) ProcessQuery(tenantId, applicationId system.UUID, requestQuery query.RequestQuery) (query.ResponseQuery, error) {
-	diagnostics.IsNotNil(addressService.AddressDataService, "addressService.AddressDataService", "AddressDataService must be provided.")
-	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
-	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
-
-	panic("Not implemented")
-
 }
 
 // Create creates a new address.
@@ -64,7 +49,28 @@ func (addressService AddressService) Update(tenantId, applicationId, addressId s
 	return addressService.AddressDataService.Update(tenantId, applicationId, addressId, mapToDataAddress(address))
 }
 
-// Read retrieves an existing address information and returns the detail of it.
+// Read retrieves an existing address information and returns only the detail which the keys provided by the detailsKeys.
+// tenantId: Mandatory. The unique identifier of the tenant owning the address.
+// applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
+// addressId: Mandatory. The unique identifier of the existing address.
+// detailsKeys: Mandatory. The interested address details keys to return.
+// Returns either the address information or error if something goes wrong.
+func (addressService AddressService) Read(tenantId, applicationId, addressId system.UUID, detailsKeys map[string]string) (domain.Address, error) {
+	diagnostics.IsNotNil(addressService.AddressDataService, "addressService.AddressDataService", "AddressDataService must be provided.")
+	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
+	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
+	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
+
+	//TODO: 20160722: Add details keys validation here
+
+	if address, err := addressService.AddressDataService.Read(tenantId, applicationId, addressId, detailsKeys); err != nil {
+		return domain.Address{}, err
+	} else {
+		return mapFromDataAddress(address), nil
+	}
+}
+
+// ReadAll retrieves an existing address information and returns all the detail of it.
 // tenantId: Mandatory. The unique identifier of the tenant owning the address.
 // applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
 // addressId: Mandatory. The unique identifier of the existing address.

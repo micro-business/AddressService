@@ -9,6 +9,16 @@ import (
 	"github.com/microbusinesses/AddressService/endpoint/message"
 )
 
+func DecodeApiRequest(context context.Context, httpRequest *http.Request) (interface{}, error) {
+	var request message.ApiRequest
+
+	if err := json.NewDecoder(httpRequest.Body).Decode(&request); err != nil {
+		return nil, err
+	}
+
+	return request, nil
+}
+
 func DecodeCreateAddressRequest(context context.Context, httpRequest *http.Request) (interface{}, error) {
 	var request message.CreateAddressRequest
 
