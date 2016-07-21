@@ -35,7 +35,7 @@ var _ = Describe("Create method input parameters and dependency test", func() {
 
 		tenantId, _ = system.RandomUUID()
 		applicationId, _ = system.RandomUUID()
-		validAddress = domain.Address{AddressKeysValues: map[string]string{"City": "Christchurch"}}
+		validAddress = domain.Address{AddressDetails: map[string]string{"City": "Christchurch"}}
 		emptyAddress = domain.Address{}
 	})
 
@@ -78,7 +78,7 @@ var _ = Describe("Create method behaviour", func() {
 
 		tenantId, _ = system.RandomUUID()
 		applicationId, _ = system.RandomUUID()
-		validAddress = domain.Address{AddressKeysValues: map[string]string{"City": "Christchurch"}}
+		validAddress = domain.Address{AddressDetails: map[string]string{"City": "Christchurch"}}
 	})
 
 	AfterEach(func() {
@@ -86,7 +86,7 @@ var _ = Describe("Create method behaviour", func() {
 	})
 
 	It("should call address data service Create function", func() {
-		mappedAddress := dataShared.Address{AddressKeysValues: validAddress.AddressKeysValues}
+		mappedAddress := dataShared.Address{AddressDetails: validAddress.AddressDetails}
 
 		mockAddressDataService.EXPECT().Create(tenantId, applicationId, mappedAddress)
 
@@ -104,7 +104,7 @@ var _ = Describe("Create method behaviour", func() {
 				addressKeysValues[key.String()] = value.String()
 			}
 
-			mappedAddress := dataShared.Address{AddressKeysValues: addressKeysValues}
+			mappedAddress := dataShared.Address{AddressDetails: addressKeysValues}
 
 			expectedAddressId, _ := system.RandomUUID()
 			mockAddressDataService.
@@ -112,7 +112,7 @@ var _ = Describe("Create method behaviour", func() {
 				Create(tenantId, applicationId, mappedAddress).
 				Return(expectedAddressId, nil)
 
-			newAddressId, err := addressService.Create(tenantId, applicationId, domain.Address{AddressKeysValues: addressKeysValues})
+			newAddressId, err := addressService.Create(tenantId, applicationId, domain.Address{AddressDetails: addressKeysValues})
 
 			Expect(expectedAddressId).To(Equal(newAddressId))
 			Expect(err).To(BeNil())
@@ -121,7 +121,7 @@ var _ = Describe("Create method behaviour", func() {
 
 	Context("when address data service fails to create the new address", func() {
 		It("should return address unique identifier as empty UUID and the returned error by address data service", func() {
-			mappedAddress := dataShared.Address{AddressKeysValues: validAddress.AddressKeysValues}
+			mappedAddress := dataShared.Address{AddressDetails: validAddress.AddressDetails}
 
 			expectedErrorId, _ := system.RandomUUID()
 			expectedError := errors.New(expectedErrorId.String())

@@ -28,7 +28,7 @@ type AddressService interface {
 	// applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
 	// addressId: Mandatory. The unique identifier of the existing address.
 	// Returns either the address information or error if something goes wrong.
-	Read(tenantId, applicationId, addressId system.UUID) (domain.Address, error)
+	ReadAll(tenantId, applicationId, addressId system.UUID) (domain.Address, error)
 
 	// Delete deletes an existing address information.
 	// tenantId: Mandatory. The unique identifier of the tenant owning the address.

@@ -23,7 +23,7 @@ func (addressService AddressService) Create(tenantId, applicationId system.UUID,
 	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
 	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
 
-	if len(address.AddressKeysValues) == 0 {
+	if len(address.AddressDetails) == 0 {
 		panic("Address does not contain any address key.")
 	}
 
@@ -42,7 +42,7 @@ func (addressService AddressService) Update(tenantId, applicationId, addressId s
 	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
 	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
 
-	if len(address.AddressKeysValues) == 0 {
+	if len(address.AddressDetails) == 0 {
 		panic("Address does not contain any address key.")
 	}
 
@@ -54,13 +54,13 @@ func (addressService AddressService) Update(tenantId, applicationId, addressId s
 // applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
 // addressId: Mandatory. The unique identifier of the existing address.
 // Returns either the address information or error if something goes wrong.
-func (addressService AddressService) Read(tenantId, applicationId, addressId system.UUID) (domain.Address, error) {
+func (addressService AddressService) ReadAll(tenantId, applicationId, addressId system.UUID) (domain.Address, error) {
 	diagnostics.IsNotNil(addressService.AddressDataService, "addressService.AddressDataService", "AddressDataService must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
 	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
 	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
 
-	if address, err := addressService.AddressDataService.Read(tenantId, applicationId, addressId); err != nil {
+	if address, err := addressService.AddressDataService.ReadAll(tenantId, applicationId, addressId); err != nil {
 		return domain.Address{}, err
 	} else {
 		return mapFromDataAddress(address), nil
@@ -85,12 +85,12 @@ func (addressService AddressService) Delete(tenantId, applicationId, addressId s
 // address: Mandatory. The address domain object
 // Returns the converted address object used in data layer
 func mapToDataAddress(address domain.Address) dataShared.Address {
-	return dataShared.Address{AddressKeysValues: address.AddressKeysValues}
+	return dataShared.Address{AddressDetails: address.AddressDetails}
 }
 
 // mapFromDataAddress Maps the address object used in data layer to the Address domain object.
 // address: Mandatory. The address object used in data layer
 // Returns the converted address domain object
 func mapFromDataAddress(address dataShared.Address) domain.Address {
-	return domain.Address{AddressKeysValues: address.AddressKeysValues}
+	return domain.Address{AddressDetails: address.AddressDetails}
 }

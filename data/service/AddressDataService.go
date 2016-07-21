@@ -27,7 +27,7 @@ func (addressDataService AddressDataService) Create(tenantId, applicationId syst
 	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
 	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
 
-	addressKeysValuesCount := len(address.AddressKeysValues)
+	addressKeysValuesCount := len(address.AddressDetails)
 
 	if addressKeysValuesCount == 0 {
 		panic("Address does not contain any address key.")
@@ -66,7 +66,7 @@ func (addressDataService AddressDataService) Update(tenantId, applicationId, add
 	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
 	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
 
-	if len(address.AddressKeysValues) == 0 {
+	if len(address.AddressDetails) == 0 {
 		panic("Address does not contain any address key.")
 	}
 
@@ -92,7 +92,7 @@ func (addressDataService AddressDataService) Update(tenantId, applicationId, add
 // applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
 // addressId: Mandatory. The unique identifier of the existing address.
 // Returns either the address information or error if something goes wrong.
-func (addressDataService AddressDataService) Read(tenantId, applicationId, addressId system.UUID) (shared.Address, error) {
+func (addressDataService AddressDataService) ReadAll(tenantId, applicationId, addressId system.UUID) (shared.Address, error) {
 	diagnostics.IsNotNil(addressDataService.ClusterConfig, "addressDataService.ClusterConfig", "ClusterConfig must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
 	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
@@ -120,10 +120,10 @@ func (addressDataService AddressDataService) Read(tenantId, applicationId, addre
 	var key string
 	var value string
 
-	address := shared.Address{AddressKeysValues: make(map[string]string)}
+	address := shared.Address{AddressDetails: make(map[string]string)}
 
 	for iter.Scan(&key, &value) {
-		address.AddressKeysValues[key] = value
+		address.AddressDetails[key] = value
 	}
 
 	return address, nil
@@ -140,7 +140,7 @@ func (addressDataService AddressDataService) Delete(tenantId, applicationId, add
 	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
 	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
 
-	address, err := addressDataService.Read(tenantId, applicationId, addressId)
+	address, err := addressDataService.ReadAll(tenantId, applicationId, addressId)
 
 	if err != nil {
 		return err
@@ -170,7 +170,7 @@ func addNewAddress(
 	address shared.Address,
 	addressId system.UUID,
 	session *gocql.Session) error {
-	addressKeysValuesCount := len(address.AddressKeysValues)
+	addressKeysValuesCount := len(address.AddressDetails)
 
 	errorChannel := make(chan error, addressKeysValuesCount*2)
 
@@ -180,7 +180,7 @@ func addNewAddress(
 
 	var waitGroup sync.WaitGroup
 
-	for key, value := range address.AddressKeysValues {
+	for key, value := range address.AddressDetails {
 		waitGroup.Add(1)
 
 		go addToAddressTable(
@@ -236,7 +236,7 @@ func removeExistingAddress(
 	address shared.Address,
 	addressId system.UUID,
 	session *gocql.Session) error {
-	addressKeysValuesCount := len(address.AddressKeysValues)
+	addressKeysValuesCount := len(address.AddressDetails)
 
 	errorChannel := make(chan error, addressKeysValuesCount+1)
 
@@ -256,7 +256,7 @@ func removeExistingAddress(
 		mappedApplicationId,
 		mappedAddressId)
 
-	for key, _ := range address.AddressKeysValues {
+	for key, _ := range address.AddressDetails {
 		waitGroup.Add(1)
 
 		go removeFromIndexByAddressKeyTable(

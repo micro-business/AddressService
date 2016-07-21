@@ -3,5 +3,5 @@ package domain
 
 // Address defines how an address should look like
 type Address struct {
-	AddressKeysValues map[string]string
+	AddressDetails map[string]string
 }

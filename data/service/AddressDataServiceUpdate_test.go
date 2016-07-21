@@ -27,7 +27,7 @@ var _ = Describe("Update method input parameters and dependency test", func() {
 		tenantId, _ = system.RandomUUID()
 		applicationId, _ = system.RandomUUID()
 		addressId, _ = system.RandomUUID()
-		validAddress = shared.Address{AddressKeysValues: map[string]string{"City": "Christchurch"}}
+		validAddress = shared.Address{AddressDetails: map[string]string{"City": "Christchurch"}}
 		emptyAddress = shared.Address{}
 	})
 

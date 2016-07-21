@@ -15,7 +15,7 @@ func createCreateAddressEndpoint(service contract.AddressService) endpoint.Endpo
 		tenantId, _ := system.ParseUUID("02365c33-43d5-4bf8-b220-25563443960b")
 		applicationId, _ := system.ParseUUID("02365c33-43d5-4bf8-b220-25563443960c")
 
-		address := domain.Address{AddressKeysValues: req.AddressKeysValues}
+		address := domain.Address{AddressDetails: req.AddressKeysValues}
 
 		addressId, err := service.Create(tenantId, applicationId, address)
 
@@ -33,7 +33,7 @@ func createUpdateAddressEndpoint(service contract.AddressService) endpoint.Endpo
 		tenantId, _ := system.ParseUUID("02365c33-43d5-4bf8-b220-25563443960b")
 		applicationId, _ := system.ParseUUID("02365c33-43d5-4bf8-b220-25563443960c")
 
-		address := domain.Address{AddressKeysValues: req.AddressKeysValues}
+		address := domain.Address{AddressDetails: req.AddressKeysValues}
 
 		err := service.Update(tenantId, applicationId, req.AddressId, address)
 
@@ -51,12 +51,12 @@ func createReadAddressEndpoint(service contract.AddressService) endpoint.Endpoin
 		tenantId, _ := system.ParseUUID("02365c33-43d5-4bf8-b220-25563443960b")
 		applicationId, _ := system.ParseUUID("02365c33-43d5-4bf8-b220-25563443960c")
 
-		address, err := service.Read(tenantId, applicationId, req.AddressId)
+		address, err := service.ReadAll(tenantId, applicationId, req.AddressId)
 
 		if err != nil {
 			return message.ReadAddressResponse{make(map[string]string), err.Error()}, err
 		} else {
-			return message.ReadAddressResponse{address.AddressKeysValues, ""}, nil
+			return message.ReadAddressResponse{address.AddressDetails, ""}, nil
 		}
 	}
 }

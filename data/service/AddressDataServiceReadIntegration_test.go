@@ -15,7 +15,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Read method behaviour", func() {
+var _ = Describe("ReadAll method behaviour", func() {
 	var (
 		mockCtrl                 *gomock.Controller
 		addressDataService       *service.AddressDataService
@@ -66,7 +66,7 @@ var _ = Describe("Read method behaviour", func() {
 
 		Expect(err).To(BeNil())
 
-		returnedAddress, err := addressDataService.Read(
+		returnedAddress, err := addressDataService.ReadAll(
 			tenantId,
 			applicationId,
 			returnedAddressId)
@@ -76,7 +76,7 @@ var _ = Describe("Read method behaviour", func() {
 	})
 })
 
-func TestReadBehaviour(t *testing.T) {
+func TestReadAllBehaviour(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Read method behaviour")
+	RunSpecs(t, "ReadAll method behaviour")
 }

@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Read method input parameters and dependency test", func() {
+var _ = Describe("ReadAll method input parameters and dependency test", func() {
 	var (
 		addressDataService *service.AddressDataService
 		tenantId           system.UUID
@@ -32,20 +32,20 @@ var _ = Describe("Read method input parameters and dependency test", func() {
 		It("should panic", func() {
 			addressDataService.ClusterConfig = nil
 
-			Ω(func() { addressDataService.Read(tenantId, applicationId, addressId) }).Should(Panic())
+			Ω(func() { addressDataService.ReadAll(tenantId, applicationId, addressId) }).Should(Panic())
 		})
 	})
 
 	DescribeTable("Input Parameters",
 		func(tenantId, applicationId, addressId system.UUID) {
-			Ω(func() { addressDataService.Read(tenantId, applicationId, addressId) }).Should(Panic())
+			Ω(func() { addressDataService.ReadAll(tenantId, applicationId, addressId) }).Should(Panic())
 		},
 		Entry("should panic when empty tenant unique identifier provided", system.EmptyUUID, applicationId, addressId),
 		Entry("should panic when empty application unique identifier provided", tenantId, system.EmptyUUID, addressId),
 		Entry("should panic when empty address unique identifier provided", tenantId, applicationId, system.EmptyUUID))
 })
 
-func TestRead(t *testing.T) {
+func TestReadAll(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Read method input parameters and dependency test")
+	RunSpecs(t, "ReadAll method input parameters and dependency test")
 }
