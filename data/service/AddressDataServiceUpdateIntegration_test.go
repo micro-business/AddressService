@@ -207,7 +207,7 @@ var _ = Describe("Update method behaviour", func() {
 			addressDetails := make(map[string]string)
 
 			for iter.Scan(&key, &value) {
-				addressiDetails[key] = value
+				addressDetails[key] = value
 			}
 
 			Expect(expectedAddressDetails).To(Equal(addressDetails))
