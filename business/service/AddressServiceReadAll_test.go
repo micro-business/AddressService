@@ -91,16 +91,16 @@ var _ = Describe("ReadAll method behaviour", func() {
 
 	Context("when address data service succeeds to read the requested address", func() {
 		It("should return no error", func() {
-			addressKeysValues := make(map[string]string)
+			addressDetails := make(map[string]string)
 
 			for idx := 0; idx < rand.Intn(10)+1; idx++ {
 				key, _ := system.RandomUUID()
 				value, _ := system.RandomUUID()
 
-				addressKeysValues[key.String()] = value.String()
+				addressDetails[key.String()] = value.String()
 			}
 
-			expectedAddress := domain.Address{AddressDetails: addressKeysValues}
+			expectedAddress := domain.Address{AddressDetails: addressDetails}
 			mockAddressDataService.
 				EXPECT().
 				ReadAll(tenantId, applicationId, addressId).

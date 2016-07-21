@@ -27,10 +27,10 @@ func (addressDataService AddressDataService) Create(tenantId, applicationId syst
 	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
 	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
 
-	addressKeysValuesCount := len(address.AddressDetails)
+	addressDetailsCount := len(address.AddressDetails)
 
-	if addressKeysValuesCount == 0 {
-		panic("Address does not contain any address key.")
+	if addressDetailsCount == 0 {
+		panic("Address does not contain any address details.")
 	}
 
 	addressId, err := addressDataService.UUIDGeneratorService.GenerateRandomUUID()
@@ -67,7 +67,7 @@ func (addressDataService AddressDataService) Update(tenantId, applicationId, add
 	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
 
 	if len(address.AddressDetails) == 0 {
-		panic("Address does not contain any address key.")
+		panic("Address does not contain any address details.")
 	}
 
 	err := addressDataService.Delete(tenantId, applicationId, addressId)
@@ -170,9 +170,9 @@ func addNewAddress(
 	address shared.Address,
 	addressId system.UUID,
 	session *gocql.Session) error {
-	addressKeysValuesCount := len(address.AddressDetails)
+	addressDetailsCount := len(address.AddressDetails)
 
-	errorChannel := make(chan error, addressKeysValuesCount*2)
+	errorChannel := make(chan error, addressDetailsCount*2)
 
 	mappedTenantId := mapSystemUUIDToGocqlUUID(tenantId)
 	mappedApplicationId := mapSystemUUIDToGocqlUUID(applicationId)
@@ -236,9 +236,9 @@ func removeExistingAddress(
 	address shared.Address,
 	addressId system.UUID,
 	session *gocql.Session) error {
-	addressKeysValuesCount := len(address.AddressDetails)
+	addressDetailsCount := len(address.AddressDetails)
 
-	errorChannel := make(chan error, addressKeysValuesCount+1)
+	errorChannel := make(chan error, addressDetailsCount+1)
 
 	mappedTenantId := mapSystemUUIDToGocqlUUID(tenantId)
 	mappedApplicationId := mapSystemUUIDToGocqlUUID(applicationId)

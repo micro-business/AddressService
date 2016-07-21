@@ -57,12 +57,12 @@ var _ = Describe("Update method behaviour", func() {
 				GenerateRandomUUID().
 				Return(addressId, nil)
 
-			addressKeysValuesToAdd := createRandomAddressDetails()
+			addressDetailsToAdd := createRandomAddressDetails()
 
 			returnedAddressId, err := addressDataService.Create(
 				tenantId,
 				applicationId,
-				shared.Address{AddressDetails: addressKeysValuesToAdd})
+				shared.Address{AddressDetails: addressDetailsToAdd})
 
 			Expect(err).To(BeNil())
 
@@ -98,7 +98,7 @@ var _ = Describe("Update method behaviour", func() {
 			var value string
 
 			for iter.Scan(&key, &value) {
-				_, ok := addressKeysValuesToAdd[key]
+				_, ok := addressDetailsToAdd[key]
 
 				Expect(ok).To(BeFalse())
 			}
@@ -110,12 +110,12 @@ var _ = Describe("Update method behaviour", func() {
 				GenerateRandomUUID().
 				Return(addressId, nil)
 
-			addressKeysValuesToAdd := createRandomAddressDetails()
+			addressDetailsToAdd := createRandomAddressDetails()
 
 			returnedAddressId, err := addressDataService.Create(
 				tenantId,
 				applicationId,
-				shared.Address{AddressDetails: addressKeysValuesToAdd})
+				shared.Address{AddressDetails: addressDetailsToAdd})
 
 			Expect(err).To(BeNil())
 
@@ -134,7 +134,7 @@ var _ = Describe("Update method behaviour", func() {
 
 			defer session.Close()
 
-			for key, _ := range addressKeysValuesToAdd {
+			for key, _ := range addressDetailsToAdd {
 				var addressValue string
 
 				iter := session.Query(
@@ -204,13 +204,13 @@ var _ = Describe("Update method behaviour", func() {
 			var key string
 			var value string
 
-			addressKeysValues := make(map[string]string)
+			addressDetails := make(map[string]string)
 
 			for iter.Scan(&key, &value) {
-				addressKeysValues[key] = value
+				addressiDetails[key] = value
 			}
 
-			Expect(expectedAddressDetails).To(Equal(addressKeysValues))
+			Expect(expectedAddressDetails).To(Equal(addressDetails))
 		})
 
 		It("should update the records in address_indexed_by_address_key table", func() {

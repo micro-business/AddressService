@@ -126,13 +126,13 @@ var _ = Describe("Create method behaviour", func() {
 			var key string
 			var value string
 
-			addressKeysValues := make(map[string]string)
+			addressDetails := make(map[string]string)
 
 			for iter.Scan(&key, &value) {
-				addressKeysValues[key] = value
+				addressDetails[key] = value
 			}
 
-			Expect(expectedAddressDetails).To(Equal(addressKeysValues))
+			Expect(expectedAddressDetails).To(Equal(addressDetails))
 		})
 
 		It("should insert the records into address_indexed_by_address_key table", func() {

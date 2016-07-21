@@ -5,12 +5,27 @@ import (
 	dataContract "github.com/microbusinesses/AddressService/data/contract"
 	dataShared "github.com/microbusinesses/AddressService/data/shared"
 	"github.com/microbusinesses/Micro-Businesses-Core/common/diagnostics"
+	"github.com/microbusinesses/Micro-Businesses-Core/common/query"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 )
 
 // The address service provides access to add new address and update/retrieve/remove an existing address.
 type AddressService struct {
 	AddressDataService dataContract.AddressDataService
+}
+
+// ProcessQuery processes the provided query through API interface.
+// tenantId: Mandatory. The unique identifier of the tenant owning the address.
+// applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
+// requestQuery: Mandatory. The reference to the request query.
+
+func (addressService AddressService) ProcessQuery(tenantId, applicationId system.UUID, requestQuery query.RequestQuery) (query.ResponseQuery, error) {
+	diagnostics.IsNotNil(addressService.AddressDataService, "addressService.AddressDataService", "AddressDataService must be provided.")
+	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
+	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
+
+	panic("Not implemented")
+
 }
 
 // Create creates a new address.

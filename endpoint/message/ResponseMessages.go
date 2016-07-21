@@ -16,8 +16,8 @@ type UpdateAddressResponse struct {
 
 // ReadAllAddressResponse defines the message that contains the result of reading an existing address
 type ReadAllAddressResponse struct {
-	AddressKeysValues map[string]string `json:AddressKeysValues`
-	Error             string            `json:"error,omitempty"`
+	AddressDetails map[string]string `json:AddressDetails`
+	Error          string            `json:"error,omitempty"`
 }
 
 // DeleteAddressResponse defines the message that contains the result of deleting an existing address

@@ -5,13 +5,13 @@ import "github.com/microbusinesses/Micro-Businesses-Core/system"
 
 // CreateAddressRequest defines the message that is used to create a new address
 type CreateAddressRequest struct {
-	AddressKeysValues map[string]string `json:AddressKeysValues`
+	AddressDetails map[string]string `json:AddressDetails`
 }
 
 // UpdateAddressRequest defines the message that is used to update an existing address
 type UpdateAddressRequest struct {
-	AddressId         system.UUID       `json:AddressId`
-	AddressKeysValues map[string]string `json:AddressKeysValues`
+	AddressId      system.UUID       `json:AddressId`
+	AddressDetails map[string]string `json:AddressDetails`
 }
 
 // ReadAllAddressRequest defines the message that is used to read an existing address
