@@ -57,10 +57,10 @@ func getHandlers(endpoint Endpoint, ctx context.Context) (map[string]http.Handle
 		handlers["/UpdateAddress"] = handler
 	}
 
-	if handler, err := createReadAddressHandler(endpoint, ctx); err != nil {
+	if handler, err := createReadAllAddressHandler(endpoint, ctx); err != nil {
 		return map[string]http.Handler{}, err
 	} else {
-		handlers["/ReadAddress"] = handler
+		handlers["/ReadAllAddress"] = handler
 	}
 
 	if handler, err := createDeleteAddressHandler(endpoint, ctx); err != nil {
@@ -92,12 +92,12 @@ func createUpdateAddressHandler(endpoint Endpoint, ctx context.Context) (http.Ha
 		transport.EncodeUpdateAddressResponse), nil
 }
 
-func createReadAddressHandler(endpoint Endpoint, ctx context.Context) (http.Handler, error) {
+func createReadAllAddressHandler(endpoint Endpoint, ctx context.Context) (http.Handler, error) {
 	return httptransport.NewServer(
 		ctx,
-		createReadAddressEndpoint(endpoint.AddressService),
-		transport.DecodeReadAddressRequest,
-		transport.EncodeReadAddressResponse), nil
+		createReadAllAddressEndpoint(endpoint.AddressService),
+		transport.DecodeReadAllAddressRequest,
+		transport.EncodeReadAllAddressResponse), nil
 }
 
 func createDeleteAddressHandler(endpoint Endpoint, ctx context.Context) (http.Handler, error) {

@@ -45,18 +45,18 @@ func createUpdateAddressEndpoint(service contract.AddressService) endpoint.Endpo
 	}
 }
 
-func createReadAddressEndpoint(service contract.AddressService) endpoint.Endpoint {
+func createReadAllAddressEndpoint(service contract.AddressService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(message.ReadAddressRequest)
+		req := request.(message.ReadAllAddressRequest)
 		tenantId, _ := system.ParseUUID("02365c33-43d5-4bf8-b220-25563443960b")
 		applicationId, _ := system.ParseUUID("02365c33-43d5-4bf8-b220-25563443960c")
 
 		address, err := service.ReadAll(tenantId, applicationId, req.AddressId)
 
 		if err != nil {
-			return message.ReadAddressResponse{make(map[string]string), err.Error()}, err
+			return message.ReadAllAddressResponse{make(map[string]string), err.Error()}, err
 		} else {
-			return message.ReadAddressResponse{address.AddressDetails, ""}, nil
+			return message.ReadAllAddressResponse{address.AddressDetails, ""}, nil
 		}
 	}
 }

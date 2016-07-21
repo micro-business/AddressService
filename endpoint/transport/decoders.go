@@ -29,8 +29,8 @@ func DecodeUpdateAddressRequest(context context.Context, httpRequest *http.Reque
 	return request, nil
 }
 
-func DecodeReadAddressRequest(context context.Context, httpRequest *http.Request) (interface{}, error) {
-	var request message.ReadAddressRequest
+func DecodeReadAllAddressRequest(context context.Context, httpRequest *http.Request) (interface{}, error) {
+	var request message.ReadAllAddressRequest
 
 	if err := json.NewDecoder(httpRequest.Body).Decode(&request); err != nil {
 		return nil, err

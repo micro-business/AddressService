@@ -14,8 +14,8 @@ type UpdateAddressRequest struct {
 	AddressKeysValues map[string]string `json:AddressKeysValues`
 }
 
-// UpdateAddressRequest defines the message that is used to read an existing address
-type ReadAddressRequest struct {
+// ReadAllAddressRequest defines the message that is used to read an existing address
+type ReadAllAddressRequest struct {
 	AddressId system.UUID `json:AddressId`
 }
 
