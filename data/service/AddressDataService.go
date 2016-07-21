@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"strings"
 	"sync"
 
 	"github.com/gocql/gocql"
@@ -94,7 +95,54 @@ func (addressDataService AddressDataService) Update(tenantId, applicationId, add
 // detailsKeys: Mandatory. The interested address details keys to return.
 // Returns either the address information or error if something goes wrong.
 func (addressDataService AddressDataService) Read(tenantId, applicationId, addressId system.UUID, detailsKeys map[string]string) (shared.Address, error) {
-	panic("Not implemented")
+	diagnostics.IsNotNil(addressDataService.ClusterConfig, "addressDataService.ClusterConfig", "ClusterConfig must be provided.")
+	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
+	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
+	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
+
+	detailsKeysCount := len(detailsKeys)
+
+	if detailsKeysCount == 0 {
+		panic("No address details key provided.")
+	}
+
+	session, err := addressDataService.ClusterConfig.CreateSession()
+
+	if err != nil {
+		return shared.Address{}, err
+	}
+
+	defer session.Close()
+
+	keys := []string{}
+
+	for key, _ := range detailsKeys {
+		keys = append(keys, key)
+	}
+
+	iter := session.Query(
+		"SELECT address_key, address_value"+
+			" FROM address"+
+			" WHERE"+
+			" tenant_id = ?"+
+			" AND application_id = ?"+
+			" AND address_id = ?"+
+			" AND address_key IN (?)",
+		tenantId.String(),
+		applicationId.String(),
+		addressId.String(),
+		"\""+strings.Join(keys, "\",\"")+"\"").Iter()
+
+	var key string
+	var value string
+
+	address := shared.Address{AddressDetails: make(map[string]string)}
+
+	for iter.Scan(&key, &value) {
+		address.AddressDetails[key] = value
+	}
+
+	return address, nil
 }
 
 // ReadAll retrieves an existing address information and returns all the detail of it.
