@@ -25,99 +25,71 @@ func (endpoint Endpoint) StartServer() {
 
 	ctx := context.Background()
 
-	if handlers, err := getHandlers(endpoint, ctx); err != nil {
+	handlers := getHandlers(endpoint, ctx)
+	http.HandleFunc("/CheckHealth", checkHealthHandleFunc)
+
+	for pattern, handler := range handlers {
+		http.Handle(pattern, handler)
+	}
+
+	if listeningPort, err := endpoint.ConfigurationReader.GetListeningPort(); err != nil {
 		log.Fatal(err.Error())
 	} else {
-		http.HandleFunc("/CheckHealth", checkHealthHandleFunc)
-
-		for pattern, handler := range handlers {
-			http.Handle(pattern, handler)
-		}
-
-		if listeningPort, err := endpoint.ConfigurationReader.GetListeningPort(); err != nil {
-			log.Fatal(err.Error())
-		} else {
-			log.Fatal(http.ListenAndServe(":"+strconv.Itoa(listeningPort), nil))
-		}
+		log.Fatal(http.ListenAndServe(":"+strconv.Itoa(listeningPort), nil))
 	}
 }
 
-func getHandlers(endpoint Endpoint, ctx context.Context) (map[string]http.Handler, error) {
+func getHandlers(endpoint Endpoint, ctx context.Context) map[string]http.Handler {
 	handlers := make(map[string]http.Handler)
+	handlers["/Api"] = createApiHandler(endpoint, ctx)
+	handlers["/CreateAddress"] = createCreateAddressHandler(endpoint, ctx)
+	handlers["/UpdateAddress"] = createUpdateAddressHandler(endpoint, ctx)
+	handlers["/ReadAllAddress"] = createReadAllAddressHandler(endpoint, ctx)
+	handlers["/DeleteAddress"] = createDeleteAddressHandler(endpoint, ctx)
 
-	if handler, err := createApiHandler(endpoint, ctx); err != nil {
-		return map[string]http.Handler{}, err
-	} else {
-		handlers["/Api"] = handler
-	}
-
-	if handler, err := createCreateAddressHandler(endpoint, ctx); err != nil {
-		return map[string]http.Handler{}, err
-	} else {
-		handlers["/CreateAddress"] = handler
-	}
-
-	if handler, err := createUpdateAddressHandler(endpoint, ctx); err != nil {
-		return map[string]http.Handler{}, err
-	} else {
-		handlers["/UpdateAddress"] = handler
-	}
-
-	if handler, err := createReadAllAddressHandler(endpoint, ctx); err != nil {
-		return map[string]http.Handler{}, err
-	} else {
-		handlers["/ReadAllAddress"] = handler
-	}
-
-	if handler, err := createDeleteAddressHandler(endpoint, ctx); err != nil {
-		return map[string]http.Handler{}, err
-	} else {
-		handlers["/DeleteAddress"] = handler
-	}
-
-	return handlers, nil
+	return handlers
 }
 
 func checkHealthHandleFunc(writer http.ResponseWriter, request *http.Request) {
 	fmt.Fprintln(writer, "Alive")
 }
 
-func createApiHandler(endpoint Endpoint, ctx context.Context) (http.Handler, error) {
+func createApiHandler(endpoint Endpoint, ctx context.Context) http.Handler {
 	return httptransport.NewServer(
 		ctx,
 		createApiEndpoint(endpoint.AddressService),
-		transport.DecodeCreateAddressRequest,
-		transport.EncodeCreateAddressResponse), nil
+		transport.DecodeApiRequest,
+		transport.EncodeApiResponse)
 }
 
-func createCreateAddressHandler(endpoint Endpoint, ctx context.Context) (http.Handler, error) {
+func createCreateAddressHandler(endpoint Endpoint, ctx context.Context) http.Handler {
 	return httptransport.NewServer(
 		ctx,
 		createCreateAddressEndpoint(endpoint.AddressService),
 		transport.DecodeCreateAddressRequest,
-		transport.EncodeCreateAddressResponse), nil
+		transport.EncodeCreateAddressResponse)
 }
 
-func createUpdateAddressHandler(endpoint Endpoint, ctx context.Context) (http.Handler, error) {
+func createUpdateAddressHandler(endpoint Endpoint, ctx context.Context) http.Handler {
 	return httptransport.NewServer(
 		ctx,
 		createUpdateAddressEndpoint(endpoint.AddressService),
 		transport.DecodeUpdateAddressRequest,
-		transport.EncodeUpdateAddressResponse), nil
+		transport.EncodeUpdateAddressResponse)
 }
 
-func createReadAllAddressHandler(endpoint Endpoint, ctx context.Context) (http.Handler, error) {
+func createReadAllAddressHandler(endpoint Endpoint, ctx context.Context) http.Handler {
 	return httptransport.NewServer(
 		ctx,
 		createReadAllAddressEndpoint(endpoint.AddressService),
 		transport.DecodeReadAllAddressRequest,
-		transport.EncodeReadAllAddressResponse), nil
+		transport.EncodeReadAllAddressResponse)
 }
 
-func createDeleteAddressHandler(endpoint Endpoint, ctx context.Context) (http.Handler, error) {
+func createDeleteAddressHandler(endpoint Endpoint, ctx context.Context) http.Handler {
 	return httptransport.NewServer(
 		ctx,
 		createDeleteAddressEndpoint(endpoint.AddressService),
 		transport.DecodeDeleteAddressRequest,
-		transport.EncodeDeleteAddressResponse), nil
+		transport.EncodeDeleteAddressResponse)
 }
