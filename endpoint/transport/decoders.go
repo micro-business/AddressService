@@ -2,6 +2,7 @@ package transport
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 
 	"golang.org/x/net/context"
@@ -10,13 +11,16 @@ import (
 )
 
 func DecodeApiRequest(context context.Context, httpRequest *http.Request) (interface{}, error) {
-	var request message.ApiRequest
 
-	if err := json.NewDecoder(httpRequest.Body).Decode(&request); err != nil {
-		return nil, err
+	if httpRequest.Method == "GET" {
+		return httpRequest.URL.Query()["query"][0], nil
 	}
 
-	return request, nil
+	if query, err := ioutil.ReadAll(httpRequest.Body); err != nil {
+		return nil, err
+	} else {
+		return string(query), nil
+	}
 }
 
 func DecodeCreateAddressRequest(context context.Context, httpRequest *http.Request) (interface{}, error) {

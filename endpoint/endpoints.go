@@ -1,7 +1,11 @@
 package endpoint
 
 import (
+	"errors"
+	"strings"
+
 	"github.com/go-kit/kit/endpoint"
+	"github.com/graphql-go/graphql"
 	"github.com/microbusinesses/AddressService/business/contract"
 	"github.com/microbusinesses/AddressService/business/domain"
 	"github.com/microbusinesses/AddressService/endpoint/message"
@@ -11,8 +15,24 @@ import (
 
 func createApiEndpoint(service contract.AddressService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		return message.ApiResponse{Error: ""}, nil
+		result := executeQuery(request.(string))
+
+		if result.HasErrors() {
+			errorMessages := []string{}
+
+			for _, err := range result.Errors {
+				errorMessages = append(errorMessages, err.Error())
+			}
+
+			return nil, errors.New(strings.Join(errorMessages, "\n"))
+		}
+
+		return result, nil
 	}
+}
+
+func executeQuery(query string) *graphql.Result {
+	return graphql.Do(graphql.Params{Schema: addressSchema, RequestString: query})
 }
 
 func createCreateAddressEndpoint(service contract.AddressService) endpoint.Endpoint {

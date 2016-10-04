@@ -3,11 +3,6 @@ package message
 
 import "github.com/microbusinesses/Micro-Businesses-Core/system"
 
-// ApiRequest defines the message that will be used to talk to the API interface
-type ApiRequest struct {
-	RequestQuery string `json:RequestQuery`
-}
-
 // CreateAddressRequest defines the message that is used to create a new address
 type CreateAddressRequest struct {
 	AddressDetails map[string]string `json:AddressDetails`
