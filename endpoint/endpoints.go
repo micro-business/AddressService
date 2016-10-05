@@ -105,13 +105,11 @@ var rootQueryType = graphql.NewObject(
 						if addressId, err := system.ParseUUID(id); err != nil {
 							return nil, err
 						} else {
-							address := address{Id: addressId.String()}
-
-							return address, nil
+							return address{Id: addressId.String()}, nil
 						}
 					}
 
-					return nil, nil
+					return nil, errors.New("Address Id must be provided!!!")
 				}},
 		},
 	},
@@ -194,22 +192,6 @@ func createUpdateAddressEndpoint(service contract.AddressService) endpoint.Endpo
 			return message.UpdateAddressResponse{err.Error()}, err
 		} else {
 			return message.UpdateAddressResponse{""}, nil
-		}
-	}
-}
-
-func createReadAllAddressEndpoint(service contract.AddressService) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(message.ReadAllAddressRequest)
-		tenantId, _ := system.ParseUUID("02365c33-43d5-4bf8-b220-25563443960b")
-		applicationId, _ := system.ParseUUID("02365c33-43d5-4bf8-b220-25563443960c")
-
-		address, err := service.ReadAll(tenantId, applicationId, req.AddressId)
-
-		if err != nil {
-			return message.ReadAllAddressResponse{make(map[string]string), err.Error()}, err
-		} else {
-			return message.ReadAllAddressResponse{address.AddressDetails, ""}, nil
 		}
 	}
 }

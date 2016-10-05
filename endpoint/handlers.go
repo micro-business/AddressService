@@ -44,7 +44,6 @@ func getHandlers(endpoint Endpoint, ctx context.Context) map[string]http.Handler
 	handlers["/Api"] = createApiHandler(endpoint, ctx)
 	handlers["/CreateAddress"] = createCreateAddressHandler(endpoint, ctx)
 	handlers["/UpdateAddress"] = createUpdateAddressHandler(endpoint, ctx)
-	handlers["/ReadAllAddress"] = createReadAllAddressHandler(endpoint, ctx)
 	handlers["/DeleteAddress"] = createDeleteAddressHandler(endpoint, ctx)
 
 	return handlers
@@ -76,14 +75,6 @@ func createUpdateAddressHandler(endpoint Endpoint, ctx context.Context) http.Han
 		createUpdateAddressEndpoint(endpoint.AddressService),
 		transport.DecodeUpdateAddressRequest,
 		transport.EncodeUpdateAddressResponse)
-}
-
-func createReadAllAddressHandler(endpoint Endpoint, ctx context.Context) http.Handler {
-	return httptransport.NewServer(
-		ctx,
-		createReadAllAddressEndpoint(endpoint.AddressService),
-		transport.DecodeReadAllAddressRequest,
-		transport.EncodeReadAllAddressResponse)
 }
 
 func createDeleteAddressHandler(endpoint Endpoint, ctx context.Context) http.Handler {

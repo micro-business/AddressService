@@ -34,15 +34,6 @@ func EncodeUpdateAddressResponse(context context.Context, writer http.ResponseWr
 	return json.NewEncoder(writer).Encode(response)
 }
 
-func EncodeReadAllAddressResponse(context context.Context, writer http.ResponseWriter, response interface{}) error {
-	writer.Header().Set("Content-Type", "application/json; charset=utf-8")
-	writer.Header().Set("Access-Control-Allow-Origin", "*")
-	writer.Header().Set("Access-Control-Allow-Methods", "POST")
-	writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
-
-	return json.NewEncoder(writer).Encode(response)
-}
-
 func EncodeDeleteAddressResponse(context context.Context, writer http.ResponseWriter, response interface{}) error {
 	writer.Header().Set("Content-Type", "application/json; charset=utf-8")
 	writer.Header().Set("Access-Control-Allow-Origin", "*")

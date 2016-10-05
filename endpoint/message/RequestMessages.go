@@ -14,11 +14,6 @@ type UpdateAddressRequest struct {
 	AddressDetails map[string]string `json:AddressDetails`
 }
 
-// ReadAllAddressRequest defines the message that is used to read an existing address
-type ReadAllAddressRequest struct {
-	AddressId system.UUID `json:AddressId`
-}
-
 // DeleteAddressRequest defines the message that is used to delete an existing address
 type DeleteAddressRequest struct {
 	AddressId system.UUID `json:AddressId`
