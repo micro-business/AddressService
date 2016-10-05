@@ -51,7 +51,7 @@ func (_mr *_MockAddressDataServiceRecorder) Update(arg0, arg1, arg2, arg3 interf
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "Update", arg0, arg1, arg2, arg3)
 }
 
-func (_m *MockAddressDataService) Read(tenantId system.UUID, applicationId system.UUID, addressId system.UUID, detailsKeys map[string]string) (shared.Address, error) {
+func (_m *MockAddressDataService) Read(tenantId system.UUID, applicationId system.UUID, addressId system.UUID, detailsKeys []string) (shared.Address, error) {
 	ret := _m.ctrl.Call(_m, "Read", tenantId, applicationId, addressId, detailsKeys)
 	ret0, _ := ret[0].(shared.Address)
 	ret1, _ := ret[1].(error)

@@ -94,7 +94,7 @@ func (addressDataService AddressDataService) Update(tenantId, applicationId, add
 // addressId: Mandatory. The unique identifier of the existing address.
 // detailsKeys: Mandatory. The interested address details keys to return.
 // Returns either the address information or error if something goes wrong.
-func (addressDataService AddressDataService) Read(tenantId, applicationId, addressId system.UUID, detailsKeys map[string]string) (shared.Address, error) {
+func (addressDataService AddressDataService) Read(tenantId, applicationId, addressId system.UUID, detailsKeys []string) (shared.Address, error) {
 	diagnostics.IsNotNil(addressDataService.ClusterConfig, "addressDataService.ClusterConfig", "ClusterConfig must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
 	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
@@ -116,7 +116,7 @@ func (addressDataService AddressDataService) Read(tenantId, applicationId, addre
 
 	keys := []string{}
 
-	for key, _ := range detailsKeys {
+	for _, key := range detailsKeys {
 		keys = append(keys, key)
 	}
 

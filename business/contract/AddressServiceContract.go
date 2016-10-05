@@ -30,7 +30,7 @@ type AddressService interface {
 	// addressId: Mandatory. The unique identifier of the existing address.
 	// detailsKeys: Mandatory. The interested address details keys to return.
 	// Returns either the address information or error if something goes wrong.
-	Read(tenantId, applicationId, addressId system.UUID, detailsKeys map[string]string) (domain.Address, error)
+	Read(tenantId, applicationId, addressId system.UUID, detailsKeys []string) (domain.Address, error)
 
 	// ReadAll retrieves an existing address information and returns all the detail of it.
 	// tenantId: Mandatory. The unique identifier of the tenant owning the address.

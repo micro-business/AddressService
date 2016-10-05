@@ -55,7 +55,7 @@ func (addressService AddressService) Update(tenantId, applicationId, addressId s
 // addressId: Mandatory. The unique identifier of the existing address.
 // detailsKeys: Mandatory. The interested address details keys to return.
 // Returns either the address information or error if something goes wrong.
-func (addressService AddressService) Read(tenantId, applicationId, addressId system.UUID, detailsKeys map[string]string) (domain.Address, error) {
+func (addressService AddressService) Read(tenantId, applicationId, addressId system.UUID, detailsKeys []string) (domain.Address, error) {
 	diagnostics.IsNotNil(addressService.AddressDataService, "addressService.AddressDataService", "AddressDataService must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
 	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
