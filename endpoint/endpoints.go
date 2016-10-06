@@ -6,83 +6,47 @@ import (
 
 	"github.com/go-kit/kit/endpoint"
 	"github.com/graphql-go/graphql"
+	ast "github.com/graphql-go/graphql/language/ast"
 	"github.com/microbusinesses/AddressService/business/contract"
 	"github.com/microbusinesses/AddressService/business/domain"
 	"github.com/microbusinesses/AddressService/endpoint/message"
-	"github.com/microbusinesses/Micro-Businesses-Core/common/query"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	"golang.org/x/net/context"
 )
 
 type address struct {
-	Id      string                     `json:"id"`
-	Details []query.StringKeyValuePair `json:"details"`
+	Id             string `json:"Id"`
+	BuildingNumber string `json:"BuildingNumber"`
+	StreetNumber   string `json:"StreetNumber"`
+	Line1          string `json:"Line1"`
+	Line2          string `json:"Line2"`
+	Line3          string `json:"Line3"`
+	Line4          string `json:"Line4"`
+	Line5          string `json:"Line5"`
+	Suburb         string `json:"Suburb"`
+	City           string `json:"City"`
+	State          string `json:"State"`
+	Postcode       string `json:"Postcode"`
+	Country        string `json:"Country"`
 }
 
 var addressType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "Address",
 		Fields: graphql.Fields{
-			"id": &graphql.Field{Type: graphql.ID},
-			"details": &graphql.Field{
-				Type: graphql.NewList(query.StringKeyValuePairType),
-				Args: graphql.FieldConfigArgument{
-					"keys": &graphql.ArgumentConfig{
-						Type: graphql.NewList(graphql.String),
-					},
-				},
-				Resolve: func(resolveParams graphql.ResolveParams) (interface{}, error) {
-					executionContext := resolveParams.Context.Value("ExecutionContext").(executionContext)
-
-					keys, keysArgProvided := resolveParams.Args["keys"].([]interface{})
-					currentAddress, _ := resolveParams.Source.(address)
-					addressId, _ := system.ParseUUID(currentAddress.Id)
-
-					var address domain.Address
-					var err error
-
-					if keysArgProvided {
-
-						detailsKeys := make([]string, 0, len(keys))
-
-						for _, key := range keys {
-							castedKey, _ := key.(string)
-							if len(strings.TrimSpace(castedKey)) != 0 {
-								detailsKeys = append(detailsKeys, castedKey)
-							}
-						}
-
-						if address, err = executionContext.addressService.Read(
-							executionContext.tenantId,
-							executionContext.applicationId,
-							addressId,
-							detailsKeys); err != nil {
-							return nil, err
-						}
-
-					} else {
-
-						if address, err = executionContext.addressService.ReadAll(
-							executionContext.tenantId,
-							executionContext.applicationId,
-							addressId); err != nil {
-							return nil, err
-						}
-					}
-
-					if len(address.AddressDetails) == 0 {
-						return nil, errors.New("Provided AddressId not found!!!")
-					}
-
-					currentAddress.Details = make([]query.StringKeyValuePair, 0, len(address.AddressDetails))
-
-					for key, value := range address.AddressDetails {
-						currentAddress.Details = append(currentAddress.Details, query.StringKeyValuePair{Key: key, Value: value})
-					}
-
-					return currentAddress, nil
-				},
-			},
+			"id":             &graphql.Field{Type: graphql.ID},
+			"BuildingNumber": &graphql.Field{Type: graphql.String},
+			"StreetNumber":   &graphql.Field{Type: graphql.String},
+			"Line1":          &graphql.Field{Type: graphql.String},
+			"Line2":          &graphql.Field{Type: graphql.String},
+			"Line3":          &graphql.Field{Type: graphql.String},
+			"Line4":          &graphql.Field{Type: graphql.String},
+			"Line5":          &graphql.Field{Type: graphql.String},
+			"Suburb":         &graphql.Field{Type: graphql.String},
+			"City":           &graphql.Field{Type: graphql.String},
+			"State":          &graphql.Field{Type: graphql.String},
+			"Postcode":       &graphql.Field{Type: graphql.String},
+			"Country":        &graphql.Field{Type: graphql.String},
 		},
 	},
 )
@@ -99,13 +63,58 @@ var rootQueryType = graphql.NewObject(
 					},
 				},
 				Resolve: func(resolveParams graphql.ResolveParams) (interface{}, error) {
+					executionContext := resolveParams.Context.Value("ExecutionContext").(executionContext)
 					id, idArgProvided := resolveParams.Args["id"].(string)
 
 					if idArgProvided {
 						if addressId, err := system.ParseUUID(id); err != nil {
 							return nil, err
 						} else {
-							return address{Id: addressId.String()}, nil
+							keys := getSelectedFields([]string{"address"}, resolveParams)
+
+							var returnedAddress domain.Address
+							var err error
+
+							if len(keys) == 0 {
+								if returnedAddress, err = executionContext.addressService.ReadAll(
+									executionContext.tenantId,
+									executionContext.applicationId,
+									addressId); err != nil {
+									return nil, err
+								}
+
+							} else {
+								if returnedAddress, err = executionContext.addressService.Read(
+									executionContext.tenantId,
+									executionContext.applicationId,
+									addressId,
+									keys); err != nil {
+									return nil, err
+								}
+
+							}
+
+							if len(returnedAddress.AddressDetails) == 0 {
+								return nil, errors.New("Provided AddressId not found!!!")
+							}
+
+							address := address{
+								Id:             addressId.String(),
+								BuildingNumber: returnedAddress.AddressDetails["BuildingNumber"],
+								StreetNumber:   returnedAddress.AddressDetails["StreetNumber"],
+								Line1:          returnedAddress.AddressDetails["Line1"],
+								Line2:          returnedAddress.AddressDetails["Line2"],
+								Line3:          returnedAddress.AddressDetails["Line3"],
+								Line4:          returnedAddress.AddressDetails["Line4"],
+								Line5:          returnedAddress.AddressDetails["Line5"],
+								Suburb:         returnedAddress.AddressDetails["Suburb"],
+								City:           returnedAddress.AddressDetails["City"],
+								State:          returnedAddress.AddressDetails["State"],
+								Postcode:       returnedAddress.AddressDetails["Postcode"],
+								Country:        returnedAddress.AddressDetails["Country"],
+							}
+
+							return address, nil
 						}
 					}
 
@@ -151,7 +160,6 @@ func createApiEndpoint(addressService contract.AddressService) endpoint.Endpoint
 }
 
 func executeQuery(query string, addressService contract.AddressService, tenantId system.UUID, applicationId system.UUID) *graphql.Result {
-
 	return graphql.Do(
 		graphql.Params{
 			Schema:        addressSchema,
@@ -210,4 +218,31 @@ func createDeleteAddressEndpoint(service contract.AddressService) endpoint.Endpo
 			return message.DeleteAddressResponse{""}, nil
 		}
 	}
+}
+
+func getSelectedFields(selectionPath []string,
+	resolveParams graphql.ResolveParams) []string {
+	fields := resolveParams.Info.FieldASTs
+	for _, propName := range selectionPath {
+		found := false
+		for _, field := range fields {
+			if field.Name.Value == propName {
+				selections := field.SelectionSet.Selections
+				fields = make([]*ast.Field, 0)
+				for _, selection := range selections {
+					fields = append(fields, selection.(*ast.Field))
+				}
+				found = true
+				break
+			}
+		}
+		if !found {
+			return []string{}
+		}
+	}
+	var collect []string
+	for _, field := range fields {
+		collect = append(collect, field.Name.Value)
+	}
+	return collect
 }
