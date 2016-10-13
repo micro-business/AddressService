@@ -239,9 +239,16 @@ var rootMutationType = graphql.NewObject(
 					},
 				},
 				Resolve: func(resolveParams graphql.ResolveParams) (interface{}, error) {
+					id, _ := resolveParams.Args["id"].(string)
+
+					var addressId system.UUID
+					var err error
+
+					if addressId, err = system.ParseUUID(id); err != nil {
+						return nil, err
+					}
 
 					var address domain.Address
-					var err error
 
 					if address, err = resolveAddressDetails(resolveParams); err != nil {
 						return nil, err
@@ -249,9 +256,10 @@ var rootMutationType = graphql.NewObject(
 
 					executionContext := resolveParams.Context.Value("ExecutionContext").(executionContext)
 
-					if addressId, err := executionContext.addressService.Create(
+					if err := executionContext.addressService.Update(
 						executionContext.tenantId,
 						executionContext.applicationId,
+						addressId,
 						address); err != nil {
 						return nil, err
 					} else {
