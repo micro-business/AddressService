@@ -131,10 +131,76 @@ var rootMutationType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "RootMutation",
 		Fields: graphql.Fields{
-			"createAddress": &graphql.Field{
+			"create": &graphql.Field{
 				Type:        graphql.ID,
 				Description: "Creates new address",
 				Args: graphql.FieldConfigArgument{
+					buildingNumber: &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+					streetNumber: &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+					line1: &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+					line2: &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+					line3: &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+					line4: &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+					line5: &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+					suburb: &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+					city: &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+					state: &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+					postcode: &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+					country: &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+				},
+				Resolve: func(resolveParams graphql.ResolveParams) (interface{}, error) {
+
+					var address domain.Address
+					var err error
+
+					if address, err = resolveAddressDetails(resolveParams); err != nil {
+						return nil, err
+					}
+
+					executionContext := resolveParams.Context.Value("ExecutionContext").(executionContext)
+
+					if addressId, err := executionContext.addressService.Create(
+						executionContext.tenantId,
+						executionContext.applicationId,
+						address); err != nil {
+						return nil, err
+					} else {
+						return addressId.String(), nil
+					}
+				},
+			},
+
+			"update": &graphql.Field{
+				Type:        graphql.ID,
+				Description: "Update existing address",
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.ID),
+					},
 					buildingNumber: &graphql.ArgumentConfig{
 						Type: graphql.String,
 					},
