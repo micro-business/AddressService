@@ -6,9 +6,9 @@ import (
 
 	"github.com/go-kit/kit/endpoint"
 	"github.com/graphql-go/graphql"
-	ast "github.com/graphql-go/graphql/language/ast"
 	"github.com/microbusinesses/AddressService/business/contract"
 	"github.com/microbusinesses/AddressService/business/domain"
+	"github.com/microbusinesses/Micro-Businesses-Core/common/query"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	"golang.org/x/net/context"
 )
@@ -26,7 +26,6 @@ const (
 	state          = "State"
 	postcode       = "Postcode"
 	country        = "Country"
-	// totalSupportedAddressDetails = 12
 )
 
 type address struct {
@@ -86,7 +85,7 @@ var rootQueryType = graphql.NewObject(
 						if addressId, err := system.ParseUUID(id); err != nil {
 							return nil, err
 						} else {
-							keys := getSelectedFields([]string{"address"}, resolveParams)
+							keys := query.GetSelectedFields([]string{"address"}, resolveParams)
 
 							var returnedAddress domain.Address
 
@@ -174,85 +173,15 @@ var rootMutationType = graphql.NewObject(
 					},
 				},
 				Resolve: func(resolveParams graphql.ResolveParams) (interface{}, error) {
-					buildingNumberArg, buildingNumberArgProvided := resolveParams.Args[buildingNumber].(string)
-					streetNumberArg, streetNumberArgProvided := resolveParams.Args[streetNumber].(string)
-					line1Arg, line1ArgProvided := resolveParams.Args[line1].(string)
-					line2Arg, line2ArgProvided := resolveParams.Args[line2].(string)
-					line3Arg, line3ArgProvided := resolveParams.Args[line3].(string)
-					line4Arg, line4ArgProvided := resolveParams.Args[line4].(string)
-					line5Arg, line5ArgProvided := resolveParams.Args[line5].(string)
-					suburbArg, suburbArgProvided := resolveParams.Args[suburb].(string)
-					cityArg, cityArgProvided := resolveParams.Args[city].(string)
-					stateArg, stateArgProvided := resolveParams.Args[state].(string)
-					postcodeArg, postcodeArgProvided := resolveParams.Args[postcode].(string)
-					countryArg, countryArgProvided := resolveParams.Args[country].(string)
 
-					if !buildingNumberArgProvided &&
-						!streetNumberArgProvided &&
-						!line1ArgProvided &&
-						!line2ArgProvided &&
-						!line3ArgProvided &&
-						!line4ArgProvided &&
-						!line5ArgProvided &&
-						!suburbArgProvided &&
-						!cityArgProvided &&
-						!stateArgProvided &&
-						!postcodeArgProvided &&
-						!countryArgProvided {
-						return nil, errors.New("At least one address part must be provided.")
+					var address domain.Address
+					var err error
+
+					if address, err = resolveAddressDetails(resolveParams); err != nil {
+						return nil, err
 					}
 
 					executionContext := resolveParams.Context.Value("ExecutionContext").(executionContext)
-
-					address := domain.Address{AddressDetails: make(map[string]string)}
-
-					if buildingNumberArgProvided {
-						address.AddressDetails[buildingNumber] = buildingNumberArg
-					}
-
-					if streetNumberArgProvided {
-						address.AddressDetails[streetNumber] = streetNumberArg
-					}
-
-					if line1ArgProvided {
-						address.AddressDetails[line1] = line1Arg
-					}
-
-					if line2ArgProvided {
-						address.AddressDetails[line2] = line2Arg
-					}
-
-					if line3ArgProvided {
-						address.AddressDetails[line3] = line3Arg
-					}
-
-					if line4ArgProvided {
-						address.AddressDetails[line4] = line4Arg
-					}
-
-					if line5ArgProvided {
-						address.AddressDetails[line5] = line5Arg
-					}
-
-					if suburbArgProvided {
-						address.AddressDetails[suburb] = suburbArg
-					}
-
-					if cityArgProvided {
-						address.AddressDetails[city] = cityArg
-					}
-
-					if stateArgProvided {
-						address.AddressDetails[state] = stateArg
-					}
-
-					if postcodeArgProvided {
-						address.AddressDetails[postcode] = postcodeArg
-					}
-
-					if countryArgProvided {
-						address.AddressDetails[country] = countryArg
-					}
 
 					if addressId, err := executionContext.addressService.Create(
 						executionContext.tenantId,
@@ -306,29 +235,83 @@ func executeQuery(query string, addressService contract.AddressService, tenantId
 		})
 }
 
-func getSelectedFields(selectionPath []string,
-	resolveParams graphql.ResolveParams) []string {
-	fields := resolveParams.Info.FieldASTs
-	for _, propName := range selectionPath {
-		found := false
-		for _, field := range fields {
-			if field.Name.Value == propName {
-				selections := field.SelectionSet.Selections
-				fields = make([]*ast.Field, 0)
-				for _, selection := range selections {
-					fields = append(fields, selection.(*ast.Field))
-				}
-				found = true
-				break
-			}
-		}
-		if !found {
-			return []string{}
-		}
+func resolveAddressDetails(resolveParams graphql.ResolveParams) (domain.Address, error) {
+	buildingNumberArg, buildingNumberArgProvided := resolveParams.Args[buildingNumber].(string)
+	streetNumberArg, streetNumberArgProvided := resolveParams.Args[streetNumber].(string)
+	line1Arg, line1ArgProvided := resolveParams.Args[line1].(string)
+	line2Arg, line2ArgProvided := resolveParams.Args[line2].(string)
+	line3Arg, line3ArgProvided := resolveParams.Args[line3].(string)
+	line4Arg, line4ArgProvided := resolveParams.Args[line4].(string)
+	line5Arg, line5ArgProvided := resolveParams.Args[line5].(string)
+	suburbArg, suburbArgProvided := resolveParams.Args[suburb].(string)
+	cityArg, cityArgProvided := resolveParams.Args[city].(string)
+	stateArg, stateArgProvided := resolveParams.Args[state].(string)
+	postcodeArg, postcodeArgProvided := resolveParams.Args[postcode].(string)
+	countryArg, countryArgProvided := resolveParams.Args[country].(string)
+
+	if !buildingNumberArgProvided &&
+		!streetNumberArgProvided &&
+		!line1ArgProvided &&
+		!line2ArgProvided &&
+		!line3ArgProvided &&
+		!line4ArgProvided &&
+		!line5ArgProvided &&
+		!suburbArgProvided &&
+		!cityArgProvided &&
+		!stateArgProvided &&
+		!postcodeArgProvided &&
+		!countryArgProvided {
+		return domain.Address{}, errors.New("At least one address part must be provided.")
 	}
-	var collect []string
-	for _, field := range fields {
-		collect = append(collect, field.Name.Value)
+
+	address := domain.Address{AddressDetails: make(map[string]string)}
+
+	if buildingNumberArgProvided {
+		address.AddressDetails[buildingNumber] = buildingNumberArg
 	}
-	return collect
+
+	if streetNumberArgProvided {
+		address.AddressDetails[streetNumber] = streetNumberArg
+	}
+
+	if line1ArgProvided {
+		address.AddressDetails[line1] = line1Arg
+	}
+
+	if line2ArgProvided {
+		address.AddressDetails[line2] = line2Arg
+	}
+
+	if line3ArgProvided {
+		address.AddressDetails[line3] = line3Arg
+	}
+
+	if line4ArgProvided {
+		address.AddressDetails[line4] = line4Arg
+	}
+
+	if line5ArgProvided {
+		address.AddressDetails[line5] = line5Arg
+	}
+
+	if suburbArgProvided {
+		address.AddressDetails[suburb] = suburbArg
+	}
+
+	if cityArgProvided {
+		address.AddressDetails[city] = cityArg
+	}
+
+	if stateArgProvided {
+		address.AddressDetails[state] = stateArg
+	}
+
+	if postcodeArgProvided {
+		address.AddressDetails[postcode] = postcodeArg
+	}
+
+	if countryArgProvided {
+		address.AddressDetails[country] = countryArg
+	}
+	return address, nil
 }
