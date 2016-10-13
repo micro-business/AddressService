@@ -119,7 +119,6 @@ func (addressDataService AddressDataService) Read(tenantId, applicationId, addre
 	for _, key := range detailsKeys {
 		keys = append(keys, key)
 	}
-
 	iter := session.Query(
 		"SELECT address_key, address_value"+
 			" FROM address"+
@@ -127,11 +126,11 @@ func (addressDataService AddressDataService) Read(tenantId, applicationId, addre
 			" tenant_id = ?"+
 			" AND application_id = ?"+
 			" AND address_id = ?"+
-			" AND address_key IN (?)",
+			" AND address_key IN "+
+			" ('"+strings.Join(keys, "','")+"')",
 		tenantId.String(),
 		applicationId.String(),
-		addressId.String(),
-		"\""+strings.Join(keys, "\",\"")+"\"").Iter()
+		addressId.String()).Iter()
 
 	var key string
 	var value string

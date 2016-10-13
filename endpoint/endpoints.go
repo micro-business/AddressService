@@ -89,25 +89,13 @@ var rootQueryType = graphql.NewObject(
 							keys := getSelectedFields([]string{"address"}, resolveParams)
 
 							var returnedAddress domain.Address
-							var err error
 
-							if len(keys) == 0 {
-								if returnedAddress, err = executionContext.addressService.ReadAll(
-									executionContext.tenantId,
-									executionContext.applicationId,
-									addressId); err != nil {
-									return nil, err
-								}
-
-							} else {
-								if returnedAddress, err = executionContext.addressService.Read(
-									executionContext.tenantId,
-									executionContext.applicationId,
-									addressId,
-									keys); err != nil {
-									return nil, err
-								}
-
+							if returnedAddress, err = executionContext.addressService.Read(
+								executionContext.tenantId,
+								executionContext.applicationId,
+								addressId,
+								keys); err != nil {
+								return nil, err
 							}
 
 							if len(returnedAddress.AddressDetails) == 0 {
@@ -231,7 +219,7 @@ var rootMutationType = graphql.NewObject(
 					}
 
 					if line2ArgProvided {
-						address.AddressDetails[line3] = line2Arg
+						address.AddressDetails[line2] = line2Arg
 					}
 
 					if line3ArgProvided {
