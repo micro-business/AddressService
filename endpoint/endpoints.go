@@ -341,82 +341,35 @@ func executeQuery(query string, addressService contract.AddressService, tenantId
 }
 
 func resolveAddressDetails(resolveParams graphql.ResolveParams) (domain.Address, error) {
-	buildingNumberArg, buildingNumberArgProvided := resolveParams.Args[buildingNumber].(string)
-	streetNumberArg, streetNumberArgProvided := resolveParams.Args[streetNumber].(string)
-	line1Arg, line1ArgProvided := resolveParams.Args[line1].(string)
-	line2Arg, line2ArgProvided := resolveParams.Args[line2].(string)
-	line3Arg, line3ArgProvided := resolveParams.Args[line3].(string)
-	line4Arg, line4ArgProvided := resolveParams.Args[line4].(string)
-	line5Arg, line5ArgProvided := resolveParams.Args[line5].(string)
-	suburbArg, suburbArgProvided := resolveParams.Args[suburb].(string)
-	cityArg, cityArgProvided := resolveParams.Args[city].(string)
-	stateArg, stateArgProvided := resolveParams.Args[state].(string)
-	postcodeArg, postcodeArgProvided := resolveParams.Args[postcode].(string)
-	countryArg, countryArgProvided := resolveParams.Args[country].(string)
 
-	if !buildingNumberArgProvided &&
-		!streetNumberArgProvided &&
-		!line1ArgProvided &&
-		!line2ArgProvided &&
-		!line3ArgProvided &&
-		!line4ArgProvided &&
-		!line5ArgProvided &&
-		!suburbArgProvided &&
-		!cityArgProvided &&
-		!stateArgProvided &&
-		!postcodeArgProvided &&
-		!countryArgProvided {
-		return domain.Address{}, errors.New("At least one address part must be provided.")
-	}
+	addressDetails := []string{
+		buildingNumber,
+		streetNumber,
+		line1,
+		line2,
+		line3,
+		line4,
+		line5,
+		suburb,
+		city,
+		state,
+		postcode,
+		country}
 
 	address := domain.Address{AddressDetails: make(map[string]string)}
 
-	if buildingNumberArgProvided {
-		address.AddressDetails[buildingNumber] = buildingNumberArg
+	for _, key := range addressDetails {
+		keyArg, KeyArgProvided := resolveParams.Args[key].(string)
+
+		if KeyArgProvided {
+			address.AddressDetails[key] = keyArg
+		}
+
 	}
 
-	if streetNumberArgProvided {
-		address.AddressDetails[streetNumber] = streetNumberArg
+	if len(address.AddressDetails) == 0 {
+		return domain.Address{}, errors.New("At least one address part must be provided.")
 	}
 
-	if line1ArgProvided {
-		address.AddressDetails[line1] = line1Arg
-	}
-
-	if line2ArgProvided {
-		address.AddressDetails[line2] = line2Arg
-	}
-
-	if line3ArgProvided {
-		address.AddressDetails[line3] = line3Arg
-	}
-
-	if line4ArgProvided {
-		address.AddressDetails[line4] = line4Arg
-	}
-
-	if line5ArgProvided {
-		address.AddressDetails[line5] = line5Arg
-	}
-
-	if suburbArgProvided {
-		address.AddressDetails[suburb] = suburbArg
-	}
-
-	if cityArgProvided {
-		address.AddressDetails[city] = cityArg
-	}
-
-	if stateArgProvided {
-		address.AddressDetails[state] = stateArg
-	}
-
-	if postcodeArgProvided {
-		address.AddressDetails[postcode] = postcodeArg
-	}
-
-	if countryArgProvided {
-		address.AddressDetails[country] = countryArg
-	}
 	return address, nil
 }
