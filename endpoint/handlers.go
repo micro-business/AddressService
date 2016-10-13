@@ -42,9 +42,6 @@ func (endpoint Endpoint) StartServer() {
 func getHandlers(endpoint Endpoint, ctx context.Context) map[string]http.Handler {
 	handlers := make(map[string]http.Handler)
 	handlers["/Api"] = createApiHandler(endpoint, ctx)
-	handlers["/CreateAddress"] = createCreateAddressHandler(endpoint, ctx)
-	handlers["/UpdateAddress"] = createUpdateAddressHandler(endpoint, ctx)
-	handlers["/DeleteAddress"] = createDeleteAddressHandler(endpoint, ctx)
 
 	return handlers
 }
@@ -59,28 +56,4 @@ func createApiHandler(endpoint Endpoint, ctx context.Context) http.Handler {
 		createApiEndpoint(endpoint.AddressService),
 		transport.DecodeApiRequest,
 		transport.EncodeApiResponse)
-}
-
-func createCreateAddressHandler(endpoint Endpoint, ctx context.Context) http.Handler {
-	return httptransport.NewServer(
-		ctx,
-		createCreateAddressEndpoint(endpoint.AddressService),
-		transport.DecodeCreateAddressRequest,
-		transport.EncodeCreateAddressResponse)
-}
-
-func createUpdateAddressHandler(endpoint Endpoint, ctx context.Context) http.Handler {
-	return httptransport.NewServer(
-		ctx,
-		createUpdateAddressEndpoint(endpoint.AddressService),
-		transport.DecodeUpdateAddressRequest,
-		transport.EncodeUpdateAddressResponse)
-}
-
-func createDeleteAddressHandler(endpoint Endpoint, ctx context.Context) http.Handler {
-	return httptransport.NewServer(
-		ctx,
-		createDeleteAddressEndpoint(endpoint.AddressService),
-		transport.DecodeDeleteAddressRequest,
-		transport.EncodeDeleteAddressResponse)
 }
