@@ -267,6 +267,37 @@ var rootMutationType = graphql.NewObject(
 					}
 				},
 			},
+
+			"delete": &graphql.Field{
+				Type:        graphql.ID,
+				Description: "Delete existing address",
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.ID),
+					},
+				},
+				Resolve: func(resolveParams graphql.ResolveParams) (interface{}, error) {
+					id, _ := resolveParams.Args["id"].(string)
+
+					var addressId system.UUID
+					var err error
+
+					if addressId, err = system.ParseUUID(id); err != nil {
+						return nil, err
+					}
+
+					executionContext := resolveParams.Context.Value("ExecutionContext").(executionContext)
+
+					if err := executionContext.addressService.Delete(
+						executionContext.tenantId,
+						executionContext.applicationId,
+						addressId); err != nil {
+						return nil, err
+					} else {
+						return addressId.String(), nil
+					}
+				},
+			},
 		},
 	},
 )
