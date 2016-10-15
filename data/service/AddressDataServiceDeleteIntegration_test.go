@@ -131,7 +131,7 @@ var _ = Describe("Delete method behaviour", func() {
 
 			defer session.Close()
 
-			for key, _ := range expectedAddressDetails {
+			for key := range expectedAddressDetails {
 				var id gocql.UUID
 				var addressValue string
 

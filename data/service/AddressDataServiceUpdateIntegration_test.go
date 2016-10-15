@@ -133,7 +133,7 @@ var _ = Describe("Update method behaviour", func() {
 
 			defer session.Close()
 
-			for key, _ := range addressDetailsToAdd {
+			for key := range addressDetailsToAdd {
 				var addressValue string
 
 				iter := session.Query(
