@@ -8,8 +8,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/microbusinesses/AddressService/business/domain"
 	"github.com/microbusinesses/AddressService/business/service"
-	dataServiceMocks "github.com/microbusinesses/AddressService/data/contract/mocks"
-	dataShared "github.com/microbusinesses/AddressService/data/shared"
+	"github.com/microbusinesses/AddressService/data/contract"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -20,7 +19,7 @@ var _ = Describe("Create method input parameters and dependency test", func() {
 	var (
 		mockCtrl               *gomock.Controller
 		addressService         *service.AddressService
-		mockAddressDataService *dataServiceMocks.MockAddressDataService
+		mockAddressDataService *MockAddressDataService
 		tenantID               system.UUID
 		applicationID          system.UUID
 		validAddress           domain.Address
@@ -29,7 +28,7 @@ var _ = Describe("Create method input parameters and dependency test", func() {
 
 	BeforeEach(func() {
 		mockCtrl = gomock.NewController(GinkgoT())
-		mockAddressDataService = dataServiceMocks.NewMockAddressDataService(mockCtrl)
+		mockAddressDataService = NewMockAddressDataService(mockCtrl)
 
 		addressService = &service.AddressService{AddressDataService: mockAddressDataService}
 
@@ -64,7 +63,7 @@ var _ = Describe("Create method behaviour", func() {
 	var (
 		mockCtrl               *gomock.Controller
 		addressService         *service.AddressService
-		mockAddressDataService *dataServiceMocks.MockAddressDataService
+		mockAddressDataService *MockAddressDataService
 		tenantID               system.UUID
 		applicationID          system.UUID
 		validAddress           domain.Address
@@ -72,7 +71,7 @@ var _ = Describe("Create method behaviour", func() {
 
 	BeforeEach(func() {
 		mockCtrl = gomock.NewController(GinkgoT())
-		mockAddressDataService = dataServiceMocks.NewMockAddressDataService(mockCtrl)
+		mockAddressDataService = NewMockAddressDataService(mockCtrl)
 
 		addressService = &service.AddressService{AddressDataService: mockAddressDataService}
 
@@ -86,7 +85,7 @@ var _ = Describe("Create method behaviour", func() {
 	})
 
 	It("should call address data service Create function", func() {
-		mappedAddress := dataShared.Address{AddressDetails: validAddress.AddressDetails}
+		mappedAddress := contract.Address{AddressDetails: validAddress.AddressDetails}
 
 		mockAddressDataService.EXPECT().Create(tenantID, applicationID, mappedAddress)
 
@@ -104,7 +103,7 @@ var _ = Describe("Create method behaviour", func() {
 				addressDetails[key.String()] = value.String()
 			}
 
-			mappedAddress := dataShared.Address{AddressDetails: addressDetails}
+			mappedAddress := contract.Address{AddressDetails: addressDetails}
 
 			expectedAddressID, _ := system.RandomUUID()
 			mockAddressDataService.
@@ -121,7 +120,7 @@ var _ = Describe("Create method behaviour", func() {
 
 	Context("when address data service fails to create the new address", func() {
 		It("should return address unique identifier as empty UUID and the returned error by address data service", func() {
-			mappedAddress := dataShared.Address{AddressDetails: validAddress.AddressDetails}
+			mappedAddress := contract.Address{AddressDetails: validAddress.AddressDetails}
 
 			expectedErrorID, _ := system.RandomUUID()
 			expectedError := errors.New(expectedErrorID.String())

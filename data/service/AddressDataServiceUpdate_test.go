@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/gocql/gocql"
+	"github.com/microbusinesses/AddressService/data/contract"
 	"github.com/microbusinesses/AddressService/data/service"
-	"github.com/microbusinesses/AddressService/data/shared"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -18,8 +18,8 @@ var _ = Describe("Update method input parameters and dependency test", func() {
 		tenantID           system.UUID
 		applicationID      system.UUID
 		addressID          system.UUID
-		validAddress       shared.Address
-		emptyAddress       shared.Address
+		validAddress       contract.Address
+		emptyAddress       contract.Address
 	)
 
 	BeforeEach(func() {
@@ -27,8 +27,8 @@ var _ = Describe("Update method input parameters and dependency test", func() {
 		tenantID, _ = system.RandomUUID()
 		applicationID, _ = system.RandomUUID()
 		addressID, _ = system.RandomUUID()
-		validAddress = shared.Address{AddressDetails: map[string]string{"City": "Christchurch"}}
-		emptyAddress = shared.Address{}
+		validAddress = contract.Address{AddressDetails: map[string]string{"City": "Christchurch"}}
+		emptyAddress = contract.Address{}
 	})
 
 	Context("when cluster configuration not provided", func() {
@@ -40,7 +40,7 @@ var _ = Describe("Update method input parameters and dependency test", func() {
 	})
 
 	DescribeTable("Input Parameters",
-		func(tenantID, applicationID, addressID system.UUID, address shared.Address) {
+		func(tenantID, applicationID, addressID system.UUID, address contract.Address) {
 			Ω(func() { addressDataService.Update(tenantID, applicationID, addressID, address) }).Should(Panic())
 		},
 		Entry("should panic when empty tenant unique identifier provided", system.EmptyUUID, applicationID, addressID, validAddress),

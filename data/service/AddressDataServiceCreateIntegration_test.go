@@ -8,9 +8,7 @@ import (
 
 	"github.com/gocql/gocql"
 	"github.com/golang/mock/gomock"
-	"github.com/microbusinesses/AddressService/data/service"
-	dataServiceMocks "github.com/microbusinesses/AddressService/data/service/mocks"
-	"github.com/microbusinesses/AddressService/data/shared"
+	"github.com/microbusinesses/AddressService/data/contract"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -20,11 +18,11 @@ var _ = Describe("Create method behaviour", func() {
 	var (
 		mockCtrl                 *gomock.Controller
 		addressDataService       *service.AddressDataService
-		mockUUIDGeneratorService *dataServiceMocks.MockUUIDGeneratorService
+		mockUUIDGeneratorService *MockUUIDGeneratorService
 		tenantID                 system.UUID
 		applicationID            system.UUID
 		addressID                system.UUID
-		validAddress             shared.Address
+		validAddress             contract.Address
 		clusterConfig            *gocql.ClusterConfig
 		keyspace                 string
 	)
@@ -38,14 +36,14 @@ var _ = Describe("Create method behaviour", func() {
 		clusterConfig.Keyspace = keyspace
 
 		mockCtrl = gomock.NewController(GinkgoT())
-		mockUUIDGeneratorService = dataServiceMocks.NewMockUUIDGeneratorService(mockCtrl)
+		mockUUIDGeneratorService = NewMockUUIDGeneratorService(mockCtrl)
 
 		addressDataService = &service.AddressDataService{UUIDGeneratorService: mockUUIDGeneratorService, ClusterConfig: clusterConfig}
 
 		tenantID, _ = system.RandomUUID()
 		applicationID, _ = system.RandomUUID()
 		addressID, _ = system.RandomUUID()
-		validAddress = shared.Address{AddressDetails: map[string]string{"City": "Christchurch"}}
+		validAddress = contract.Address{AddressDetails: map[string]string{"City": "Christchurch"}}
 	})
 
 	AfterEach(func() {
@@ -96,7 +94,7 @@ var _ = Describe("Create method behaviour", func() {
 			returnedAddressID, err := addressDataService.Create(
 				tenantID,
 				applicationID,
-				shared.Address{AddressDetails: expectedAddressDetails})
+				contract.Address{AddressDetails: expectedAddressDetails})
 
 			Expect(addressID).To(Equal(returnedAddressID))
 			Expect(err).To(BeNil())
@@ -143,7 +141,7 @@ var _ = Describe("Create method behaviour", func() {
 
 			expectedAddressDetails := createRandomAddressDetails()
 
-			addressDataService.Create(tenantID, applicationID, shared.Address{AddressDetails: expectedAddressDetails})
+			addressDataService.Create(tenantID, applicationID, contract.Address{AddressDetails: expectedAddressDetails})
 
 			config := getClusterConfig()
 			config.Keyspace = keyspace

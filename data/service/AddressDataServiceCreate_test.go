@@ -5,9 +5,8 @@ import (
 
 	"github.com/gocql/gocql"
 	"github.com/golang/mock/gomock"
+	"github.com/microbusinesses/AddressService/data/contract"
 	"github.com/microbusinesses/AddressService/data/service"
-	dataServiceMocks "github.com/microbusinesses/AddressService/data/service/mocks"
-	"github.com/microbusinesses/AddressService/data/shared"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -18,23 +17,23 @@ var _ = Describe("Create method input parameters and dependency test", func() {
 	var (
 		mockCtrl                 *gomock.Controller
 		addressDataService       *service.AddressDataService
-		mockUUIDGeneratorService *dataServiceMocks.MockUUIDGeneratorService
+		mockUUIDGeneratorService *MockUUIDGeneratorService
 		tenantID                 system.UUID
 		applicationID            system.UUID
-		validAddress             shared.Address
-		emptyAddress             shared.Address
+		validAddress             contract.Address
+		emptyAddress             contract.Address
 	)
 
 	BeforeEach(func() {
 		mockCtrl = gomock.NewController(GinkgoT())
-		mockUUIDGeneratorService = dataServiceMocks.NewMockUUIDGeneratorService(mockCtrl)
+		mockUUIDGeneratorService = NewMockUUIDGeneratorService(mockCtrl)
 
 		addressDataService = &service.AddressDataService{UUIDGeneratorService: mockUUIDGeneratorService, ClusterConfig: &gocql.ClusterConfig{}}
 
 		tenantID, _ = system.RandomUUID()
 		applicationID, _ = system.RandomUUID()
-		validAddress = shared.Address{AddressDetails: map[string]string{"City": "Christchurch"}}
-		emptyAddress = shared.Address{}
+		validAddress = contract.Address{AddressDetails: map[string]string{"City": "Christchurch"}}
+		emptyAddress = contract.Address{}
 	})
 
 	AfterEach(func() {
@@ -58,7 +57,7 @@ var _ = Describe("Create method input parameters and dependency test", func() {
 	})
 
 	DescribeTable("Input Parameters",
-		func(tenantID, applicationID system.UUID, address shared.Address) {
+		func(tenantID, applicationID system.UUID, address contract.Address) {
 			Ω(func() { addressDataService.Create(tenantID, applicationID, address) }).Should(Panic())
 		},
 		Entry("should panic when empty tenant unique identifier provided", system.EmptyUUID, applicationID, validAddress),

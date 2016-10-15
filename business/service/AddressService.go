@@ -2,15 +2,14 @@ package service
 
 import (
 	"github.com/microbusinesses/AddressService/business/domain"
-	dataContract "github.com/microbusinesses/AddressService/data/contract"
-	dataShared "github.com/microbusinesses/AddressService/data/shared"
+	"github.com/microbusinesses/AddressService/data/contract"
 	"github.com/microbusinesses/Micro-Businesses-Core/common/diagnostics"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 )
 
 // AddressService provides access to add new address and update/retrieve/remove an existing address.
 type AddressService struct {
-	AddressDataService dataContract.AddressDataService
+	AddressDataService contract.AddressDataService
 }
 
 // Create creates a new address.
@@ -109,13 +108,13 @@ func (addressService AddressService) Delete(tenantID, applicationID, addressID s
 // mapToDataAddress Maps the domain address object to the Address object used in data layer.
 // address: Mandatory. The address domain object
 // Returns the converted address object used in data layer
-func mapToDataAddress(address domain.Address) dataShared.Address {
-	return dataShared.Address{AddressDetails: address.AddressDetails}
+func mapToDataAddress(address domain.Address) contract.Address {
+	return contract.Address{AddressDetails: address.AddressDetails}
 }
 
 // mapFromDataAddress Maps the address object used in data layer to the Address domain object.
 // address: Mandatory. The address object used in data layer
 // Returns the converted address domain object
-func mapFromDataAddress(address dataShared.Address) domain.Address {
+func mapFromDataAddress(address contract.Address) domain.Address {
 	return domain.Address{AddressDetails: address.AddressDetails}
 }

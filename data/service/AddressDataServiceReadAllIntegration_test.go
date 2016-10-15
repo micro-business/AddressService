@@ -7,9 +7,9 @@ import (
 
 	"github.com/gocql/gocql"
 	"github.com/golang/mock/gomock"
+	"github.com/microbusinesses/AddressService/data/contract"
 	"github.com/microbusinesses/AddressService/data/service"
 	dataServiceMocks "github.com/microbusinesses/AddressService/data/service/mocks"
-	"github.com/microbusinesses/AddressService/data/shared"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -58,7 +58,7 @@ var _ = Describe("ReadAll method behaviour", func() {
 
 		expectedAddressDetails := createRandomAddressDetails()
 
-		expectedAddress := shared.Address{AddressDetails: expectedAddressDetails}
+		expectedAddress := contract.Address{AddressDetails: expectedAddressDetails}
 		returnedAddressID, err := addressDataService.Create(
 			tenantID,
 			applicationID,

@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/gocql/gocql"
-	"github.com/microbusinesses/AddressService/data/shared"
+	"github.com/microbusinesses/AddressService/data/contract"
 	"github.com/microbusinesses/Micro-Businesses-Core/common/diagnostics"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 )
@@ -22,7 +22,7 @@ type AddressDataService struct {
 // applicationID: Mandatory. The unique identifier of the tenant's application will be owning the address.
 // address: Mandatory. The reference to the new address information.
 // Returns either the unique identifier of the new address or error if something goes wrong.
-func (addressDataService AddressDataService) Create(tenantID, applicationID system.UUID, address shared.Address) (system.UUID, error) {
+func (addressDataService AddressDataService) Create(tenantID, applicationID system.UUID, address contract.Address) (system.UUID, error) {
 	diagnostics.IsNotNil(addressDataService.UUIDGeneratorService, "addressDataService.UUIDGeneratorService", "UUIDGeneratorService must be provided.")
 	diagnostics.IsNotNil(addressDataService.ClusterConfig, "addressDataService.ClusterConfig", "ClusterConfig must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
@@ -61,7 +61,7 @@ func (addressDataService AddressDataService) Create(tenantID, applicationID syst
 // addressID: Mandatory. The unique identifier of the existing address.
 // address: Mandatory. The reeference to the updated address information.
 // Returns error if something goes wrong.
-func (addressDataService AddressDataService) Update(tenantID, applicationID, addressID system.UUID, address shared.Address) error {
+func (addressDataService AddressDataService) Update(tenantID, applicationID, addressID system.UUID, address contract.Address) error {
 	diagnostics.IsNotNil(addressDataService.ClusterConfig, "addressDataService.ClusterConfig", "ClusterConfig must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
 	diagnostics.IsNotNilOrEmpty(applicationID, "applicationID", "applicationID must be provided.")
@@ -94,7 +94,7 @@ func (addressDataService AddressDataService) Update(tenantID, applicationID, add
 // addressID: Mandatory. The unique identifier of the existing address.
 // detailsKeys: Mandatory. The interested address details keys to return.
 // Returns either the address information or error if something goes wrong.
-func (addressDataService AddressDataService) Read(tenantID, applicationID, addressID system.UUID, detailsKeys []string) (shared.Address, error) {
+func (addressDataService AddressDataService) Read(tenantID, applicationID, addressID system.UUID, detailsKeys []string) (contract.Address, error) {
 	diagnostics.IsNotNil(addressDataService.ClusterConfig, "addressDataService.ClusterConfig", "ClusterConfig must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
 	diagnostics.IsNotNilOrEmpty(applicationID, "applicationID", "applicationID must be provided.")
@@ -109,7 +109,7 @@ func (addressDataService AddressDataService) Read(tenantID, applicationID, addre
 	session, err := addressDataService.ClusterConfig.CreateSession()
 
 	if err != nil {
-		return shared.Address{}, err
+		return contract.Address{}, err
 	}
 
 	defer session.Close()
@@ -135,7 +135,7 @@ func (addressDataService AddressDataService) Read(tenantID, applicationID, addre
 	var key string
 	var value string
 
-	address := shared.Address{AddressDetails: make(map[string]string)}
+	address := contract.Address{AddressDetails: make(map[string]string)}
 
 	for iter.Scan(&key, &value) {
 		address.AddressDetails[key] = value
@@ -149,7 +149,7 @@ func (addressDataService AddressDataService) Read(tenantID, applicationID, addre
 // applicationID: Mandatory. The unique identifier of the tenant's application will be owning the address.
 // addressID: Mandatory. The unique identifier of the existing address.
 // Returns either the address information or error if something goes wrong.
-func (addressDataService AddressDataService) ReadAll(tenantID, applicationID, addressID system.UUID) (shared.Address, error) {
+func (addressDataService AddressDataService) ReadAll(tenantID, applicationID, addressID system.UUID) (contract.Address, error) {
 	diagnostics.IsNotNil(addressDataService.ClusterConfig, "addressDataService.ClusterConfig", "ClusterConfig must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
 	diagnostics.IsNotNilOrEmpty(applicationID, "applicationID", "applicationID must be provided.")
@@ -158,7 +158,7 @@ func (addressDataService AddressDataService) ReadAll(tenantID, applicationID, ad
 	session, err := addressDataService.ClusterConfig.CreateSession()
 
 	if err != nil {
-		return shared.Address{}, err
+		return contract.Address{}, err
 	}
 
 	defer session.Close()
@@ -177,7 +177,7 @@ func (addressDataService AddressDataService) ReadAll(tenantID, applicationID, ad
 	var key string
 	var value string
 
-	address := shared.Address{AddressDetails: make(map[string]string)}
+	address := contract.Address{AddressDetails: make(map[string]string)}
 
 	for iter.Scan(&key, &value) {
 		address.AddressDetails[key] = value
@@ -224,7 +224,7 @@ func mapSystemUUIDToGocqlUUID(uuid system.UUID) gocql.UUID {
 // addNewAddress adds new address to address table
 func addNewAddress(
 	tenantID, applicationID system.UUID,
-	address shared.Address,
+	address contract.Address,
 	addressID system.UUID,
 	session *gocql.Session) error {
 	addressDetailsCount := len(address.AddressDetails)
@@ -290,7 +290,7 @@ func addNewAddress(
 // addNewAddress adds new address to address table
 func removeExistingAddress(
 	tenantID, applicationID system.UUID,
-	address shared.Address,
+	address contract.Address,
 	addressID system.UUID,
 	session *gocql.Session) error {
 	addressDetailsCount := len(address.AddressDetails)

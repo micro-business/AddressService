@@ -7,9 +7,9 @@ import (
 
 	"github.com/gocql/gocql"
 	"github.com/golang/mock/gomock"
+	"github.com/microbusinesses/AddressService/data/contract"
 	"github.com/microbusinesses/AddressService/data/service"
 	dataServiceMocks "github.com/microbusinesses/AddressService/data/service/mocks"
-	"github.com/microbusinesses/AddressService/data/shared"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -62,7 +62,7 @@ var _ = Describe("Delete method behaviour", func() {
 			returnedAddressID, err := addressDataService.Create(
 				tenantID,
 				applicationID,
-				shared.Address{AddressDetails: expectedAddressDetails})
+				contract.Address{AddressDetails: expectedAddressDetails})
 
 			Expect(err).To(BeNil())
 
@@ -112,7 +112,7 @@ var _ = Describe("Delete method behaviour", func() {
 			returnedAddressID, err := addressDataService.Create(
 				tenantID,
 				applicationID,
-				shared.Address{AddressDetails: expectedAddressDetails})
+				contract.Address{AddressDetails: expectedAddressDetails})
 
 			Expect(err).To(BeNil())
 

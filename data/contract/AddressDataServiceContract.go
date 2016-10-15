@@ -2,9 +2,13 @@
 package contract
 
 import (
-	"github.com/microbusinesses/AddressService/data/shared"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 )
+
+// Address defines how an address should look like
+type Address struct {
+	AddressDetails map[string]string
+}
 
 // AddressDataService service can add new address and update/retrieve/remove an existing address.
 type AddressDataService interface {
@@ -13,7 +17,7 @@ type AddressDataService interface {
 	// applicationID: Mandatory. The unique identifier of the tenant's application will be owning the address.
 	// address: Mandatory. The reference to the new address information.
 	// Returns either the unique identifier of the new address or error if something goes wrong.
-	Create(tenantID, applicationID system.UUID, address shared.Address) (system.UUID, error)
+	Create(tenantID, applicationID system.UUID, address Address) (system.UUID, error)
 
 	// Update updates an existing address.
 	// tenantID: Mandatory. The unique identifier of the tenant owning the address.
@@ -21,7 +25,7 @@ type AddressDataService interface {
 	// addressID: Mandatory. The unique identifier of the existing address.
 	// address: Mandatory. The reeference to the updated address information.
 	// Returns error if something goes wrong.
-	Update(tenantID, applicationID, addressID system.UUID, address shared.Address) error
+	Update(tenantID, applicationID, addressID system.UUID, address Address) error
 
 	// Read retrieves an existing address information and returns only the detail which the keys provided by the detailsKeys.
 	// tenantID: Mandatory. The unique identifier of the tenant owning the address.
@@ -29,14 +33,14 @@ type AddressDataService interface {
 	// addressID: Mandatory. The unique identifier of the existing address.
 	// detailsKeys: Mandatory. The interested address details keys to return.
 	// Returns either the address information or error if something goes wrong.
-	Read(tenantID, applicationID, addressID system.UUID, detailsKeys []string) (shared.Address, error)
+	Read(tenantID, applicationID, addressID system.UUID, detailsKeys []string) (Address, error)
 
 	// ReadAll retrieves an existing address information and returns all the detail of it.
 	// tenantID: Mandatory. The unique identifier of the tenant owning the address.
 	// applicationID: Mandatory. The unique identifier of the tenant's application will be owning the address.
 	// addressID: Mandatory. The unique identifier of the existing address.
 	// Returns either the address information or error if something goes wrong.
-	ReadAll(tenantID, applicationID, addressID system.UUID) (shared.Address, error)
+	ReadAll(tenantID, applicationID, addressID system.UUID) (Address, error)
 
 	// Delete deletes an existing address information.
 	// tenantID: Mandatory. The unique identifier of the tenant owning the address.

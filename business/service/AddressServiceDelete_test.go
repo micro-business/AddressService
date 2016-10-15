@@ -6,7 +6,6 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/microbusinesses/AddressService/business/service"
-	dataServiceMocks "github.com/microbusinesses/AddressService/data/contract/mocks"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -17,7 +16,7 @@ var _ = Describe("Delete method input parameters and dependency test", func() {
 	var (
 		mockCtrl               *gomock.Controller
 		addressService         *service.AddressService
-		mockAddressDataService *dataServiceMocks.MockAddressDataService
+		mockAddressDataService *MockAddressDataService
 		tenantID               system.UUID
 		applicationID          system.UUID
 		addressID              system.UUID
@@ -25,7 +24,7 @@ var _ = Describe("Delete method input parameters and dependency test", func() {
 
 	BeforeEach(func() {
 		mockCtrl = gomock.NewController(GinkgoT())
-		mockAddressDataService = dataServiceMocks.NewMockAddressDataService(mockCtrl)
+		mockAddressDataService = NewMockAddressDataService(mockCtrl)
 
 		addressService = &service.AddressService{AddressDataService: mockAddressDataService}
 
@@ -59,7 +58,7 @@ var _ = Describe("Delete method behaviour", func() {
 	var (
 		mockCtrl               *gomock.Controller
 		addressService         *service.AddressService
-		mockAddressDataService *dataServiceMocks.MockAddressDataService
+		mockAddressDataService *MockAddressDataService
 		tenantID               system.UUID
 		applicationID          system.UUID
 		addressID              system.UUID
@@ -67,7 +66,7 @@ var _ = Describe("Delete method behaviour", func() {
 
 	BeforeEach(func() {
 		mockCtrl = gomock.NewController(GinkgoT())
-		mockAddressDataService = dataServiceMocks.NewMockAddressDataService(mockCtrl)
+		mockAddressDataService = NewMockAddressDataService(mockCtrl)
 
 		addressService = &service.AddressService{AddressDataService: mockAddressDataService}
 

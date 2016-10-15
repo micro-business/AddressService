@@ -7,9 +7,9 @@ import (
 
 	"github.com/gocql/gocql"
 	"github.com/golang/mock/gomock"
+	"github.com/microbusinesses/AddressService/data/contract"
 	"github.com/microbusinesses/AddressService/data/service"
 	dataServiceMocks "github.com/microbusinesses/AddressService/data/service/mocks"
-	"github.com/microbusinesses/AddressService/data/shared"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -62,7 +62,7 @@ var _ = Describe("Update method behaviour", func() {
 			returnedAddressID, err := addressDataService.Create(
 				tenantID,
 				applicationID,
-				shared.Address{AddressDetails: addressDetailsToAdd})
+				contract.Address{AddressDetails: addressDetailsToAdd})
 
 			Expect(err).To(BeNil())
 
@@ -70,7 +70,7 @@ var _ = Describe("Update method behaviour", func() {
 				tenantID,
 				applicationID,
 				returnedAddressID,
-				shared.Address{AddressDetails: createRandomAddressDetails()})
+				contract.Address{AddressDetails: createRandomAddressDetails()})
 
 			config := getClusterConfig()
 			config.Keyspace = keyspace
@@ -115,7 +115,7 @@ var _ = Describe("Update method behaviour", func() {
 			returnedAddressID, err := addressDataService.Create(
 				tenantID,
 				applicationID,
-				shared.Address{AddressDetails: addressDetailsToAdd})
+				contract.Address{AddressDetails: addressDetailsToAdd})
 
 			Expect(err).To(BeNil())
 
@@ -123,7 +123,7 @@ var _ = Describe("Update method behaviour", func() {
 				tenantID,
 				applicationID,
 				returnedAddressID,
-				shared.Address{AddressDetails: createRandomAddressDetails()})
+				contract.Address{AddressDetails: createRandomAddressDetails()})
 
 			config := getClusterConfig()
 			config.Keyspace = keyspace
@@ -165,7 +165,7 @@ var _ = Describe("Update method behaviour", func() {
 			returnedAddressID, err := addressDataService.Create(
 				tenantID,
 				applicationID,
-				shared.Address{AddressDetails: createRandomAddressDetails()})
+				contract.Address{AddressDetails: createRandomAddressDetails()})
 
 			Expect(err).To(BeNil())
 
@@ -175,7 +175,7 @@ var _ = Describe("Update method behaviour", func() {
 				tenantID,
 				applicationID,
 				returnedAddressID,
-				shared.Address{AddressDetails: expectedAddressDetails})
+				contract.Address{AddressDetails: expectedAddressDetails})
 
 			Expect(err).To(BeNil())
 
@@ -222,7 +222,7 @@ var _ = Describe("Update method behaviour", func() {
 			returnedAddressID, err := addressDataService.Create(
 				tenantID,
 				applicationID,
-				shared.Address{AddressDetails: createRandomAddressDetails()})
+				contract.Address{AddressDetails: createRandomAddressDetails()})
 
 			Expect(err).To(BeNil())
 
@@ -232,7 +232,7 @@ var _ = Describe("Update method behaviour", func() {
 				tenantID,
 				applicationID,
 				returnedAddressID,
-				shared.Address{AddressDetails: expectedAddressDetails})
+				contract.Address{AddressDetails: expectedAddressDetails})
 
 			Expect(err).To(BeNil())
 

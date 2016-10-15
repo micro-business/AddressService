@@ -8,8 +8,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/microbusinesses/AddressService/business/domain"
 	"github.com/microbusinesses/AddressService/business/service"
-	dataServiceMocks "github.com/microbusinesses/AddressService/data/contract/mocks"
-	dataShared "github.com/microbusinesses/AddressService/data/shared"
+	"github.com/microbusinesses/AddressService/data/contract"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -20,7 +19,7 @@ var _ = Describe("ReadAll method input parameters and dependency test", func() {
 	var (
 		mockCtrl               *gomock.Controller
 		addressService         *service.AddressService
-		mockAddressDataService *dataServiceMocks.MockAddressDataService
+		mockAddressDataService *MockAddressDataService
 		tenantID               system.UUID
 		applicationID          system.UUID
 		addressID              system.UUID
@@ -28,7 +27,7 @@ var _ = Describe("ReadAll method input parameters and dependency test", func() {
 
 	BeforeEach(func() {
 		mockCtrl = gomock.NewController(GinkgoT())
-		mockAddressDataService = dataServiceMocks.NewMockAddressDataService(mockCtrl)
+		mockAddressDataService = NewMockAddressDataService(mockCtrl)
 
 		addressService = &service.AddressService{AddressDataService: mockAddressDataService}
 
@@ -62,7 +61,7 @@ var _ = Describe("ReadAll method behaviour", func() {
 	var (
 		mockCtrl               *gomock.Controller
 		addressService         *service.AddressService
-		mockAddressDataService *dataServiceMocks.MockAddressDataService
+		mockAddressDataService *MockAddressDataService
 		tenantID               system.UUID
 		applicationID          system.UUID
 		addressID              system.UUID
@@ -70,7 +69,7 @@ var _ = Describe("ReadAll method behaviour", func() {
 
 	BeforeEach(func() {
 		mockCtrl = gomock.NewController(GinkgoT())
-		mockAddressDataService = dataServiceMocks.NewMockAddressDataService(mockCtrl)
+		mockAddressDataService = NewMockAddressDataService(mockCtrl)
 
 		addressService = &service.AddressService{AddressDataService: mockAddressDataService}
 
@@ -104,7 +103,7 @@ var _ = Describe("ReadAll method behaviour", func() {
 			mockAddressDataService.
 				EXPECT().
 				ReadAll(tenantID, applicationID, addressID).
-				Return(dataShared.Address{AddressDetails: expectedAddress.AddressDetails}, nil)
+				Return(contract.Address{AddressDetails: expectedAddress.AddressDetails}, nil)
 
 			address, err := addressService.ReadAll(tenantID, applicationID, addressID)
 
@@ -120,7 +119,7 @@ var _ = Describe("ReadAll method behaviour", func() {
 			mockAddressDataService.
 				EXPECT().
 				ReadAll(tenantID, applicationID, addressID).
-				Return(dataShared.Address{}, expectedError)
+				Return(contract.Address{}, expectedError)
 
 			expectedAddress, err := addressService.ReadAll(tenantID, applicationID, addressID)
 
