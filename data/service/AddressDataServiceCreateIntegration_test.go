@@ -21,9 +21,9 @@ var _ = Describe("Create method behaviour", func() {
 		mockCtrl                 *gomock.Controller
 		addressDataService       *service.AddressDataService
 		mockUUIDGeneratorService *dataServiceMocks.MockUUIDGeneratorService
-		tenantId                 system.UUID
-		applicationId            system.UUID
-		addressId                system.UUID
+		tenantID                 system.UUID
+		applicationID            system.UUID
+		addressID                system.UUID
 		validAddress             shared.Address
 		clusterConfig            *gocql.ClusterConfig
 		keyspace                 string
@@ -42,9 +42,9 @@ var _ = Describe("Create method behaviour", func() {
 
 		addressDataService = &service.AddressDataService{UUIDGeneratorService: mockUUIDGeneratorService, ClusterConfig: clusterConfig}
 
-		tenantId, _ = system.RandomUUID()
-		applicationId, _ = system.RandomUUID()
-		addressId, _ = system.RandomUUID()
+		tenantID, _ = system.RandomUUID()
+		applicationID, _ = system.RandomUUID()
+		addressID, _ = system.RandomUUID()
 		validAddress = shared.Address{AddressDetails: map[string]string{"City": "Christchurch"}}
 	})
 
@@ -55,31 +55,31 @@ var _ = Describe("Create method behaviour", func() {
 
 	Context("when UUID generator service succeeds to create the new UUID", func() {
 		It("should return the new UUID as address uniuqe identifier and no error", func() {
-			expectedAddressId, _ := system.RandomUUID()
+			expectedAddressID, _ := system.RandomUUID()
 			mockUUIDGeneratorService.
 				EXPECT().
 				GenerateRandomUUID().
-				Return(expectedAddressId, nil)
+				Return(expectedAddressID, nil)
 
-			newAddressId, err := addressDataService.Create(tenantId, applicationId, validAddress)
+			newAddressID, err := addressDataService.Create(tenantID, applicationID, validAddress)
 
-			Expect(expectedAddressId).To(Equal(newAddressId))
+			Expect(expectedAddressID).To(Equal(newAddressID))
 			Expect(err).To(BeNil())
 		})
 	})
 
 	Context("when UUID generator service fails to create the new UUID", func() {
 		It("should return address unique identifier as empty UUID and the returned error by address data service", func() {
-			expectedErrorId, _ := system.RandomUUID()
-			expectedError := errors.New(expectedErrorId.String())
+			expectedErrorID, _ := system.RandomUUID()
+			expectedError := errors.New(expectedErrorID.String())
 			mockUUIDGeneratorService.
 				EXPECT().
 				GenerateRandomUUID().
 				Return(system.EmptyUUID, expectedError)
 
-			newAddressId, err := addressDataService.Create(tenantId, applicationId, validAddress)
+			newAddressID, err := addressDataService.Create(tenantID, applicationID, validAddress)
 
-			Expect(newAddressId).To(Equal(system.EmptyUUID))
+			Expect(newAddressID).To(Equal(system.EmptyUUID))
 			Expect(err).To(Equal(expectedError))
 		})
 	})
@@ -89,16 +89,16 @@ var _ = Describe("Create method behaviour", func() {
 			mockUUIDGeneratorService.
 				EXPECT().
 				GenerateRandomUUID().
-				Return(addressId, nil)
+				Return(addressID, nil)
 
 			expectedAddressDetails := createRandomAddressDetails()
 
-			returnedAddressId, err := addressDataService.Create(
-				tenantId,
-				applicationId,
+			returnedAddressID, err := addressDataService.Create(
+				tenantID,
+				applicationID,
 				shared.Address{AddressDetails: expectedAddressDetails})
 
-			Expect(addressId).To(Equal(returnedAddressId))
+			Expect(addressID).To(Equal(returnedAddressID))
 			Expect(err).To(BeNil())
 
 			config := getClusterConfig()
@@ -117,9 +117,9 @@ var _ = Describe("Create method behaviour", func() {
 					" tenant_id = ?"+
 					" AND application_id = ?"+
 					" AND address_id = ?",
-				tenantId.String(),
-				applicationId.String(),
-				addressId.String()).Iter()
+				tenantID.String(),
+				applicationID.String(),
+				addressID.String()).Iter()
 
 			defer iter.Close()
 
@@ -139,11 +139,11 @@ var _ = Describe("Create method behaviour", func() {
 			mockUUIDGeneratorService.
 				EXPECT().
 				GenerateRandomUUID().
-				Return(addressId, nil)
+				Return(addressID, nil)
 
 			expectedAddressDetails := createRandomAddressDetails()
 
-			addressDataService.Create(tenantId, applicationId, shared.Address{AddressDetails: expectedAddressDetails})
+			addressDataService.Create(tenantID, applicationID, shared.Address{AddressDetails: expectedAddressDetails})
 
 			config := getClusterConfig()
 			config.Keyspace = keyspace
@@ -165,13 +165,13 @@ var _ = Describe("Create method behaviour", func() {
 						" tenant_id = ?"+
 						" AND application_id = ?"+
 						" AND address_key = ?",
-					tenantId.String(),
-					applicationId.String(),
+					tenantID.String(),
+					applicationID.String(),
 					key).Scan(&id, &addressValue)
 
 				Expect(err).To(BeNil())
 
-				Expect(addressId).To(Equal(mapGocqlUUIDToSystemUUID(id)))
+				Expect(addressID).To(Equal(mapGocqlUUIDToSystemUUID(id)))
 				Expect(value).To(Equal(addressValue))
 			}
 		})

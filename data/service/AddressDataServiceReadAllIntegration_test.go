@@ -20,9 +20,9 @@ var _ = Describe("ReadAll method behaviour", func() {
 		mockCtrl                 *gomock.Controller
 		addressDataService       *service.AddressDataService
 		mockUUIDGeneratorService *dataServiceMocks.MockUUIDGeneratorService
-		tenantId                 system.UUID
-		applicationId            system.UUID
-		addressId                system.UUID
+		tenantID                 system.UUID
+		applicationID            system.UUID
+		addressID                system.UUID
 		clusterConfig            *gocql.ClusterConfig
 		keyspace                 string
 	)
@@ -40,9 +40,9 @@ var _ = Describe("ReadAll method behaviour", func() {
 
 		addressDataService = &service.AddressDataService{UUIDGeneratorService: mockUUIDGeneratorService, ClusterConfig: clusterConfig}
 
-		tenantId, _ = system.RandomUUID()
-		applicationId, _ = system.RandomUUID()
-		addressId, _ = system.RandomUUID()
+		tenantID, _ = system.RandomUUID()
+		applicationID, _ = system.RandomUUID()
+		addressID, _ = system.RandomUUID()
 	})
 
 	AfterEach(func() {
@@ -54,22 +54,22 @@ var _ = Describe("ReadAll method behaviour", func() {
 		mockUUIDGeneratorService.
 			EXPECT().
 			GenerateRandomUUID().
-			Return(addressId, nil)
+			Return(addressID, nil)
 
 		expectedAddressDetails := createRandomAddressDetails()
 
 		expectedAddress := shared.Address{AddressDetails: expectedAddressDetails}
-		returnedAddressId, err := addressDataService.Create(
-			tenantId,
-			applicationId,
+		returnedAddressID, err := addressDataService.Create(
+			tenantID,
+			applicationID,
 			expectedAddress)
 
 		Expect(err).To(BeNil())
 
 		returnedAddress, err := addressDataService.ReadAll(
-			tenantId,
-			applicationId,
-			returnedAddressId)
+			tenantID,
+			applicationID,
+			returnedAddressID)
 
 		Expect(err).To(BeNil())
 		Expect(expectedAddress).To(Equal(returnedAddress))

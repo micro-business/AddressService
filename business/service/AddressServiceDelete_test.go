@@ -18,9 +18,9 @@ var _ = Describe("Delete method input parameters and dependency test", func() {
 		mockCtrl               *gomock.Controller
 		addressService         *service.AddressService
 		mockAddressDataService *dataServiceMocks.MockAddressDataService
-		tenantId               system.UUID
-		applicationId          system.UUID
-		addressId              system.UUID
+		tenantID               system.UUID
+		applicationID          system.UUID
+		addressID              system.UUID
 	)
 
 	BeforeEach(func() {
@@ -29,9 +29,9 @@ var _ = Describe("Delete method input parameters and dependency test", func() {
 
 		addressService = &service.AddressService{AddressDataService: mockAddressDataService}
 
-		tenantId, _ = system.RandomUUID()
-		applicationId, _ = system.RandomUUID()
-		addressId, _ = system.RandomUUID()
+		tenantID, _ = system.RandomUUID()
+		applicationID, _ = system.RandomUUID()
+		addressID, _ = system.RandomUUID()
 	})
 
 	AfterEach(func() {
@@ -42,17 +42,17 @@ var _ = Describe("Delete method input parameters and dependency test", func() {
 		It("should panic", func() {
 			addressService.AddressDataService = nil
 
-			Ω(func() { addressService.Delete(tenantId, applicationId, addressId) }).Should(Panic())
+			Ω(func() { addressService.Delete(tenantID, applicationID, addressID) }).Should(Panic())
 		})
 	})
 
 	DescribeTable("Input Parameters",
-		func(tenantId, applicationId, addressId system.UUID) {
-			Ω(func() { addressService.Delete(tenantId, applicationId, addressId) }).Should(Panic())
+		func(tenantID, applicationID, addressID system.UUID) {
+			Ω(func() { addressService.Delete(tenantID, applicationID, addressID) }).Should(Panic())
 		},
-		Entry("should panic when empty tenant unique identifier provided", system.EmptyUUID, applicationId, addressId),
-		Entry("should panic when empty application unique identifier provided", tenantId, system.EmptyUUID, addressId),
-		Entry("should panic when empty address unique identifier provided", tenantId, applicationId, system.EmptyUUID))
+		Entry("should panic when empty tenant unique identifier provided", system.EmptyUUID, applicationID, addressID),
+		Entry("should panic when empty application unique identifier provided", tenantID, system.EmptyUUID, addressID),
+		Entry("should panic when empty address unique identifier provided", tenantID, applicationID, system.EmptyUUID))
 })
 
 var _ = Describe("Delete method behaviour", func() {
@@ -60,9 +60,9 @@ var _ = Describe("Delete method behaviour", func() {
 		mockCtrl               *gomock.Controller
 		addressService         *service.AddressService
 		mockAddressDataService *dataServiceMocks.MockAddressDataService
-		tenantId               system.UUID
-		applicationId          system.UUID
-		addressId              system.UUID
+		tenantID               system.UUID
+		applicationID          system.UUID
+		addressID              system.UUID
 	)
 
 	BeforeEach(func() {
@@ -71,9 +71,9 @@ var _ = Describe("Delete method behaviour", func() {
 
 		addressService = &service.AddressService{AddressDataService: mockAddressDataService}
 
-		tenantId, _ = system.RandomUUID()
-		applicationId, _ = system.RandomUUID()
-		addressId, _ = system.RandomUUID()
+		tenantID, _ = system.RandomUUID()
+		applicationID, _ = system.RandomUUID()
+		addressID, _ = system.RandomUUID()
 	})
 
 	AfterEach(func() {
@@ -81,19 +81,19 @@ var _ = Describe("Delete method behaviour", func() {
 	})
 
 	It("should call address data service Delete function", func() {
-		mockAddressDataService.EXPECT().Delete(tenantId, applicationId, addressId)
+		mockAddressDataService.EXPECT().Delete(tenantID, applicationID, addressID)
 
-		addressService.Delete(tenantId, applicationId, addressId)
+		addressService.Delete(tenantID, applicationID, addressID)
 	})
 
 	Context("when address data service succeeds to delete the requested address", func() {
 		It("should return no error", func() {
 			mockAddressDataService.
 				EXPECT().
-				Delete(tenantId, applicationId, addressId).
+				Delete(tenantID, applicationID, addressID).
 				Return(nil)
 
-			err := addressService.Delete(tenantId, applicationId, addressId)
+			err := addressService.Delete(tenantID, applicationID, addressID)
 
 			Expect(err).To(BeNil())
 		})
@@ -101,14 +101,14 @@ var _ = Describe("Delete method behaviour", func() {
 
 	Context("when address data service fails to delete the requested address", func() {
 		It("should return the error returned by address data service", func() {
-			expectedErrorId, _ := system.RandomUUID()
-			expectedError := errors.New(expectedErrorId.String())
+			expectedErrorID, _ := system.RandomUUID()
+			expectedError := errors.New(expectedErrorID.String())
 			mockAddressDataService.
 				EXPECT().
-				Delete(tenantId, applicationId, addressId).
+				Delete(tenantID, applicationID, addressID).
 				Return(expectedError)
 
-			err := addressService.Delete(tenantId, applicationId, addressId)
+			err := addressService.Delete(tenantID, applicationID, addressID)
 
 			Expect(err).To(Equal(expectedError))
 		})

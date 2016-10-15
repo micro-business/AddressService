@@ -20,9 +20,9 @@ var _ = Describe("Update method input parameters and dependency test", func() {
 		mockCtrl               *gomock.Controller
 		addressService         *service.AddressService
 		mockAddressDataService *dataServiceMocks.MockAddressDataService
-		tenantId               system.UUID
-		applicationId          system.UUID
-		addressId              system.UUID
+		tenantID               system.UUID
+		applicationID          system.UUID
+		addressID              system.UUID
 		validAddress           domain.Address
 		emptyAddress           domain.Address
 	)
@@ -33,9 +33,9 @@ var _ = Describe("Update method input parameters and dependency test", func() {
 
 		addressService = &service.AddressService{AddressDataService: mockAddressDataService}
 
-		tenantId, _ = system.RandomUUID()
-		applicationId, _ = system.RandomUUID()
-		addressId, _ = system.RandomUUID()
+		tenantID, _ = system.RandomUUID()
+		applicationID, _ = system.RandomUUID()
+		addressID, _ = system.RandomUUID()
 		validAddress = domain.Address{AddressDetails: map[string]string{"City": "Christchurch"}}
 		emptyAddress = domain.Address{}
 	})
@@ -48,18 +48,18 @@ var _ = Describe("Update method input parameters and dependency test", func() {
 		It("should panic", func() {
 			addressService.AddressDataService = nil
 
-			Ω(func() { addressService.Update(tenantId, applicationId, addressId, validAddress) }).Should(Panic())
+			Ω(func() { addressService.Update(tenantID, applicationID, addressID, validAddress) }).Should(Panic())
 		})
 	})
 
 	DescribeTable("Input Parameters",
-		func(tenantId, applicationId, addressId system.UUID, address domain.Address) {
-			Ω(func() { addressService.Update(tenantId, applicationId, addressId, address) }).Should(Panic())
+		func(tenantID, applicationID, addressID system.UUID, address domain.Address) {
+			Ω(func() { addressService.Update(tenantID, applicationID, addressID, address) }).Should(Panic())
 		},
-		Entry("should panic when empty tenant unique identifier provided", system.EmptyUUID, applicationId, addressId, validAddress),
-		Entry("should panic when empty application unique identifier provided", tenantId, system.EmptyUUID, addressId, validAddress),
-		Entry("should panic when empty address unique identifier provided", tenantId, applicationId, system.EmptyUUID, validAddress),
-		Entry("should panic when address without address key provided", tenantId, applicationId, addressId, emptyAddress))
+		Entry("should panic when empty tenant unique identifier provided", system.EmptyUUID, applicationID, addressID, validAddress),
+		Entry("should panic when empty application unique identifier provided", tenantID, system.EmptyUUID, addressID, validAddress),
+		Entry("should panic when empty address unique identifier provided", tenantID, applicationID, system.EmptyUUID, validAddress),
+		Entry("should panic when address without address key provided", tenantID, applicationID, addressID, emptyAddress))
 })
 
 var _ = Describe("Update method behaviour", func() {
@@ -67,9 +67,9 @@ var _ = Describe("Update method behaviour", func() {
 		mockCtrl               *gomock.Controller
 		addressService         *service.AddressService
 		mockAddressDataService *dataServiceMocks.MockAddressDataService
-		tenantId               system.UUID
-		applicationId          system.UUID
-		addressId              system.UUID
+		tenantID               system.UUID
+		applicationID          system.UUID
+		addressID              system.UUID
 		validAddress           domain.Address
 	)
 
@@ -79,9 +79,9 @@ var _ = Describe("Update method behaviour", func() {
 
 		addressService = &service.AddressService{AddressDataService: mockAddressDataService}
 
-		tenantId, _ = system.RandomUUID()
-		applicationId, _ = system.RandomUUID()
-		addressId, _ = system.RandomUUID()
+		tenantID, _ = system.RandomUUID()
+		applicationID, _ = system.RandomUUID()
+		addressID, _ = system.RandomUUID()
 		validAddress = domain.Address{AddressDetails: map[string]string{"City": "Christchurch"}}
 	})
 
@@ -92,9 +92,9 @@ var _ = Describe("Update method behaviour", func() {
 	It("should call address data service Update function", func() {
 		mappedAddress := dataShared.Address{AddressDetails: validAddress.AddressDetails}
 
-		mockAddressDataService.EXPECT().Update(tenantId, applicationId, addressId, mappedAddress)
+		mockAddressDataService.EXPECT().Update(tenantID, applicationID, addressID, mappedAddress)
 
-		addressService.Update(tenantId, applicationId, addressId, validAddress)
+		addressService.Update(tenantID, applicationID, addressID, validAddress)
 	})
 
 	Context("when address data service succeeds to update the requested address", func() {
@@ -103,10 +103,10 @@ var _ = Describe("Update method behaviour", func() {
 
 			mockAddressDataService.
 				EXPECT().
-				Update(tenantId, applicationId, addressId, mappedAddress).
+				Update(tenantID, applicationID, addressID, mappedAddress).
 				Return(nil)
 
-			err := addressService.Update(tenantId, applicationId, addressId, validAddress)
+			err := addressService.Update(tenantID, applicationID, addressID, validAddress)
 
 			Expect(err).To(BeNil())
 		})
@@ -116,14 +116,14 @@ var _ = Describe("Update method behaviour", func() {
 		It("should return the error returned by address data service", func() {
 			mappedAddress := dataShared.Address{AddressDetails: validAddress.AddressDetails}
 
-			expectedErrorId, _ := system.RandomUUID()
-			expectedError := errors.New(expectedErrorId.String())
+			expectedErrorID, _ := system.RandomUUID()
+			expectedError := errors.New(expectedErrorID.String())
 			mockAddressDataService.
 				EXPECT().
-				Update(tenantId, applicationId, addressId, mappedAddress).
+				Update(tenantID, applicationID, addressID, mappedAddress).
 				Return(expectedError)
 
-			err := addressService.Update(tenantId, applicationId, addressId, validAddress)
+			err := addressService.Update(tenantID, applicationID, addressID, validAddress)
 
 			Expect(err).To(Equal(expectedError))
 		})

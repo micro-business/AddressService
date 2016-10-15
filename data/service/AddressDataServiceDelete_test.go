@@ -14,33 +14,33 @@ import (
 var _ = Describe("Delete method input parameters and dependency test", func() {
 	var (
 		addressDataService *service.AddressDataService
-		tenantId           system.UUID
-		applicationId      system.UUID
-		addressId          system.UUID
+		tenantID           system.UUID
+		applicationID      system.UUID
+		addressID          system.UUID
 	)
 
 	BeforeEach(func() {
 		addressDataService = &service.AddressDataService{ClusterConfig: &gocql.ClusterConfig{}}
-		tenantId, _ = system.RandomUUID()
-		applicationId, _ = system.RandomUUID()
-		addressId, _ = system.RandomUUID()
+		tenantID, _ = system.RandomUUID()
+		applicationID, _ = system.RandomUUID()
+		addressID, _ = system.RandomUUID()
 	})
 
 	Context("when cluster configuration not provided", func() {
 		It("should panic", func() {
 			addressDataService.ClusterConfig = nil
 
-			Ω(func() { addressDataService.Delete(tenantId, applicationId, addressId) }).Should(Panic())
+			Ω(func() { addressDataService.Delete(tenantID, applicationID, addressID) }).Should(Panic())
 		})
 	})
 
 	DescribeTable("Input Parameters",
-		func(tenantId, applicationId, addressId system.UUID) {
-			Ω(func() { addressDataService.Delete(tenantId, applicationId, addressId) }).Should(Panic())
+		func(tenantID, applicationID, addressID system.UUID) {
+			Ω(func() { addressDataService.Delete(tenantID, applicationID, addressID) }).Should(Panic())
 		},
-		Entry("should panic when empty tenant unique identifier provided", system.EmptyUUID, applicationId, addressId),
-		Entry("should panic when empty application unique identifier provided", tenantId, system.EmptyUUID, addressId),
-		Entry("should panic when empty address unique identifier provided", tenantId, applicationId, system.EmptyUUID))
+		Entry("should panic when empty tenant unique identifier provided", system.EmptyUUID, applicationID, addressID),
+		Entry("should panic when empty application unique identifier provided", tenantID, system.EmptyUUID, addressID),
+		Entry("should panic when empty address unique identifier provided", tenantID, applicationID, system.EmptyUUID))
 })
 
 func TestDelete(t *testing.T) {

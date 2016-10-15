@@ -15,18 +15,18 @@ import (
 var _ = Describe("Update method input parameters and dependency test", func() {
 	var (
 		addressDataService *service.AddressDataService
-		tenantId           system.UUID
-		applicationId      system.UUID
-		addressId          system.UUID
+		tenantID           system.UUID
+		applicationID      system.UUID
+		addressID          system.UUID
 		validAddress       shared.Address
 		emptyAddress       shared.Address
 	)
 
 	BeforeEach(func() {
 		addressDataService = &service.AddressDataService{ClusterConfig: &gocql.ClusterConfig{}}
-		tenantId, _ = system.RandomUUID()
-		applicationId, _ = system.RandomUUID()
-		addressId, _ = system.RandomUUID()
+		tenantID, _ = system.RandomUUID()
+		applicationID, _ = system.RandomUUID()
+		addressID, _ = system.RandomUUID()
 		validAddress = shared.Address{AddressDetails: map[string]string{"City": "Christchurch"}}
 		emptyAddress = shared.Address{}
 	})
@@ -35,18 +35,18 @@ var _ = Describe("Update method input parameters and dependency test", func() {
 		It("should panic", func() {
 			addressDataService.ClusterConfig = nil
 
-			Ω(func() { addressDataService.Update(tenantId, applicationId, addressId, validAddress) }).Should(Panic())
+			Ω(func() { addressDataService.Update(tenantID, applicationID, addressID, validAddress) }).Should(Panic())
 		})
 	})
 
 	DescribeTable("Input Parameters",
-		func(tenantId, applicationId, addressId system.UUID, address shared.Address) {
-			Ω(func() { addressDataService.Update(tenantId, applicationId, addressId, address) }).Should(Panic())
+		func(tenantID, applicationID, addressID system.UUID, address shared.Address) {
+			Ω(func() { addressDataService.Update(tenantID, applicationID, addressID, address) }).Should(Panic())
 		},
-		Entry("should panic when empty tenant unique identifier provided", system.EmptyUUID, applicationId, addressId, validAddress),
-		Entry("should panic when empty application unique identifier provided", tenantId, system.EmptyUUID, addressId, validAddress),
-		Entry("should panic when empty address unique identifier provided", tenantId, applicationId, system.EmptyUUID, validAddress),
-		Entry("should panic when address without address key provided", tenantId, applicationId, addressId, emptyAddress))
+		Entry("should panic when empty tenant unique identifier provided", system.EmptyUUID, applicationID, addressID, validAddress),
+		Entry("should panic when empty application unique identifier provided", tenantID, system.EmptyUUID, addressID, validAddress),
+		Entry("should panic when empty address unique identifier provided", tenantID, applicationID, system.EmptyUUID, validAddress),
+		Entry("should panic when address without address key provided", tenantID, applicationID, addressID, emptyAddress))
 })
 
 func TestUpdate(t *testing.T) {

@@ -8,7 +8,7 @@ import (
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 )
 
-// The address service provides access to add new address and update/retrieve/remove an existing address.
+// AddressService provides access to add new address and update/retrieve/remove an existing address.
 type AddressService struct {
 	AddressDataService dataContract.AddressDataService
 }
@@ -63,11 +63,13 @@ func (addressService AddressService) Read(tenantID, applicationID, addressID sys
 
 	//TODO: 20160722: Add details keys validation here
 
-	if address, err := addressService.AddressDataService.Read(tenantID, applicationID, addressID, detailsKeys); err != nil {
+	address, err := addressService.AddressDataService.Read(tenantID, applicationID, addressID, detailsKeys)
+
+	if err != nil {
 		return domain.Address{}, err
-	} else {
-		return mapFromDataAddress(address), nil
 	}
+
+	return mapFromDataAddress(address), nil
 }
 
 // ReadAll retrieves an existing address information and returns all the detail of it.
@@ -81,11 +83,13 @@ func (addressService AddressService) ReadAll(tenantID, applicationID, addressID 
 	diagnostics.IsNotNilOrEmpty(applicationID, "applicationID", "applicationID must be provided.")
 	diagnostics.IsNotNilOrEmpty(addressID, "addressID", "addressID must be provided.")
 
-	if address, err := addressService.AddressDataService.ReadAll(tenantID, applicationID, addressID); err != nil {
+	address, err := addressService.AddressDataService.ReadAll(tenantID, applicationID, addressID)
+
+	if err != nil {
 		return domain.Address{}, err
-	} else {
-		return mapFromDataAddress(address), nil
 	}
+
+	return mapFromDataAddress(address), nil
 }
 
 // Delete deletes an existing address information.

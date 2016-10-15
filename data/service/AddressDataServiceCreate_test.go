@@ -19,8 +19,8 @@ var _ = Describe("Create method input parameters and dependency test", func() {
 		mockCtrl                 *gomock.Controller
 		addressDataService       *service.AddressDataService
 		mockUUIDGeneratorService *dataServiceMocks.MockUUIDGeneratorService
-		tenantId                 system.UUID
-		applicationId            system.UUID
+		tenantID                 system.UUID
+		applicationID            system.UUID
 		validAddress             shared.Address
 		emptyAddress             shared.Address
 	)
@@ -31,8 +31,8 @@ var _ = Describe("Create method input parameters and dependency test", func() {
 
 		addressDataService = &service.AddressDataService{UUIDGeneratorService: mockUUIDGeneratorService, ClusterConfig: &gocql.ClusterConfig{}}
 
-		tenantId, _ = system.RandomUUID()
-		applicationId, _ = system.RandomUUID()
+		tenantID, _ = system.RandomUUID()
+		applicationID, _ = system.RandomUUID()
 		validAddress = shared.Address{AddressDetails: map[string]string{"City": "Christchurch"}}
 		emptyAddress = shared.Address{}
 	})
@@ -45,7 +45,7 @@ var _ = Describe("Create method input parameters and dependency test", func() {
 		It("should panic", func() {
 			addressDataService.UUIDGeneratorService = nil
 
-			Ω(func() { addressDataService.Create(tenantId, applicationId, validAddress) }).Should(Panic())
+			Ω(func() { addressDataService.Create(tenantID, applicationID, validAddress) }).Should(Panic())
 		})
 	})
 
@@ -53,17 +53,17 @@ var _ = Describe("Create method input parameters and dependency test", func() {
 		It("should panic", func() {
 			addressDataService.ClusterConfig = nil
 
-			Ω(func() { addressDataService.Create(tenantId, applicationId, validAddress) }).Should(Panic())
+			Ω(func() { addressDataService.Create(tenantID, applicationID, validAddress) }).Should(Panic())
 		})
 	})
 
 	DescribeTable("Input Parameters",
-		func(tenantId, applicationId system.UUID, address shared.Address) {
-			Ω(func() { addressDataService.Create(tenantId, applicationId, address) }).Should(Panic())
+		func(tenantID, applicationID system.UUID, address shared.Address) {
+			Ω(func() { addressDataService.Create(tenantID, applicationID, address) }).Should(Panic())
 		},
-		Entry("should panic when empty tenant unique identifier provided", system.EmptyUUID, applicationId, validAddress),
-		Entry("should panic when empty application unique identifier provided", tenantId, system.EmptyUUID, validAddress),
-		Entry("should panic when address without address key provided", tenantId, applicationId, emptyAddress))
+		Entry("should panic when empty tenant unique identifier provided", system.EmptyUUID, applicationID, validAddress),
+		Entry("should panic when empty application unique identifier provided", tenantID, system.EmptyUUID, validAddress),
+		Entry("should panic when address without address key provided", tenantID, applicationID, emptyAddress))
 })
 
 func TestCreate(t *testing.T) {

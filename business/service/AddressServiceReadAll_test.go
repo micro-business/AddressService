@@ -21,9 +21,9 @@ var _ = Describe("ReadAll method input parameters and dependency test", func() {
 		mockCtrl               *gomock.Controller
 		addressService         *service.AddressService
 		mockAddressDataService *dataServiceMocks.MockAddressDataService
-		tenantId               system.UUID
-		applicationId          system.UUID
-		addressId              system.UUID
+		tenantID               system.UUID
+		applicationID          system.UUID
+		addressID              system.UUID
 	)
 
 	BeforeEach(func() {
@@ -32,9 +32,9 @@ var _ = Describe("ReadAll method input parameters and dependency test", func() {
 
 		addressService = &service.AddressService{AddressDataService: mockAddressDataService}
 
-		tenantId, _ = system.RandomUUID()
-		applicationId, _ = system.RandomUUID()
-		addressId, _ = system.RandomUUID()
+		tenantID, _ = system.RandomUUID()
+		applicationID, _ = system.RandomUUID()
+		addressID, _ = system.RandomUUID()
 	})
 
 	AfterEach(func() {
@@ -45,17 +45,17 @@ var _ = Describe("ReadAll method input parameters and dependency test", func() {
 		It("should panic", func() {
 			addressService.AddressDataService = nil
 
-			Ω(func() { addressService.ReadAll(tenantId, applicationId, addressId) }).Should(Panic())
+			Ω(func() { addressService.ReadAll(tenantID, applicationID, addressID) }).Should(Panic())
 		})
 	})
 
 	DescribeTable("Input Parameters",
-		func(tenantId, applicationId, addressId system.UUID) {
-			Ω(func() { addressService.ReadAll(tenantId, applicationId, addressId) }).Should(Panic())
+		func(tenantID, applicationID, addressID system.UUID) {
+			Ω(func() { addressService.ReadAll(tenantID, applicationID, addressID) }).Should(Panic())
 		},
-		Entry("should panic when empty tenant unique identifier provided", system.EmptyUUID, applicationId, addressId),
-		Entry("should panic when empty application unique identifier provided", tenantId, system.EmptyUUID, addressId),
-		Entry("should panic when empty address unique identifier provided", tenantId, applicationId, system.EmptyUUID))
+		Entry("should panic when empty tenant unique identifier provided", system.EmptyUUID, applicationID, addressID),
+		Entry("should panic when empty application unique identifier provided", tenantID, system.EmptyUUID, addressID),
+		Entry("should panic when empty address unique identifier provided", tenantID, applicationID, system.EmptyUUID))
 })
 
 var _ = Describe("ReadAll method behaviour", func() {
@@ -63,9 +63,9 @@ var _ = Describe("ReadAll method behaviour", func() {
 		mockCtrl               *gomock.Controller
 		addressService         *service.AddressService
 		mockAddressDataService *dataServiceMocks.MockAddressDataService
-		tenantId               system.UUID
-		applicationId          system.UUID
-		addressId              system.UUID
+		tenantID               system.UUID
+		applicationID          system.UUID
+		addressID              system.UUID
 	)
 
 	BeforeEach(func() {
@@ -74,9 +74,9 @@ var _ = Describe("ReadAll method behaviour", func() {
 
 		addressService = &service.AddressService{AddressDataService: mockAddressDataService}
 
-		tenantId, _ = system.RandomUUID()
-		applicationId, _ = system.RandomUUID()
-		addressId, _ = system.RandomUUID()
+		tenantID, _ = system.RandomUUID()
+		applicationID, _ = system.RandomUUID()
+		addressID, _ = system.RandomUUID()
 	})
 
 	AfterEach(func() {
@@ -84,9 +84,9 @@ var _ = Describe("ReadAll method behaviour", func() {
 	})
 
 	It("should call address data service ReadAll function", func() {
-		mockAddressDataService.EXPECT().ReadAll(tenantId, applicationId, addressId)
+		mockAddressDataService.EXPECT().ReadAll(tenantID, applicationID, addressID)
 
-		addressService.ReadAll(tenantId, applicationId, addressId)
+		addressService.ReadAll(tenantID, applicationID, addressID)
 	})
 
 	Context("when address data service succeeds to read the requested address", func() {
@@ -103,10 +103,10 @@ var _ = Describe("ReadAll method behaviour", func() {
 			expectedAddress := domain.Address{AddressDetails: addressDetails}
 			mockAddressDataService.
 				EXPECT().
-				ReadAll(tenantId, applicationId, addressId).
+				ReadAll(tenantID, applicationID, addressID).
 				Return(dataShared.Address{AddressDetails: expectedAddress.AddressDetails}, nil)
 
-			address, err := addressService.ReadAll(tenantId, applicationId, addressId)
+			address, err := addressService.ReadAll(tenantID, applicationID, addressID)
 
 			Expect(address).To(Equal(expectedAddress))
 			Expect(err).To(BeNil())
@@ -115,14 +115,14 @@ var _ = Describe("ReadAll method behaviour", func() {
 
 	Context("when address data service fails to read the requested address", func() {
 		It("should return the error returned by address data service", func() {
-			expectedErrorId, _ := system.RandomUUID()
-			expectedError := errors.New(expectedErrorId.String())
+			expectedErrorID, _ := system.RandomUUID()
+			expectedError := errors.New(expectedErrorID.String())
 			mockAddressDataService.
 				EXPECT().
-				ReadAll(tenantId, applicationId, addressId).
+				ReadAll(tenantID, applicationID, addressID).
 				Return(dataShared.Address{}, expectedError)
 
-			expectedAddress, err := addressService.ReadAll(tenantId, applicationId, addressId)
+			expectedAddress, err := addressService.ReadAll(tenantID, applicationID, addressID)
 
 			Expect(expectedAddress).To(Equal(domain.Address{}))
 			Expect(err).To(Equal(expectedError))

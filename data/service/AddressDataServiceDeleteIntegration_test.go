@@ -20,9 +20,9 @@ var _ = Describe("Delete method behaviour", func() {
 		mockCtrl                 *gomock.Controller
 		addressDataService       *service.AddressDataService
 		mockUUIDGeneratorService *dataServiceMocks.MockUUIDGeneratorService
-		tenantId                 system.UUID
-		applicationId            system.UUID
-		addressId                system.UUID
+		tenantID                 system.UUID
+		applicationID            system.UUID
+		addressID                system.UUID
 		clusterConfig            *gocql.ClusterConfig
 		keyspace                 string
 	)
@@ -40,9 +40,9 @@ var _ = Describe("Delete method behaviour", func() {
 
 		addressDataService = &service.AddressDataService{UUIDGeneratorService: mockUUIDGeneratorService, ClusterConfig: clusterConfig}
 
-		tenantId, _ = system.RandomUUID()
-		applicationId, _ = system.RandomUUID()
-		addressId, _ = system.RandomUUID()
+		tenantID, _ = system.RandomUUID()
+		applicationID, _ = system.RandomUUID()
+		addressID, _ = system.RandomUUID()
 	})
 
 	AfterEach(func() {
@@ -55,21 +55,21 @@ var _ = Describe("Delete method behaviour", func() {
 			mockUUIDGeneratorService.
 				EXPECT().
 				GenerateRandomUUID().
-				Return(addressId, nil)
+				Return(addressID, nil)
 
 			expectedAddressDetails := createRandomAddressDetails()
 
-			returnedAddressId, err := addressDataService.Create(
-				tenantId,
-				applicationId,
+			returnedAddressID, err := addressDataService.Create(
+				tenantID,
+				applicationID,
 				shared.Address{AddressDetails: expectedAddressDetails})
 
 			Expect(err).To(BeNil())
 
 			err = addressDataService.Delete(
-				tenantId,
-				applicationId,
-				returnedAddressId)
+				tenantID,
+				applicationID,
+				returnedAddressID)
 
 			Expect(err).To(BeNil())
 
@@ -92,9 +92,9 @@ var _ = Describe("Delete method behaviour", func() {
 					" tenant_id = ?"+
 					" AND application_id = ?"+
 					" AND address_id = ?",
-				tenantId.String(),
-				applicationId.String(),
-				returnedAddressId.String()).Iter()
+				tenantID.String(),
+				applicationID.String(),
+				returnedAddressID.String()).Iter()
 
 			defer iter.Close()
 
@@ -105,21 +105,21 @@ var _ = Describe("Delete method behaviour", func() {
 			mockUUIDGeneratorService.
 				EXPECT().
 				GenerateRandomUUID().
-				Return(addressId, nil)
+				Return(addressID, nil)
 
 			expectedAddressDetails := createRandomAddressDetails()
 
-			returnedAddressId, err := addressDataService.Create(
-				tenantId,
-				applicationId,
+			returnedAddressID, err := addressDataService.Create(
+				tenantID,
+				applicationID,
 				shared.Address{AddressDetails: expectedAddressDetails})
 
 			Expect(err).To(BeNil())
 
 			err = addressDataService.Delete(
-				tenantId,
-				applicationId,
-				returnedAddressId)
+				tenantID,
+				applicationID,
+				returnedAddressID)
 
 			Expect(err).To(BeNil())
 
@@ -143,8 +143,8 @@ var _ = Describe("Delete method behaviour", func() {
 						" tenant_id = ?"+
 						" AND application_id = ?"+
 						" AND address_key = ?",
-					tenantId.String(),
-					applicationId.String(),
+					tenantID.String(),
+					applicationID.String(),
 					key).Iter()
 
 				defer iter.Close()

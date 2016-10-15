@@ -21,8 +21,8 @@ var _ = Describe("Create method input parameters and dependency test", func() {
 		mockCtrl               *gomock.Controller
 		addressService         *service.AddressService
 		mockAddressDataService *dataServiceMocks.MockAddressDataService
-		tenantId               system.UUID
-		applicationId          system.UUID
+		tenantID               system.UUID
+		applicationID          system.UUID
 		validAddress           domain.Address
 		emptyAddress           domain.Address
 	)
@@ -33,8 +33,8 @@ var _ = Describe("Create method input parameters and dependency test", func() {
 
 		addressService = &service.AddressService{AddressDataService: mockAddressDataService}
 
-		tenantId, _ = system.RandomUUID()
-		applicationId, _ = system.RandomUUID()
+		tenantID, _ = system.RandomUUID()
+		applicationID, _ = system.RandomUUID()
 		validAddress = domain.Address{AddressDetails: map[string]string{"City": "Christchurch"}}
 		emptyAddress = domain.Address{}
 	})
@@ -47,17 +47,17 @@ var _ = Describe("Create method input parameters and dependency test", func() {
 		It("should panic", func() {
 			addressService.AddressDataService = nil
 
-			Ω(func() { addressService.Create(tenantId, applicationId, validAddress) }).Should(Panic())
+			Ω(func() { addressService.Create(tenantID, applicationID, validAddress) }).Should(Panic())
 		})
 	})
 
 	DescribeTable("Input Parameters",
-		func(tenantId, applicationId system.UUID, address domain.Address) {
-			Ω(func() { addressService.Create(tenantId, applicationId, address) }).Should(Panic())
+		func(tenantID, applicationID system.UUID, address domain.Address) {
+			Ω(func() { addressService.Create(tenantID, applicationID, address) }).Should(Panic())
 		},
-		Entry("should panic when empty tenant unique identifier provided", system.EmptyUUID, applicationId, validAddress),
-		Entry("should panic when empty application unique identifier provided", tenantId, system.EmptyUUID, validAddress),
-		Entry("should panic when address without address key provided", tenantId, applicationId, emptyAddress))
+		Entry("should panic when empty tenant unique identifier provided", system.EmptyUUID, applicationID, validAddress),
+		Entry("should panic when empty application unique identifier provided", tenantID, system.EmptyUUID, validAddress),
+		Entry("should panic when address without address key provided", tenantID, applicationID, emptyAddress))
 })
 
 var _ = Describe("Create method behaviour", func() {
@@ -65,8 +65,8 @@ var _ = Describe("Create method behaviour", func() {
 		mockCtrl               *gomock.Controller
 		addressService         *service.AddressService
 		mockAddressDataService *dataServiceMocks.MockAddressDataService
-		tenantId               system.UUID
-		applicationId          system.UUID
+		tenantID               system.UUID
+		applicationID          system.UUID
 		validAddress           domain.Address
 	)
 
@@ -76,8 +76,8 @@ var _ = Describe("Create method behaviour", func() {
 
 		addressService = &service.AddressService{AddressDataService: mockAddressDataService}
 
-		tenantId, _ = system.RandomUUID()
-		applicationId, _ = system.RandomUUID()
+		tenantID, _ = system.RandomUUID()
+		applicationID, _ = system.RandomUUID()
 		validAddress = domain.Address{AddressDetails: map[string]string{"City": "Christchurch"}}
 	})
 
@@ -88,9 +88,9 @@ var _ = Describe("Create method behaviour", func() {
 	It("should call address data service Create function", func() {
 		mappedAddress := dataShared.Address{AddressDetails: validAddress.AddressDetails}
 
-		mockAddressDataService.EXPECT().Create(tenantId, applicationId, mappedAddress)
+		mockAddressDataService.EXPECT().Create(tenantID, applicationID, mappedAddress)
 
-		addressService.Create(tenantId, applicationId, validAddress)
+		addressService.Create(tenantID, applicationID, validAddress)
 	})
 
 	Context("when address data service succeeds to create the new address", func() {
@@ -106,15 +106,15 @@ var _ = Describe("Create method behaviour", func() {
 
 			mappedAddress := dataShared.Address{AddressDetails: addressDetails}
 
-			expectedAddressId, _ := system.RandomUUID()
+			expectedAddressID, _ := system.RandomUUID()
 			mockAddressDataService.
 				EXPECT().
-				Create(tenantId, applicationId, mappedAddress).
-				Return(expectedAddressId, nil)
+				Create(tenantID, applicationID, mappedAddress).
+				Return(expectedAddressID, nil)
 
-			newAddressId, err := addressService.Create(tenantId, applicationId, domain.Address{AddressDetails: addressDetails})
+			dnewAddressIDd, err := addressService.Create(tenantID, applicationID, domain.Address{AddressDetails: addressDetails})
 
-			Expect(expectedAddressId).To(Equal(newAddressId))
+			Expect(expectedAddressID).To(Equal(dnewAddressIDd))
 			Expect(err).To(BeNil())
 		})
 	})
@@ -123,16 +123,16 @@ var _ = Describe("Create method behaviour", func() {
 		It("should return address unique identifier as empty UUID and the returned error by address data service", func() {
 			mappedAddress := dataShared.Address{AddressDetails: validAddress.AddressDetails}
 
-			expectedErrorId, _ := system.RandomUUID()
-			expectedError := errors.New(expectedErrorId.String())
+			expectedErrorID, _ := system.RandomUUID()
+			expectedError := errors.New(expectedErrorID.String())
 			mockAddressDataService.
 				EXPECT().
-				Create(tenantId, applicationId, mappedAddress).
+				Create(tenantID, applicationID, mappedAddress).
 				Return(system.EmptyUUID, expectedError)
 
-			newAddressId, err := addressService.Create(tenantId, applicationId, validAddress)
+			dnewAddressIDd, err := addressService.Create(tenantID, applicationID, validAddress)
 
-			Expect(newAddressId).To(Equal(system.EmptyUUID))
+			Expect(dnewAddressIDd).To(Equal(system.EmptyUUID))
 			Expect(err).To(Equal(expectedError))
 		})
 	})

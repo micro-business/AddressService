@@ -4,11 +4,11 @@ import (
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 )
 
-// Default implementation of UUID generator service
+// UUIDGeneratorServiceImpl is the default implementation of UUID generator service
 type UUIDGeneratorServiceImpl struct {
 }
 
-// Generates random UUID value.
+// GenerateRandomUUID generates random UUID value.
 // Either the new random generated UUID or an error if something goes wrong.
 func (UUIDGeneratorServiceImpl) GenerateRandomUUID() (system.UUID, error) {
 	return system.RandomUUID()
