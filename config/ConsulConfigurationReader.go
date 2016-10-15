@@ -22,6 +22,7 @@ const cassandraHostsKey = "services/address-service/data/cassandra/hosts"
 const cassandraKeyspaceKey = "services/address-service/data/cassandra/keyspace"
 const cassandraProtocolVersionKey = "services/address-service/data/cassandra/protocol-version"
 
+// GetListeningPort returns the port the service should listen on to serve the HTTP request
 func (consul ConsulConfigurationReader) GetListeningPort() (int, error) {
 	if consul.ListeningPortToOverride != 0 {
 		return consul.ListeningPortToOverride, nil
@@ -32,6 +33,7 @@ func (consul ConsulConfigurationReader) GetListeningPort() (int, error) {
 	return consulHelper.GetInt(serviceListeningPortKey)
 }
 
+// GetCassandraHosts returns the list of Cassandra host addresses.
 func (consul ConsulConfigurationReader) GetCassandraHosts() ([]string, error) {
 	if len(consul.CassandraHostsToOverride) != 0 {
 		return consul.CassandraHostsToOverride, nil
@@ -59,6 +61,7 @@ func (consul ConsulConfigurationReader) GetCassandraHosts() ([]string, error) {
 	return strings.Split(string(keyPair.Value), ","), nil
 }
 
+// GetCassandraKeyspace returns the name of Cassandra key space that the service data is stored under.
 func (consul ConsulConfigurationReader) GetCassandraKeyspace() (string, error) {
 	if len(consul.CassandraKeyspaceToOverride) != 0 {
 		return consul.CassandraKeyspaceToOverride, nil
@@ -69,6 +72,7 @@ func (consul ConsulConfigurationReader) GetCassandraKeyspace() (string, error) {
 	return consulHelper.GetString(cassandraKeyspaceKey)
 }
 
+// GetCassandraProtocolVersion returns the Cassandra protocol version to be used when connecting to Cassandra database.
 func (consul ConsulConfigurationReader) GetCassandraProtocolVersion() (int, error) {
 	if consul.CassandraProtocolVersionToOverride != 0 {
 		return consul.CassandraProtocolVersionToOverride, nil
