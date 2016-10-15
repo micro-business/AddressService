@@ -9,6 +9,7 @@ import (
 	"github.com/gocql/gocql"
 	"github.com/golang/mock/gomock"
 	"github.com/microbusinesses/AddressService/data/contract"
+	"github.com/microbusinesses/AddressService/data/service"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

@@ -9,7 +9,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/microbusinesses/AddressService/data/contract"
 	"github.com/microbusinesses/AddressService/data/service"
-	dataServiceMocks "github.com/microbusinesses/AddressService/data/service/mocks"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -19,7 +18,7 @@ var _ = Describe("ReadAll method behaviour", func() {
 	var (
 		mockCtrl                 *gomock.Controller
 		addressDataService       *service.AddressDataService
-		mockUUIDGeneratorService *dataServiceMocks.MockUUIDGeneratorService
+		mockUUIDGeneratorService *MockUUIDGeneratorService
 		tenantID                 system.UUID
 		applicationID            system.UUID
 		addressID                system.UUID
@@ -36,7 +35,7 @@ var _ = Describe("ReadAll method behaviour", func() {
 		clusterConfig.Keyspace = keyspace
 
 		mockCtrl = gomock.NewController(GinkgoT())
-		mockUUIDGeneratorService = dataServiceMocks.NewMockUUIDGeneratorService(mockCtrl)
+		mockUUIDGeneratorService = NewMockUUIDGeneratorService(mockCtrl)
 
 		addressDataService = &service.AddressDataService{UUIDGeneratorService: mockUUIDGeneratorService, ClusterConfig: clusterConfig}
 
