@@ -14,56 +14,56 @@ type AddressService struct {
 }
 
 // Create creates a new address.
-// tenantId: Mandatory. The unique identifier of the tenant owning the address.
-// applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
+// tenantID: Mandatory. The unique identifier of the tenant owning the address.
+// applicationID: Mandatory. The unique identifier of the tenant's application will be owning the address.
 // address: Mandatory. The reference to the new address information.
 // Returns either the unique identifier of the new address or error if something goes wrong.
-func (addressService AddressService) Create(tenantId, applicationId system.UUID, address domain.Address) (system.UUID, error) {
+func (addressService AddressService) Create(tenantID, applicationID system.UUID, address domain.Address) (system.UUID, error) {
 	diagnostics.IsNotNil(addressService.AddressDataService, "addressService.AddressDataService", "AddressDataService must be provided.")
-	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
-	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
+	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
+	diagnostics.IsNotNilOrEmpty(applicationID, "applicationID", "applicationID must be provided.")
 
 	if len(address.AddressDetails) == 0 {
 		panic("Address does not contain any address key.")
 	}
 
-	return addressService.AddressDataService.Create(tenantId, applicationId, mapToDataAddress(address))
+	return addressService.AddressDataService.Create(tenantID, applicationID, mapToDataAddress(address))
 }
 
 // Update updates an existing address.
-// tenantId: Mandatory. The unique identifier of the tenant owning the address.
-// applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
-// addressId: Mandatory. The unique identifier of the existing address.
+// tenantID: Mandatory. The unique identifier of the tenant owning the address.
+// applicationID: Mandatory. The unique identifier of the tenant's application will be owning the address.
+// addressID: Mandatory. The unique identifier of the existing address.
 // address: Mandatory. The reeference to the updated address information.
 // Returns error if something goes wrong.
-func (addressService AddressService) Update(tenantId, applicationId, addressId system.UUID, address domain.Address) error {
+func (addressService AddressService) Update(tenantID, applicationID, addressID system.UUID, address domain.Address) error {
 	diagnostics.IsNotNil(addressService.AddressDataService, "addressService.AddressDataService", "AddressDataService must be provided.")
-	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
-	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
-	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
+	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
+	diagnostics.IsNotNilOrEmpty(applicationID, "applicationID", "applicationID must be provided.")
+	diagnostics.IsNotNilOrEmpty(addressID, "addressID", "addressID must be provided.")
 
 	if len(address.AddressDetails) == 0 {
 		panic("Address does not contain any address key.")
 	}
 
-	return addressService.AddressDataService.Update(tenantId, applicationId, addressId, mapToDataAddress(address))
+	return addressService.AddressDataService.Update(tenantID, applicationID, addressID, mapToDataAddress(address))
 }
 
 // Read retrieves an existing address information and returns only the detail which the keys provided by the detailsKeys.
-// tenantId: Mandatory. The unique identifier of the tenant owning the address.
-// applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
-// addressId: Mandatory. The unique identifier of the existing address.
+// tenantID: Mandatory. The unique identifier of the tenant owning the address.
+// applicationID: Mandatory. The unique identifier of the tenant's application will be owning the address.
+// addressID: Mandatory. The unique identifier of the existing address.
 // detailsKeys: Mandatory. The interested address details keys to return.
 // Returns either the address information or error if something goes wrong.
-func (addressService AddressService) Read(tenantId, applicationId, addressId system.UUID, detailsKeys []string) (domain.Address, error) {
+func (addressService AddressService) Read(tenantID, applicationID, addressID system.UUID, detailsKeys []string) (domain.Address, error) {
 	diagnostics.IsNotNil(addressService.AddressDataService, "addressService.AddressDataService", "AddressDataService must be provided.")
-	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
-	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
-	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
+	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
+	diagnostics.IsNotNilOrEmpty(applicationID, "applicationID", "applicationID must be provided.")
+	diagnostics.IsNotNilOrEmpty(addressID, "addressID", "addressID must be provided.")
 
 	//TODO: 20160722: Add details keys validation here
 
-	if address, err := addressService.AddressDataService.Read(tenantId, applicationId, addressId, detailsKeys); err != nil {
+	if address, err := addressService.AddressDataService.Read(tenantID, applicationID, addressID, detailsKeys); err != nil {
 		return domain.Address{}, err
 	} else {
 		return mapFromDataAddress(address), nil
@@ -71,17 +71,17 @@ func (addressService AddressService) Read(tenantId, applicationId, addressId sys
 }
 
 // ReadAll retrieves an existing address information and returns all the detail of it.
-// tenantId: Mandatory. The unique identifier of the tenant owning the address.
-// applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
-// addressId: Mandatory. The unique identifier of the existing address.
+// tenantID: Mandatory. The unique identifier of the tenant owning the address.
+// applicationID: Mandatory. The unique identifier of the tenant's application will be owning the address.
+// addressID: Mandatory. The unique identifier of the existing address.
 // Returns either the address information or error if something goes wrong.
-func (addressService AddressService) ReadAll(tenantId, applicationId, addressId system.UUID) (domain.Address, error) {
+func (addressService AddressService) ReadAll(tenantID, applicationID, addressID system.UUID) (domain.Address, error) {
 	diagnostics.IsNotNil(addressService.AddressDataService, "addressService.AddressDataService", "AddressDataService must be provided.")
-	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
-	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
-	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId must be provided.")
+	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
+	diagnostics.IsNotNilOrEmpty(applicationID, "applicationID", "applicationID must be provided.")
+	diagnostics.IsNotNilOrEmpty(addressID, "addressID", "addressID must be provided.")
 
-	if address, err := addressService.AddressDataService.ReadAll(tenantId, applicationId, addressId); err != nil {
+	if address, err := addressService.AddressDataService.ReadAll(tenantID, applicationID, addressID); err != nil {
 		return domain.Address{}, err
 	} else {
 		return mapFromDataAddress(address), nil
@@ -89,17 +89,17 @@ func (addressService AddressService) ReadAll(tenantId, applicationId, addressId 
 }
 
 // Delete deletes an existing address information.
-// tenantId: Mandatory. The unique identifier of the tenant owning the address.
-// applicationId: Mandatory. The unique identifier of the tenant's application will be owning the address.
-// addressId: Mandatory. The unique identifier of the existing address to remove.
+// tenantID: Mandatory. The unique identifier of the tenant owning the address.
+// applicationID: Mandatory. The unique identifier of the tenant's application will be owning the address.
+// addressID: Mandatory. The unique identifier of the existing address to remove.
 // Returns error if something goes wrong.
-func (addressService AddressService) Delete(tenantId, applicationId, addressId system.UUID) error {
+func (addressService AddressService) Delete(tenantID, applicationID, addressID system.UUID) error {
 	diagnostics.IsNotNil(addressService.AddressDataService, "addressService.AddressDataService", "AddressDataService must be provided.")
-	diagnostics.IsNotNilOrEmpty(tenantId, "tenantId", "tenantId must be provided.")
-	diagnostics.IsNotNilOrEmpty(applicationId, "applicationId", "applicationId must be provided.")
-	diagnostics.IsNotNilOrEmpty(addressId, "addressId", "addressId  must be provided.")
+	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
+	diagnostics.IsNotNilOrEmpty(applicationID, "applicationID", "applicationID must be provided.")
+	diagnostics.IsNotNilOrEmpty(addressID, "addressID", "addressID  must be provided.")
 
-	return addressService.AddressDataService.Delete(tenantId, applicationId, addressId)
+	return addressService.AddressDataService.Delete(tenantID, applicationID, addressID)
 }
 
 // mapToDataAddress Maps the domain address object to the Address object used in data layer.

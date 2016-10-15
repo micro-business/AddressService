@@ -41,7 +41,7 @@ func (endpoint Endpoint) StartServer() {
 
 func getHandlers(endpoint Endpoint, ctx context.Context) map[string]http.Handler {
 	handlers := make(map[string]http.Handler)
-	handlers["/Api"] = createApiHandler(endpoint, ctx)
+	handlers["/Api"] = createAPIHandler(endpoint, ctx)
 
 	return handlers
 }
@@ -50,10 +50,10 @@ func checkHealthHandleFunc(writer http.ResponseWriter, request *http.Request) {
 	fmt.Fprintln(writer, "Alive")
 }
 
-func createApiHandler(endpoint Endpoint, ctx context.Context) http.Handler {
+func createAPIHandler(endpoint Endpoint, ctx context.Context) http.Handler {
 	return httptransport.NewServer(
 		ctx,
-		createApiEndpoint(endpoint.AddressService),
-		transport.DecodeApiRequest,
-		transport.EncodeApiResponse)
+		createAPIEndpoint(endpoint.AddressService),
+		transport.DecodeAPIRequest,
+		transport.EncodeAPIResponse)
 }

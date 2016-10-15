@@ -29,7 +29,6 @@ const (
 )
 
 type address struct {
-	Id             string `json:"Id"`
 	BuildingNumber string `json:"BuildingNumber"`
 	StreetNumber   string `json:"StreetNumber"`
 	Line1          string `json:"Line1"`
@@ -48,7 +47,6 @@ var addressType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "Address",
 		Fields: graphql.Fields{
-			"id":           &graphql.Field{Type: graphql.ID},
 			buildingNumber: &graphql.Field{Type: graphql.String},
 			streetNumber:   &graphql.Field{Type: graphql.String},
 			line1:          &graphql.Field{Type: graphql.String},
@@ -61,6 +59,26 @@ var addressType = graphql.NewObject(
 			state:          &graphql.Field{Type: graphql.String},
 			postcode:       &graphql.Field{Type: graphql.String},
 			country:        &graphql.Field{Type: graphql.String},
+		},
+	},
+)
+
+var inputAddressType = graphql.NewInputObject(
+	graphql.InputObjectConfig{
+		Name: "Address",
+		Fields: graphql.InputObjectConfigFieldMap{
+			buildingNumber: &graphql.InputObjectFieldConfig{Type: graphql.String},
+			streetNumber:   &graphql.InputObjectFieldConfig{Type: graphql.String},
+			line1:          &graphql.InputObjectFieldConfig{Type: graphql.String},
+			line2:          &graphql.InputObjectFieldConfig{Type: graphql.String},
+			line3:          &graphql.InputObjectFieldConfig{Type: graphql.String},
+			line4:          &graphql.InputObjectFieldConfig{Type: graphql.String},
+			line5:          &graphql.InputObjectFieldConfig{Type: graphql.String},
+			suburb:         &graphql.InputObjectFieldConfig{Type: graphql.String},
+			city:           &graphql.InputObjectFieldConfig{Type: graphql.String},
+			state:          &graphql.InputObjectFieldConfig{Type: graphql.String},
+			postcode:       &graphql.InputObjectFieldConfig{Type: graphql.String},
+			country:        &graphql.InputObjectFieldConfig{Type: graphql.String},
 		},
 	},
 )
@@ -82,7 +100,7 @@ var rootQueryType = graphql.NewObject(
 					id, idArgProvided := resolveParams.Args["id"].(string)
 
 					if idArgProvided {
-						if addressId, err := system.ParseUUID(id); err != nil {
+						if addressID, err := system.ParseUUID(id); err != nil {
 							return nil, err
 						} else {
 							keys := query.GetSelectedFields([]string{"address"}, resolveParams)
@@ -90,9 +108,9 @@ var rootQueryType = graphql.NewObject(
 							var returnedAddress domain.Address
 
 							if returnedAddress, err = executionContext.addressService.Read(
-								executionContext.tenantId,
-								executionContext.applicationId,
-								addressId,
+								executionContext.tenantID,
+								executionContext.applicationID,
+								addressID,
 								keys); err != nil {
 								return nil, err
 							}
@@ -102,7 +120,6 @@ var rootQueryType = graphql.NewObject(
 							}
 
 							address := address{
-								Id:             addressId.String(),
 								BuildingNumber: returnedAddress.AddressDetails[buildingNumber],
 								StreetNumber:   returnedAddress.AddressDetails[streetNumber],
 								Line1:          returnedAddress.AddressDetails[line1],
@@ -135,61 +152,28 @@ var rootMutationType = graphql.NewObject(
 				Type:        graphql.ID,
 				Description: "Creates new address",
 				Args: graphql.FieldConfigArgument{
-					buildingNumber: &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					streetNumber: &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					line1: &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					line2: &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					line3: &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					line4: &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					line5: &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					suburb: &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					city: &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					state: &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					postcode: &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					country: &graphql.ArgumentConfig{
-						Type: graphql.String,
+					"address": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(inputAddressType),
 					},
 				},
 				Resolve: func(resolveParams graphql.ResolveParams) (interface{}, error) {
-
+					inputAddressArgument, _ := resolveParams.Args["address"].(map[string]interface{})
 					var address domain.Address
 					var err error
 
-					if address, err = resolveAddressDetails(resolveParams); err != nil {
+					if address, err = resolveAddressFromInputAddressArgument(inputAddressArgument); err != nil {
 						return nil, err
 					}
 
 					executionContext := resolveParams.Context.Value("ExecutionContext").(executionContext)
 
-					if addressId, err := executionContext.addressService.Create(
-						executionContext.tenantId,
-						executionContext.applicationId,
+					if addressID, err := executionContext.addressService.Create(
+						executionContext.tenantID,
+						executionContext.applicationID,
 						address); err != nil {
 						return nil, err
 					} else {
-						return addressId.String(), nil
+						return addressID.String(), nil
 					}
 				},
 			},
@@ -201,69 +185,37 @@ var rootMutationType = graphql.NewObject(
 					"id": &graphql.ArgumentConfig{
 						Type: graphql.NewNonNull(graphql.ID),
 					},
-					buildingNumber: &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					streetNumber: &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					line1: &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					line2: &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					line3: &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					line4: &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					line5: &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					suburb: &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					city: &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					state: &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					postcode: &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					country: &graphql.ArgumentConfig{
-						Type: graphql.String,
+					"address": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(inputAddressType),
 					},
 				},
 				Resolve: func(resolveParams graphql.ResolveParams) (interface{}, error) {
 					id, _ := resolveParams.Args["id"].(string)
+					inputAddressArgument, _ := resolveParams.Args["address"].(map[string]interface{})
 
-					var addressId system.UUID
+					var addressID system.UUID
 					var err error
 
-					if addressId, err = system.ParseUUID(id); err != nil {
+					if addressID, err = system.ParseUUID(id); err != nil {
 						return nil, err
 					}
 
 					var address domain.Address
 
-					if address, err = resolveAddressDetails(resolveParams); err != nil {
+					if address, err = resolveAddressFromInputAddressArgument(inputAddressArgument); err != nil {
 						return nil, err
 					}
 
 					executionContext := resolveParams.Context.Value("ExecutionContext").(executionContext)
 
 					if err := executionContext.addressService.Update(
-						executionContext.tenantId,
-						executionContext.applicationId,
-						addressId,
+						executionContext.tenantID,
+						executionContext.applicationID,
+						addressID,
 						address); err != nil {
 						return nil, err
 					} else {
-						return addressId.String(), nil
+						return addressID.String(), nil
 					}
 				},
 			},
@@ -279,22 +231,22 @@ var rootMutationType = graphql.NewObject(
 				Resolve: func(resolveParams graphql.ResolveParams) (interface{}, error) {
 					id, _ := resolveParams.Args["id"].(string)
 
-					var addressId system.UUID
+					var addressID system.UUID
 					var err error
 
-					if addressId, err = system.ParseUUID(id); err != nil {
+					if addressID, err = system.ParseUUID(id); err != nil {
 						return nil, err
 					}
 
 					executionContext := resolveParams.Context.Value("ExecutionContext").(executionContext)
 
 					if err := executionContext.addressService.Delete(
-						executionContext.tenantId,
-						executionContext.applicationId,
-						addressId); err != nil {
+						executionContext.tenantID,
+						executionContext.applicationID,
+						addressID); err != nil {
 						return nil, err
 					} else {
-						return addressId.String(), nil
+						return addressID.String(), nil
 					}
 				},
 			},
@@ -306,16 +258,16 @@ var addressSchema, _ = graphql.NewSchema(graphql.SchemaConfig{Query: rootQueryTy
 
 type executionContext struct {
 	addressService contract.AddressService
-	tenantId       system.UUID
-	applicationId  system.UUID
+	tenantID       system.UUID
+	applicationID  system.UUID
 }
 
-func createApiEndpoint(addressService contract.AddressService) endpoint.Endpoint {
+func createAPIEndpoint(addressService contract.AddressService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		tenantId, _ := system.ParseUUID("02365c33-43d5-4bf8-b220-25563443960b")
-		applicationId, _ := system.ParseUUID("02365c33-43d5-4bf8-b220-25563443960c")
+		tenantID, _ := system.ParseUUID("02365c33-43d5-4bf8-b220-25563443960b")
+		applicationID, _ := system.ParseUUID("02365c33-43d5-4bf8-b220-25563443960c")
 
-		result := executeQuery(request.(string), addressService, tenantId, applicationId)
+		result := executeQuery(request.(string), addressService, tenantID, applicationID)
 
 		if result.HasErrors() {
 			errorMessages := []string{}
@@ -331,18 +283,18 @@ func createApiEndpoint(addressService contract.AddressService) endpoint.Endpoint
 	}
 }
 
-func executeQuery(query string, addressService contract.AddressService, tenantId system.UUID, applicationId system.UUID) *graphql.Result {
+func executeQuery(query string, addressService contract.AddressService, tenantID system.UUID, applicationID system.UUID) *graphql.Result {
 	return graphql.Do(
 		graphql.Params{
 			Schema:        addressSchema,
 			RequestString: query,
-			Context:       context.WithValue(context.Background(), "ExecutionContext", executionContext{addressService, tenantId, applicationId}),
+			Context:       context.WithValue(context.Background(), "ExecutionContext", executionContext{addressService, tenantID, applicationID}),
 		})
 }
 
-func resolveAddressDetails(resolveParams graphql.ResolveParams) (domain.Address, error) {
-
-	addressDetails := []string{
+func resolveAddressFromInputAddressArgument(inputAddressArgument map[string]interface{}) (domain.Address, error) {
+	address := domain.Address{AddressDetails: make(map[string]string)}
+	keys := []string{
 		buildingNumber,
 		streetNumber,
 		line1,
@@ -356,19 +308,18 @@ func resolveAddressDetails(resolveParams graphql.ResolveParams) (domain.Address,
 		postcode,
 		country}
 
-	address := domain.Address{AddressDetails: make(map[string]string)}
-
-	for _, key := range addressDetails {
-		keyArg, KeyArgProvided := resolveParams.Args[key].(string)
+	for _, key := range keys {
+		keyArg, KeyArgProvided := inputAddressArgument[key].(string)
 
 		if KeyArgProvided {
-			address.AddressDetails[key] = keyArg
+			if len(strings.TrimSpace(keyArg)) != 0 {
+				address.AddressDetails[key] = keyArg
+			}
 		}
-
 	}
 
 	if len(address.AddressDetails) == 0 {
-		return domain.Address{}, errors.New("At least one address part must be provided.")
+		return domain.Address{}, errors.New("At least one address part key be provided.")
 	}
 
 	return address, nil
