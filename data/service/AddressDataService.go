@@ -88,21 +88,21 @@ func (addressDataService AddressDataService) Update(tenantID, applicationID, add
 	return addNewAddress(tenantID, applicationID, address, addressID, session)
 }
 
-// Read retrieves an existing address information and returns only the detail which the keys provided by the detailsKeys.
+// Read retrieves an existing address information and returns only the detail which the keys provided by the keys.
 // tenantID: Mandatory. The unique identifier of the tenant owning the address.
 // applicationID: Mandatory. The unique identifier of the tenant's application will be owning the address.
 // addressID: Mandatory. The unique identifier of the existing address.
-// detailsKeys: Mandatory. The interested address details keys to return.
+// keys: Mandatory. The interested address details keys to return.
 // Returns either the address information or error if something goes wrong.
-func (addressDataService AddressDataService) Read(tenantID, applicationID, addressID system.UUID, detailsKeys []string) (contract.Address, error) {
+func (addressDataService AddressDataService) Read(tenantID, applicationID, addressID system.UUID, keys []string) (contract.Address, error) {
 	diagnostics.IsNotNil(addressDataService.ClusterConfig, "addressDataService.ClusterConfig", "ClusterConfig must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
 	diagnostics.IsNotNilOrEmpty(applicationID, "applicationID", "applicationID must be provided.")
 	diagnostics.IsNotNilOrEmpty(addressID, "addressID", "addressID must be provided.")
 
-	detailsKeysCount := len(detailsKeys)
+	keysCount := len(keys)
 
-	if detailsKeysCount == 0 {
+	if keysCount == 0 {
 		panic("No address details key provided.")
 	}
 
@@ -114,11 +114,6 @@ func (addressDataService AddressDataService) Read(tenantID, applicationID, addre
 
 	defer session.Close()
 
-	keys := []string{}
-
-	for _, key := range detailsKeys {
-		keys = append(keys, key)
-	}
 	iter := session.Query(
 		"SELECT address_key, address_value"+
 			" FROM address"+

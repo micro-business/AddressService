@@ -24,13 +24,13 @@ type AddressService interface {
 	// Returns error if something goes wrong.
 	Update(tenantID, applicationID, addressID system.UUID, address domain.Address) error
 
-	// Read retrieves an existing address information and returns only the detail which the keys provided by the detailsKeys.
+	// Read retrieves an existing address information and returns only the detail which the keys provided by the keys.
 	// tenantID: Mandatory. The unique identifier of the tenant owning the address.
 	// applicationID: Mandatory. The unique identifier of the tenant's application will be owning the address.
 	// addressID: Mandatory. The unique identifier of the existing address.
-	// detailsKeys: Mandatory. The interested address details keys to return.
+	// keys: Mandatory. The interested address details keys to return.
 	// Returns either the address information or error if something goes wrong.
-	Read(tenantID, applicationID, addressID system.UUID, detailsKeys []string) (domain.Address, error)
+	Read(tenantID, applicationID, addressID system.UUID, keys []string) (domain.Address, error)
 
 	// ReadAll retrieves an existing address information and returns all the detail of it.
 	// tenantID: Mandatory. The unique identifier of the tenant owning the address.

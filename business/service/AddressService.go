@@ -48,13 +48,13 @@ func (addressService AddressService) Update(tenantID, applicationID, addressID s
 	return addressService.AddressDataService.Update(tenantID, applicationID, addressID, mapToDataAddress(address))
 }
 
-// Read retrieves an existing address information and returns only the detail which the keys provided by the detailsKeys.
+// Read retrieves an existing address information and returns only the detail which the keys provided by the keys.
 // tenantID: Mandatory. The unique identifier of the tenant owning the address.
 // applicationID: Mandatory. The unique identifier of the tenant's application will be owning the address.
 // addressID: Mandatory. The unique identifier of the existing address.
-// detailsKeys: Mandatory. The interested address details keys to return.
+// keys: Mandatory. The interested address details keys to return.
 // Returns either the address information or error if something goes wrong.
-func (addressService AddressService) Read(tenantID, applicationID, addressID system.UUID, detailsKeys []string) (domain.Address, error) {
+func (addressService AddressService) Read(tenantID, applicationID, addressID system.UUID, keys []string) (domain.Address, error) {
 	diagnostics.IsNotNil(addressService.AddressDataService, "addressService.AddressDataService", "AddressDataService must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
 	diagnostics.IsNotNilOrEmpty(applicationID, "applicationID", "applicationID must be provided.")
@@ -62,7 +62,7 @@ func (addressService AddressService) Read(tenantID, applicationID, addressID sys
 
 	//TODO: 20160722: Add details keys validation here
 
-	address, err := addressService.AddressDataService.Read(tenantID, applicationID, addressID, detailsKeys)
+	address, err := addressService.AddressDataService.Read(tenantID, applicationID, addressID, keys)
 
 	if err != nil {
 		return domain.Address{}, err
