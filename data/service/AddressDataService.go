@@ -313,7 +313,7 @@ func removeExistingAddress(
 		mappedApplicationID,
 		mappedAddressID)
 
-	for key, _ := range address.AddressDetails {
+	for key := range address.AddressDetails {
 		waitGroup.Add(1)
 
 		go removeFromIndexByAddressKeyTable(
