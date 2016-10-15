@@ -14,11 +14,13 @@ import (
 	"golang.org/x/net/context"
 )
 
+// Endpoint implements method to start the service. The structure contains all the dependencies required by the Endpoint service.
 type Endpoint struct {
 	ConfigurationReader config.ConfigurationReader
 	AddressService      businessContract.AddressService
 }
 
+// StartServer creates all the endpoints and starts the server.
 func (endpoint Endpoint) StartServer() {
 	diagnostics.IsNotNil(endpoint.AddressService, "endpoint.AddressService", "AddressService must be provided.")
 	diagnostics.IsNotNil(endpoint.ConfigurationReader, "endpoint.ConfigurationReader", "ConfigurationReader must be provided.")

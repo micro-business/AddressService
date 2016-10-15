@@ -100,45 +100,48 @@ var rootQueryType = graphql.NewObject(
 					id, idArgProvided := resolveParams.Args["id"].(string)
 
 					if idArgProvided {
-						if addressID, err := system.ParseUUID(id); err != nil {
+						addressID, err := system.ParseUUID(id)
+
+						if err != nil {
 							return nil, err
-						} else {
-							keys := query.GetSelectedFields([]string{"address"}, resolveParams)
-
-							var returnedAddress domain.Address
-
-							if returnedAddress, err = executionContext.addressService.Read(
-								executionContext.tenantID,
-								executionContext.applicationID,
-								addressID,
-								keys); err != nil {
-								return nil, err
-							}
-
-							if len(returnedAddress.AddressDetails) == 0 {
-								return nil, errors.New("Provided AddressId not found!!!")
-							}
-
-							address := address{
-								BuildingNumber: returnedAddress.AddressDetails[buildingNumber],
-								StreetNumber:   returnedAddress.AddressDetails[streetNumber],
-								Line1:          returnedAddress.AddressDetails[line1],
-								Line2:          returnedAddress.AddressDetails[line2],
-								Line3:          returnedAddress.AddressDetails[line3],
-								Line4:          returnedAddress.AddressDetails[line4],
-								Line5:          returnedAddress.AddressDetails[line5],
-								Suburb:         returnedAddress.AddressDetails[suburb],
-								City:           returnedAddress.AddressDetails[city],
-								State:          returnedAddress.AddressDetails[state],
-								Postcode:       returnedAddress.AddressDetails[postcode],
-								Country:        returnedAddress.AddressDetails[country],
-							}
-
-							return address, nil
 						}
+
+						keys := query.GetSelectedFields([]string{"address"}, resolveParams)
+
+						var returnedAddress domain.Address
+
+						if returnedAddress, err = executionContext.addressService.Read(
+							executionContext.tenantID,
+							executionContext.applicationID,
+							addressID,
+							keys); err != nil {
+							return nil, err
+						}
+
+						if len(returnedAddress.AddressDetails) == 0 {
+							return nil, errors.New("Provided AddressID not found!!!")
+						}
+
+						address := address{
+							BuildingNumber: returnedAddress.AddressDetails[buildingNumber],
+							StreetNumber:   returnedAddress.AddressDetails[streetNumber],
+							Line1:          returnedAddress.AddressDetails[line1],
+							Line2:          returnedAddress.AddressDetails[line2],
+							Line3:          returnedAddress.AddressDetails[line3],
+							Line4:          returnedAddress.AddressDetails[line4],
+							Line5:          returnedAddress.AddressDetails[line5],
+							Suburb:         returnedAddress.AddressDetails[suburb],
+							City:           returnedAddress.AddressDetails[city],
+							State:          returnedAddress.AddressDetails[state],
+							Postcode:       returnedAddress.AddressDetails[postcode],
+							Country:        returnedAddress.AddressDetails[country],
+						}
+
+						return address, nil
+
 					}
 
-					return nil, errors.New("Address Id must be provided.")
+					return nil, errors.New("Address ID must be provided.")
 				}},
 		},
 	},
@@ -167,14 +170,16 @@ var rootMutationType = graphql.NewObject(
 
 					executionContext := resolveParams.Context.Value("ExecutionContext").(executionContext)
 
-					if addressID, err := executionContext.addressService.Create(
+					addressID, err := executionContext.addressService.Create(
 						executionContext.tenantID,
 						executionContext.applicationID,
-						address); err != nil {
+						address)
+
+					if err != nil {
 						return nil, err
-					} else {
-						return addressID.String(), nil
 					}
+
+					return addressID.String(), nil
 				},
 			},
 
@@ -208,15 +213,16 @@ var rootMutationType = graphql.NewObject(
 
 					executionContext := resolveParams.Context.Value("ExecutionContext").(executionContext)
 
-					if err := executionContext.addressService.Update(
+					err = executionContext.addressService.Update(
 						executionContext.tenantID,
 						executionContext.applicationID,
 						addressID,
-						address); err != nil {
+						address)
+					if err != nil {
 						return nil, err
-					} else {
-						return addressID.String(), nil
 					}
+
+					return addressID.String(), nil
 				},
 			},
 
@@ -240,14 +246,17 @@ var rootMutationType = graphql.NewObject(
 
 					executionContext := resolveParams.Context.Value("ExecutionContext").(executionContext)
 
-					if err := executionContext.addressService.Delete(
+					err = executionContext.addressService.Delete(
 						executionContext.tenantID,
 						executionContext.applicationID,
-						addressID); err != nil {
+						addressID)
+
+					if err != nil {
 						return nil, err
-					} else {
-						return addressID.String(), nil
 					}
+
+					return addressID.String(), nil
+
 				},
 			},
 		},
