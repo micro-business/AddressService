@@ -8,8 +8,8 @@ type ConfigurationReader interface {
 	// GetCassandraHosts returns the list of Cassandra host addresses.
 	GetCassandraHosts() ([]string, error)
 
-	GetCassandraKeyspace() (string, error)
 	// GetCassandraKeyspace returns the name of Cassandra key space that the service data is stored under.
+	GetCassandraKeyspace() (string, error)
 
 	// GetCassandraProtocolVersion returns the cassandra procotol version.
 	GetCassandraProtocolVersion() (int, error)
