@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	httptransport "github.com/go-kit/kit/transport/http"
-	businessContract "github.com/microbusinesses/AddressService/business/contract"
+	"github.com/microbusinesses/AddressService/business/contract"
 	"github.com/microbusinesses/AddressService/config"
 	"github.com/microbusinesses/AddressService/endpoint/transport"
 	"github.com/microbusinesses/Micro-Businesses-Core/common/diagnostics"
@@ -17,7 +17,7 @@ import (
 // Endpoint implements method to start the service. The structure contains all the dependencies required by the Endpoint service.
 type Endpoint struct {
 	ConfigurationReader config.ConfigurationReader
-	AddressService      businessContract.AddressService
+	AddressService      contract.AddressService
 }
 
 // StartServer creates all the endpoints and starts the server.
