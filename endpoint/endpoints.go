@@ -121,7 +121,7 @@ var rootQueryType = graphql.NewObject(
 						return nil, errors.New("Provided AddressID not found!!!")
 					}
 
-					address := address{
+					return address{
 						BuildingNumber: returnedAddress.AddressDetails[buildingNumber],
 						StreetNumber:   returnedAddress.AddressDetails[streetNumber],
 						Line1:          returnedAddress.AddressDetails[line1],
@@ -134,9 +134,7 @@ var rootQueryType = graphql.NewObject(
 						State:          returnedAddress.AddressDetails[state],
 						Postcode:       returnedAddress.AddressDetails[postcode],
 						Country:        returnedAddress.AddressDetails[country],
-					}
-
-					return address, nil
+					}, nil
 				},
 			},
 		},
