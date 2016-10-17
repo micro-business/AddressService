@@ -92,57 +92,53 @@ var rootQueryType = graphql.NewObject(
 				Description: "Returns an existing address",
 				Args: graphql.FieldConfigArgument{
 					"id": &graphql.ArgumentConfig{
-						Type: graphql.String,
+						Type: graphql.NewNonNull(graphql.String),
 					},
 				},
 				Resolve: func(resolveParams graphql.ResolveParams) (interface{}, error) {
 					executionContext := resolveParams.Context.Value("ExecutionContext").(executionContext)
-					id, idArgProvided := resolveParams.Args["id"].(string)
+					id, _ := resolveParams.Args["id"].(string)
 
-					if idArgProvided {
-						addressID, err := system.ParseUUID(id)
+					addressID, err := system.ParseUUID(id)
 
-						if err != nil {
-							return nil, err
-						}
-
-						keys := query.GetSelectedFields([]string{"address"}, resolveParams)
-
-						var returnedAddress domain.Address
-
-						if returnedAddress, err = executionContext.addressService.Read(
-							executionContext.tenantID,
-							executionContext.applicationID,
-							addressID,
-							keys); err != nil {
-							return nil, err
-						}
-
-						if len(returnedAddress.AddressDetails) == 0 {
-							return nil, errors.New("Provided AddressID not found!!!")
-						}
-
-						address := address{
-							BuildingNumber: returnedAddress.AddressDetails[buildingNumber],
-							StreetNumber:   returnedAddress.AddressDetails[streetNumber],
-							Line1:          returnedAddress.AddressDetails[line1],
-							Line2:          returnedAddress.AddressDetails[line2],
-							Line3:          returnedAddress.AddressDetails[line3],
-							Line4:          returnedAddress.AddressDetails[line4],
-							Line5:          returnedAddress.AddressDetails[line5],
-							Suburb:         returnedAddress.AddressDetails[suburb],
-							City:           returnedAddress.AddressDetails[city],
-							State:          returnedAddress.AddressDetails[state],
-							Postcode:       returnedAddress.AddressDetails[postcode],
-							Country:        returnedAddress.AddressDetails[country],
-						}
-
-						return address, nil
-
+					if err != nil {
+						return nil, err
 					}
 
-					return nil, errors.New("Address ID must be provided.")
-				}},
+					keys := query.GetSelectedFields([]string{"address"}, resolveParams)
+
+					var returnedAddress domain.Address
+
+					if returnedAddress, err = executionContext.addressService.Read(
+						executionContext.tenantID,
+						executionContext.applicationID,
+						addressID,
+						keys); err != nil {
+						return nil, err
+					}
+
+					if len(returnedAddress.AddressDetails) == 0 {
+						return nil, errors.New("Provided AddressID not found!!!")
+					}
+
+					address := address{
+						BuildingNumber: returnedAddress.AddressDetails[buildingNumber],
+						StreetNumber:   returnedAddress.AddressDetails[streetNumber],
+						Line1:          returnedAddress.AddressDetails[line1],
+						Line2:          returnedAddress.AddressDetails[line2],
+						Line3:          returnedAddress.AddressDetails[line3],
+						Line4:          returnedAddress.AddressDetails[line4],
+						Line5:          returnedAddress.AddressDetails[line5],
+						Suburb:         returnedAddress.AddressDetails[suburb],
+						City:           returnedAddress.AddressDetails[city],
+						State:          returnedAddress.AddressDetails[state],
+						Postcode:       returnedAddress.AddressDetails[postcode],
+						Country:        returnedAddress.AddressDetails[country],
+					}
+
+					return address, nil
+				},
+			},
 		},
 	},
 )
