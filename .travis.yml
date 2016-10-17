@@ -30,6 +30,6 @@ after_success:
   - export REPO_NAME_EXTENSION=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo ""; else echo -$TRAVIS_BRANCH ; fi`
   - export REPO=microbusinesses/address-service$REPO_NAME_EXTENSION
   - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
-  - docker build -f Dockerfile -t $REPO:$COMMIT .
-  - docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
+  - docker build -f Dockerfile -t $REPO .
+  - docker tag $REPO $REPO:travis-$TRAVIS_BUILD_NUMBER
   - docker push $REPO
