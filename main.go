@@ -13,6 +13,7 @@ import (
 	dataService "github.com/microbusinesses/AddressService/data/service"
 	"github.com/microbusinesses/AddressService/endpoint"
 	"github.com/microbusinesses/Micro-Businesses-Core/common/diagnostics"
+	"github.com/microbusinesses/Micro-Businesses-Core/system"
 )
 
 var consulAddress string
@@ -61,7 +62,7 @@ func main() {
 		return
 	}
 
-	uuidGeneratorService := dataService.UUIDGeneratorServiceImpl{}
+	uuidGeneratorService := system.UUIDGeneratorServiceImpl{}
 
 	cluster := gocql.NewCluster()
 	cluster.Hosts = cassandraHosts

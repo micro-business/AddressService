@@ -13,7 +13,7 @@ import (
 
 // AddressDataService provides access to add new address and update/retrieve/remove an existing address.
 type AddressDataService struct {
-	UUIDGeneratorService UUIDGeneratorService
+	UUIDGeneratorService system.UUIDGeneratorService
 	ClusterConfig        *gocql.ClusterConfig
 }
 
