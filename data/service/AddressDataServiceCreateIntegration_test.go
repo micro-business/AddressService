@@ -25,14 +25,9 @@ var _ = Describe("Create method behaviour", func() {
 		addressID                system.UUID
 		validAddress             contract.Address
 		clusterConfig            *gocql.ClusterConfig
-		keyspace                 string
 	)
 
 	BeforeEach(func() {
-		keyspace = createRandomKeyspace()
-
-		createAddressKeyspaceAndAllRequiredTables(keyspace)
-
 		clusterConfig = getClusterConfig()
 		clusterConfig.Keyspace = keyspace
 
@@ -49,7 +44,6 @@ var _ = Describe("Create method behaviour", func() {
 
 	AfterEach(func() {
 		mockCtrl.Finish()
-		dropKeyspace(keyspace)
 	})
 
 	Context("when UUID generator service succeeds to create the new UUID", func() {

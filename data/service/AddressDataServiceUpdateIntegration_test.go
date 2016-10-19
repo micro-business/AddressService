@@ -23,14 +23,9 @@ var _ = Describe("Update method behaviour", func() {
 		applicationID            system.UUID
 		addressID                system.UUID
 		clusterConfig            *gocql.ClusterConfig
-		keyspace                 string
 	)
 
 	BeforeEach(func() {
-		keyspace = createRandomKeyspace()
-
-		createAddressKeyspaceAndAllRequiredTables(keyspace)
-
 		clusterConfig = getClusterConfig()
 		clusterConfig.Keyspace = keyspace
 
@@ -46,7 +41,6 @@ var _ = Describe("Update method behaviour", func() {
 
 	AfterEach(func() {
 		mockCtrl.Finish()
-		dropKeyspace(keyspace)
 	})
 
 	Context("when updating existing address", func() {

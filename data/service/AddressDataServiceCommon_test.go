@@ -11,10 +11,22 @@ import (
 
 	"github.com/gocql/gocql"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
+	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 const databasePreparationMaxTimeout = time.Minute
+
+var keyspace string
+
+var _ = BeforeSuite(func() {
+	keyspace = createRandomKeyspace()
+	createAddressKeyspaceAndAllRequiredTables(keyspace)
+})
+
+var _ = AfterSuite(func() {
+	dropKeyspace(keyspace)
+})
 
 func getClusterConfig() *gocql.ClusterConfig {
 	cassandraIPAddress := os.Getenv("CASSANDRA_ADDRESS")
