@@ -282,7 +282,7 @@ func addNewAddress(
 
 }
 
-// addNewAddress adds new address to address table
+// removeExistingAddress adds new address to address table
 func removeExistingAddress(
 	tenantID, applicationID system.UUID,
 	address contract.Address,
