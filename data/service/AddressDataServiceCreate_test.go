@@ -20,7 +20,6 @@ var _ = Describe("Create method input parameters and dependency test", func() {
 		tenantID                 system.UUID
 		applicationID            system.UUID
 		validAddress             contract.Address
-		emptyAddress             contract.Address
 	)
 
 	BeforeEach(func() {
@@ -32,7 +31,6 @@ var _ = Describe("Create method input parameters and dependency test", func() {
 		tenantID, _ = system.RandomUUID()
 		applicationID, _ = system.RandomUUID()
 		validAddress = contract.Address{AddressDetails: map[string]string{"City": "Christchurch"}}
-		emptyAddress = contract.Address{}
 	})
 
 	AfterEach(func() {

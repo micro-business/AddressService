@@ -18,7 +18,6 @@ var _ = Describe("Update method input parameters and dependency test", func() {
 		applicationID      system.UUID
 		addressID          system.UUID
 		validAddress       contract.Address
-		emptyAddress       contract.Address
 	)
 
 	BeforeEach(func() {
@@ -27,7 +26,6 @@ var _ = Describe("Update method input parameters and dependency test", func() {
 		applicationID, _ = system.RandomUUID()
 		addressID, _ = system.RandomUUID()
 		validAddress = contract.Address{AddressDetails: map[string]string{"City": "Christchurch"}}
-		emptyAddress = contract.Address{}
 	})
 
 	Context("when cluster configuration not provided", func() {
