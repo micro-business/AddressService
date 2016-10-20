@@ -3,6 +3,7 @@
 package service_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/gocql/gocql"
@@ -43,29 +44,37 @@ var _ = Describe("ReadAll method behaviour", func() {
 		mockCtrl.Finish()
 	})
 
-	It("should return the existing address keys and values", func() {
-		mockUUIDGeneratorService.
-			EXPECT().
-			GenerateRandomUUID().
-			Return(addressID, nil)
+	Context("when reading existing address", func() {
+		It("should return error if address does not exist", func() {
+			err := addressDataService.ReadAll(tenantID, applicationID, addressID)
 
-		expectedAddressDetails := createRandomAddressDetails()
+			Expect(err).To(Equal(fmt.Errorf("Address not found. Address ID: %s", addressID.String())))
+		})
 
-		expectedAddress := contract.Address{AddressDetails: expectedAddressDetails}
-		returnedAddressID, err := addressDataService.Create(
-			tenantID,
-			applicationID,
-			expectedAddress)
+		It("should return the existing address keys and values", func() {
+			mockUUIDGeneratorService.
+				EXPECT().
+				GenerateRandomUUID().
+				Return(addressID, nil)
 
-		Expect(err).To(BeNil())
+			expectedAddressDetails := createRandomAddressDetails()
 
-		returnedAddress, err := addressDataService.ReadAll(
-			tenantID,
-			applicationID,
-			returnedAddressID)
+			expectedAddress := contract.Address{AddressDetails: expectedAddressDetails}
+			returnedAddressID, err := addressDataService.Create(
+				tenantID,
+				applicationID,
+				expectedAddress)
 
-		Expect(err).To(BeNil())
-		Expect(expectedAddress).To(Equal(returnedAddress))
+			Expect(err).To(BeNil())
+
+			returnedAddress, err := addressDataService.ReadAll(
+				tenantID,
+				applicationID,
+				returnedAddressID)
+
+			Expect(err).To(BeNil())
+			Expect(expectedAddress).To(Equal(returnedAddress))
+		})
 	})
 })
 

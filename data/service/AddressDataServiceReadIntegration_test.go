@@ -3,6 +3,7 @@
 package service_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/gocql/gocql"
@@ -43,36 +44,47 @@ var _ = Describe("Read method behaviour", func() {
 		mockCtrl.Finish()
 	})
 
-	It("should return the existing address keys and values", func() {
-		mockUUIDGeneratorService.
-			EXPECT().
-			GenerateRandomUUID().
-			Return(addressID, nil)
+	Context("when reading existing address", func() {
+		It("should return error if address does not exist", func() {
+			keys := make([]string, 1)
+			keys[0] = "Line1"
 
-		expectedAddressDetails := createRandomAddressDetails()
+			err := addressDataService.Read(tenantID, applicationID, addressID, keys)
 
-		expectedAddress := contract.Address{AddressDetails: expectedAddressDetails}
-		returnedAddressID, err := addressDataService.Create(
-			tenantID,
-			applicationID,
-			expectedAddress)
+			Expect(err).To(Equal(fmt.Errorf("Address not found. Address ID: %s", addressID.String())))
+		})
 
-		Expect(err).To(BeNil())
+		It("should return the existing address keys and values", func() {
+			mockUUIDGeneratorService.
+				EXPECT().
+				GenerateRandomUUID().
+				Return(addressID, nil)
 
-		keys := make([]string, len(expectedAddress.AddressDetails))
+			expectedAddressDetails := createRandomAddressDetails()
 
-		for key := range expectedAddress.AddressDetails {
-			keys = append(keys, key)
-		}
+			expectedAddress := contract.Address{AddressDetails: expectedAddressDetails}
+			returnedAddressID, err := addressDataService.Create(
+				tenantID,
+				applicationID,
+				expectedAddress)
 
-		returnedAddress, err := addressDataService.Read(
-			tenantID,
-			applicationID,
-			returnedAddressID,
-			keys)
+			Expect(err).To(BeNil())
 
-		Expect(err).To(BeNil())
-		Expect(expectedAddress).To(Equal(returnedAddress))
+			keys := make([]string, len(expectedAddress.AddressDetails))
+
+			for key := range expectedAddress.AddressDetails {
+				keys = append(keys, key)
+			}
+
+			returnedAddress, err := addressDataService.Read(
+				tenantID,
+				applicationID,
+				returnedAddressID,
+				keys)
+
+			Expect(err).To(BeNil())
+			Expect(expectedAddress).To(Equal(returnedAddress))
+		})
 	})
 })
 

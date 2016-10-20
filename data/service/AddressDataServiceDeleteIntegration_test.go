@@ -45,10 +45,10 @@ var _ = Describe("Delete method behaviour", func() {
 	})
 
 	Context("when deleting existing address", func() {
-		It("should return error if tenant does not exist", func() {
+		It("should return error if address does not exist", func() {
 			err := addressDataService.Delete(tenantID, applicationID, addressID)
 
-			Expect(err).To(Equal(fmt.Errorf("Address not found. Address ID: %s", tenantID.String())))
+			Expect(err).To(Equal(fmt.Errorf("Address not found. Address ID: %s", addressID.String())))
 		})
 
 		It("should remove the records from address table", func() {

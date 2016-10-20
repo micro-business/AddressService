@@ -45,10 +45,10 @@ var _ = Describe("Update method behaviour", func() {
 	})
 
 	Context("when updating existing address", func() {
-		It("should return error if tenant does not exist", func() {
+		It("should return error if address does not exist", func() {
 			err := addressDataService.Update(tenantID, applicationID, addressID, contract.Address{AddressDetails: createRandomAddressDetails()})
 
-			Expect(err).To(Equal(fmt.Errorf("Address not found. Address ID: %s", tenantID.String())))
+			Expect(err).To(Equal(fmt.Errorf("Address not found. Address ID: %s", addressID.String())))
 		})
 
 		It("should remove all old records from address table", func() {
