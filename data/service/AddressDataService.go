@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"sync"
 
@@ -112,6 +113,10 @@ func (addressDataService AddressDataService) Read(tenantID, applicationID, addre
 		address.AddressDetails[key] = value
 	}
 
+	if len(address.AddressDetails) == 0 {
+		return contract.Address{}, fmt.Errorf("Address not found. Address ID: %s", addressID.String())
+	}
+
 	return address, nil
 }
 
@@ -149,6 +154,10 @@ func (addressDataService AddressDataService) ReadAll(tenantID, applicationID, ad
 
 	for iter.Scan(&key, &value) {
 		address.AddressDetails[key] = value
+	}
+
+	if len(address.AddressDetails) == 0 {
+		return contract.Address{}, fmt.Errorf("Address not found. Address ID: %s", addressID.String())
 	}
 
 	return address, nil

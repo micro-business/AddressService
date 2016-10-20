@@ -117,10 +117,6 @@ var rootQueryType = graphql.NewObject(
 						return nil, err
 					}
 
-					if len(returnedAddress.AddressDetails) == 0 {
-						return nil, errors.New("Provided AddressID not found!!!")
-					}
-
 					return address{
 						BuildingNumber: returnedAddress.AddressDetails[buildingNumber],
 						StreetNumber:   returnedAddress.AddressDetails[streetNumber],
