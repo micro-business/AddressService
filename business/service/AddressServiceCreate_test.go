@@ -140,9 +140,9 @@ var _ = Describe("Create method behaviour", func() {
 				Create(tenantID, applicationID, mappedAddress).
 				Return(expectedAddressID, nil)
 
-			dnewAddressIDd, err := addressService.Create(tenantID, applicationID, domain.Address{AddressDetails: addressDetails})
+			newAddressID, err := addressService.Create(tenantID, applicationID, domain.Address{AddressDetails: addressDetails})
 
-			Expect(expectedAddressID).To(Equal(dnewAddressIDd))
+			Expect(expectedAddressID).To(Equal(newAddressID))
 			Expect(err).To(BeNil())
 		})
 	})
@@ -158,9 +158,9 @@ var _ = Describe("Create method behaviour", func() {
 				Create(tenantID, applicationID, mappedAddress).
 				Return(system.EmptyUUID, expectedError)
 
-			dnewAddressIDd, err := addressService.Create(tenantID, applicationID, validAddress)
+			newAddressID, err := addressService.Create(tenantID, applicationID, validAddress)
 
-			Expect(dnewAddressIDd).To(Equal(system.EmptyUUID))
+			Expect(newAddressID).To(Equal(system.EmptyUUID))
 			Expect(err).To(Equal(expectedError))
 		})
 	})
