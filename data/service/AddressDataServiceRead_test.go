@@ -10,12 +10,13 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("ReadAll method input parameters and dependency test", func() {
+var _ = Describe("Read method input parameters and dependency test", func() {
 	var (
 		addressDataService *service.AddressDataService
 		tenantID           system.UUID
 		applicationID      system.UUID
 		addressID          system.UUID
+		validKeys          []string
 	)
 
 	BeforeEach(func() {
@@ -25,18 +26,20 @@ var _ = Describe("ReadAll method input parameters and dependency test", func() {
 		tenantID, _ = system.RandomUUID()
 		applicationID, _ = system.RandomUUID()
 		addressID, _ = system.RandomUUID()
+		validKeys = make([]string, 1)
+		validKeys[0] = "Line1"
 	})
 
 	Context("when cluster configuration not provided", func() {
 		It("should panic", func() {
 			addressDataService.ClusterConfig = nil
 
-			Ω(func() { addressDataService.ReadAll(tenantID, applicationID, addressID) }).Should(Panic())
+			Ω(func() { addressDataService.Read(tenantID, applicationID, addressID, validKeys) }).Should(Panic())
 		})
 	})
 })
 
-func TestReadAll(t *testing.T) {
+func TestRead(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "ReadAll method input parameters and dependency test")
+	RunSpecs(t, "Read method input parameters and dependency test")
 }

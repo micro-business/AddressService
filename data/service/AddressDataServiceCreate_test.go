@@ -9,7 +9,6 @@ import (
 	"github.com/microbusinesses/AddressService/data/service"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
@@ -55,14 +54,6 @@ var _ = Describe("Create method input parameters and dependency test", func() {
 			Ω(func() { addressDataService.Create(tenantID, applicationID, validAddress) }).Should(Panic())
 		})
 	})
-
-	DescribeTable("Input Parameters",
-		func(tenantID, applicationID system.UUID, address contract.Address) {
-			Ω(func() { addressDataService.Create(tenantID, applicationID, address) }).Should(Panic())
-		},
-		Entry("should panic when empty tenant unique identifier provided", system.EmptyUUID, applicationID, validAddress),
-		Entry("should panic when empty application unique identifier provided", tenantID, system.EmptyUUID, validAddress),
-		Entry("should panic when address without address key provided", tenantID, applicationID, emptyAddress))
 })
 
 func TestCreate(t *testing.T) {

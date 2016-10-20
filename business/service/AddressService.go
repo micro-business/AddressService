@@ -22,9 +22,7 @@ func (addressService AddressService) Create(tenantID, applicationID system.UUID,
 	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
 	diagnostics.IsNotNilOrEmpty(applicationID, "applicationID", "applicationID must be provided.")
 
-	if len(address.AddressDetails) == 0 {
-		panic("Address does not contain any address key.")
-	}
+	validateAddress(address)
 
 	return addressService.AddressDataService.Create(tenantID, applicationID, mapToDataAddress(address))
 }
@@ -41,9 +39,7 @@ func (addressService AddressService) Update(tenantID, applicationID, addressID s
 	diagnostics.IsNotNilOrEmpty(applicationID, "applicationID", "applicationID must be provided.")
 	diagnostics.IsNotNilOrEmpty(addressID, "addressID", "addressID must be provided.")
 
-	if len(address.AddressDetails) == 0 {
-		panic("Address does not contain any address key.")
-	}
+	validateAddress(address)
 
 	return addressService.AddressDataService.Update(tenantID, applicationID, addressID, mapToDataAddress(address))
 }
@@ -60,7 +56,11 @@ func (addressService AddressService) Read(tenantID, applicationID, addressID sys
 	diagnostics.IsNotNilOrEmpty(applicationID, "applicationID", "applicationID must be provided.")
 	diagnostics.IsNotNilOrEmpty(addressID, "addressID", "addressID must be provided.")
 
-	//TODO: 20160722: Add details keys validation here
+	keysCount := len(keys)
+
+	if keysCount == 0 {
+		panic("No address details key provided.")
+	}
 
 	address, err := addressService.AddressDataService.Read(tenantID, applicationID, addressID, keys)
 
@@ -103,6 +103,13 @@ func (addressService AddressService) Delete(tenantID, applicationID, addressID s
 	diagnostics.IsNotNilOrEmpty(addressID, "addressID", "addressID  must be provided.")
 
 	return addressService.AddressDataService.Delete(tenantID, applicationID, addressID)
+}
+
+// validateAddress validates the tenant domain object and make sure the data is consistent and valid.
+func validateAddress(address domain.Address) {
+	if len(address.AddressDetails) == 0 {
+		panic("Address does not contain any address key.")
+	}
 }
 
 // mapToDataAddress Maps the domain address object to the Address object used in data layer.

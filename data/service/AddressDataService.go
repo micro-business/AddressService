@@ -25,14 +25,6 @@ type AddressDataService struct {
 func (addressDataService AddressDataService) Create(tenantID, applicationID system.UUID, address contract.Address) (system.UUID, error) {
 	diagnostics.IsNotNil(addressDataService.UUIDGeneratorService, "addressDataService.UUIDGeneratorService", "UUIDGeneratorService must be provided.")
 	diagnostics.IsNotNil(addressDataService.ClusterConfig, "addressDataService.ClusterConfig", "ClusterConfig must be provided.")
-	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
-	diagnostics.IsNotNilOrEmpty(applicationID, "applicationID", "applicationID must be provided.")
-
-	addressDetailsCount := len(address.AddressDetails)
-
-	if addressDetailsCount == 0 {
-		panic("Address does not contain any address details.")
-	}
 
 	addressID, err := addressDataService.UUIDGeneratorService.GenerateRandomUUID()
 
@@ -63,13 +55,6 @@ func (addressDataService AddressDataService) Create(tenantID, applicationID syst
 // Returns error if something goes wrong.
 func (addressDataService AddressDataService) Update(tenantID, applicationID, addressID system.UUID, address contract.Address) error {
 	diagnostics.IsNotNil(addressDataService.ClusterConfig, "addressDataService.ClusterConfig", "ClusterConfig must be provided.")
-	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
-	diagnostics.IsNotNilOrEmpty(applicationID, "applicationID", "applicationID must be provided.")
-	diagnostics.IsNotNilOrEmpty(addressID, "addressID", "addressID must be provided.")
-
-	if len(address.AddressDetails) == 0 {
-		panic("Address does not contain any address details.")
-	}
 
 	err := addressDataService.Delete(tenantID, applicationID, addressID)
 
@@ -96,15 +81,6 @@ func (addressDataService AddressDataService) Update(tenantID, applicationID, add
 // Returns either the address information or error if something goes wrong.
 func (addressDataService AddressDataService) Read(tenantID, applicationID, addressID system.UUID, keys []string) (contract.Address, error) {
 	diagnostics.IsNotNil(addressDataService.ClusterConfig, "addressDataService.ClusterConfig", "ClusterConfig must be provided.")
-	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
-	diagnostics.IsNotNilOrEmpty(applicationID, "applicationID", "applicationID must be provided.")
-	diagnostics.IsNotNilOrEmpty(addressID, "addressID", "addressID must be provided.")
-
-	keysCount := len(keys)
-
-	if keysCount == 0 {
-		panic("No address details key provided.")
-	}
 
 	session, err := addressDataService.ClusterConfig.CreateSession()
 
@@ -146,9 +122,6 @@ func (addressDataService AddressDataService) Read(tenantID, applicationID, addre
 // Returns either the address information or error if something goes wrong.
 func (addressDataService AddressDataService) ReadAll(tenantID, applicationID, addressID system.UUID) (contract.Address, error) {
 	diagnostics.IsNotNil(addressDataService.ClusterConfig, "addressDataService.ClusterConfig", "ClusterConfig must be provided.")
-	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
-	diagnostics.IsNotNilOrEmpty(applicationID, "applicationID", "applicationID must be provided.")
-	diagnostics.IsNotNilOrEmpty(addressID, "addressID", "addressID must be provided.")
 
 	session, err := addressDataService.ClusterConfig.CreateSession()
 
@@ -188,9 +161,6 @@ func (addressDataService AddressDataService) ReadAll(tenantID, applicationID, ad
 // Returns error if something goes wrong.
 func (addressDataService AddressDataService) Delete(tenantID, applicationID, addressID system.UUID) error {
 	diagnostics.IsNotNil(addressDataService.ClusterConfig, "addressDataService.ClusterConfig", "ClusterConfig must be provided.")
-	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
-	diagnostics.IsNotNilOrEmpty(applicationID, "applicationID", "applicationID must be provided.")
-	diagnostics.IsNotNilOrEmpty(addressID, "addressID", "addressID must be provided.")
 
 	address, err := addressDataService.ReadAll(tenantID, applicationID, addressID)
 

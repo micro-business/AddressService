@@ -8,7 +8,6 @@ import (
 
 // AddressService contract, it can add new address and update/retrieve/remove an existing address.
 type AddressService interface {
-
 	// Create creates a new address.
 	// tenantID: Mandatory. The unique identifier of the tenant owning the address.
 	// applicationID: Mandatory. The unique identifier of the tenant's application will be owning the address.
