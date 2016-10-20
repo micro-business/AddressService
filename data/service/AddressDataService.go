@@ -71,6 +71,10 @@ func (addressDataService AddressDataService) Update(tenantID, applicationID, add
 
 	defer session.Close()
 
+	if !doesAddressExist(tenantID, applicationID, addressID, session) {
+		return fmt.Errorf("Address not found. Address ID: %s", addressID.String())
+	}
+
 	return addNewAddress(tenantID, applicationID, address, addressID, session)
 }
 
@@ -184,6 +188,10 @@ func (addressDataService AddressDataService) Delete(tenantID, applicationID, add
 	}
 
 	defer session.Close()
+
+	if !doesAddressExist(tenantID, applicationID, addressID, session) {
+		return fmt.Errorf("Address not found. Address ID: %s", addressID.String())
+	}
 
 	return removeExistingAddress(tenantID, applicationID, address, addressID, session)
 }
@@ -426,4 +434,23 @@ func removeFromIndexByAddressKeyTable(
 	} else {
 		errorChannel <- nil
 	}
+}
+
+// doesAddressExist checks whether the provided addressID exists in database
+func doesAddressExist(tenantID, applicationID, addressID system.UUID, session *gocql.Session) bool {
+	iter := session.Query(
+		"SELECT address_key"+
+			" FROM address"+
+			" WHERE"+
+			" tenant_id = ?"+
+			" AND application_id = ?"+
+			" AND address_id = ?"+
+			" LIMIT 1",
+		tenantID.String(),
+		applicationID.String(),
+		addressID.String()).Iter()
+
+	var addressKey string
+
+	return iter.Scan(&addressKey)
 }
