@@ -11,19 +11,22 @@ import (
 	"github.com/microbusinesses/AddressService/data/contract"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Create method input parameters and dependency test", func() {
 	var (
-		mockCtrl               *gomock.Controller
-		addressService         *service.AddressService
-		mockAddressDataService *MockAddressDataService
-		tenantID               system.UUID
-		applicationID          system.UUID
-		validAddress           domain.Address
-		emptyAddress           domain.Address
+		mockCtrl                   *gomock.Controller
+		addressService             *service.AddressService
+		mockAddressDataService     *MockAddressDataService
+		tenantID                   system.UUID
+		applicationID              system.UUID
+		validAddress               domain.Address
+		emptyAddress               domain.Address
+		addressWithEmptyKey        domain.Address
+		addressWithWhitespaceKey   domain.Address
+		addressWithEmptyValue      domain.Address
+		addressWithWhitespaceValue domain.Address
 	)
 
 	BeforeEach(func() {
@@ -36,6 +39,10 @@ var _ = Describe("Create method input parameters and dependency test", func() {
 		applicationID, _ = system.RandomUUID()
 		validAddress = domain.Address{AddressDetails: map[string]string{"City": "Christchurch"}}
 		emptyAddress = domain.Address{}
+		addressWithEmptyKey = domain.Address{AddressDetails: map[string]string{"": "Christchurch"}}
+		addressWithWhitespaceKey = domain.Address{AddressDetails: map[string]string{"    ": "Christchurch"}}
+		addressWithEmptyValue = domain.Address{AddressDetails: map[string]string{"City": ""}}
+		addressWithWhitespaceValue = domain.Address{AddressDetails: map[string]string{"City": "    "}}
 	})
 
 	AfterEach(func() {
@@ -50,13 +57,35 @@ var _ = Describe("Create method input parameters and dependency test", func() {
 		})
 	})
 
-	DescribeTable("Input Parameters",
-		func(tenantID, applicationID system.UUID, address domain.Address) {
-			Ω(func() { addressService.Create(tenantID, applicationID, address) }).Should(Panic())
-		},
-		Entry("should panic when empty tenant unique identifier provided", system.EmptyUUID, applicationID, validAddress),
-		Entry("should panic when empty application unique identifier provided", tenantID, system.EmptyUUID, validAddress),
-		Entry("should panic when address without address key provided", tenantID, applicationID, emptyAddress))
+	Describe("Input Parameters", func() {
+		It("should panic when empty tenant unique identifier provided", func() {
+			Ω(func() { addressService.Create(system.EmptyUUID, applicationID, validAddress) }).Should(Panic())
+		})
+
+		It("should panic when empty application unique identifier provided", func() {
+			Ω(func() { addressService.Create(tenantID, system.EmptyUUID, validAddress) }).Should(Panic())
+		})
+
+		It("should panic when address without address key provided", func() {
+			Ω(func() { addressService.Create(tenantID, applicationID, emptyAddress) }).Should(Panic())
+		})
+
+		It("should panic when address with empty key provided", func() {
+			Ω(func() { addressService.Create(tenantID, applicationID, addressWithEmptyKey) }).Should(Panic())
+		})
+
+		It("should panic when address with key contains whitespace only provided", func() {
+			Ω(func() { addressService.Create(tenantID, applicationID, addressWithWhitespaceKey) }).Should(Panic())
+		})
+
+		It("should panic when address with empty value provided", func() {
+			Ω(func() { addressService.Create(tenantID, applicationID, addressWithEmptyValue) }).Should(Panic())
+		})
+
+		It("should panic when address with value contains whitespace only provided", func() {
+			Ω(func() { addressService.Create(tenantID, applicationID, addressWithWhitespaceValue) }).Should(Panic())
+		})
+	})
 })
 
 var _ = Describe("Create method behaviour", func() {

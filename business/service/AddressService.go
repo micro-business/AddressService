@@ -62,6 +62,10 @@ func (addressService AddressService) Read(tenantID, applicationID, addressID sys
 		panic("No address details key provided.")
 	}
 
+	for _, key := range keys {
+		diagnostics.IsNotNilOrEmptyOrWhitespace(key, "key", "key cannot be empty or contains whitespace only.")
+	}
+
 	address, err := addressService.AddressDataService.Read(tenantID, applicationID, addressID, keys)
 
 	if err != nil {
@@ -109,6 +113,11 @@ func (addressService AddressService) Delete(tenantID, applicationID, addressID s
 func validateAddress(address domain.Address) {
 	if len(address.AddressDetails) == 0 {
 		panic("Address does not contain any address key.")
+	}
+
+	for key, value := range address.AddressDetails {
+		diagnostics.IsNotNilOrEmptyOrWhitespace(key, "key", "key cannot be empty or contains whitespace only.")
+		diagnostics.IsNotNilOrEmptyOrWhitespace(value, "value", "value cannot be empty or contains whitespace only.")
 	}
 }
 

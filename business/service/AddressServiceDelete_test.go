@@ -8,7 +8,6 @@ import (
 	"github.com/microbusinesses/AddressService/business/service"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
@@ -45,13 +44,19 @@ var _ = Describe("Delete method input parameters and dependency test", func() {
 		})
 	})
 
-	DescribeTable("Input Parameters",
-		func(tenantID, applicationID, addressID system.UUID) {
-			Ω(func() { addressService.Delete(tenantID, applicationID, addressID) }).Should(Panic())
-		},
-		Entry("should panic when empty tenant unique identifier provided", system.EmptyUUID, applicationID, addressID),
-		Entry("should panic when empty application unique identifier provided", tenantID, system.EmptyUUID, addressID),
-		Entry("should panic when empty address unique identifier provided", tenantID, applicationID, system.EmptyUUID))
+	Describe("Input Parameters", func() {
+		It("should panic when empty tenant unique identifier provided", func() {
+			Ω(func() { addressService.Delete(system.EmptyUUID, applicationID, addressID) }).Should(Panic())
+		})
+
+		It("should panic when empty application unique identifier provided", func() {
+			Ω(func() { addressService.Delete(tenantID, system.EmptyUUID, addressID) }).Should(Panic())
+		})
+
+		It("should panic when empty address unique identifier provided", func() {
+			Ω(func() { addressService.Delete(tenantID, applicationID, system.EmptyUUID) }).Should(Panic())
+		})
+	})
 })
 
 var _ = Describe("Delete method behaviour", func() {

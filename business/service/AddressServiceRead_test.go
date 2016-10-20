@@ -14,14 +14,18 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("ReadAll method input parameters and dependency test", func() {
+var _ = Describe("Read method input parameters and dependency test", func() {
 	var (
-		mockCtrl               *gomock.Controller
-		addressService         *service.AddressService
-		mockAddressDataService *MockAddressDataService
-		tenantID               system.UUID
-		applicationID          system.UUID
-		addressID              system.UUID
+		mockCtrl                *gomock.Controller
+		addressService          *service.AddressService
+		mockAddressDataService  *MockAddressDataService
+		tenantID                system.UUID
+		applicationID           system.UUID
+		addressID               system.UUID
+		validKeys               []string
+		emptyKeys               []string
+		keysWithEmptyValue      []string
+		keysWithWhitespaceValue []string
 	)
 
 	BeforeEach(func() {
@@ -33,6 +37,18 @@ var _ = Describe("ReadAll method input parameters and dependency test", func() {
 		tenantID, _ = system.RandomUUID()
 		applicationID, _ = system.RandomUUID()
 		addressID, _ = system.RandomUUID()
+
+		validKeys = make([]string, 1)
+		randomKey, _ := system.RandomUUID()
+		validKeys[0] = randomKey.String()
+
+		emptyKeys = make([]string, 0)
+
+		keysWithEmptyValue = make([]string, 1)
+		keysWithEmptyValue[0] = ""
+
+		keysWithWhitespaceValue = make([]string, 1)
+		keysWithWhitespaceValue[0] = "    "
 	})
 
 	AfterEach(func() {
@@ -43,26 +59,39 @@ var _ = Describe("ReadAll method input parameters and dependency test", func() {
 		It("should panic", func() {
 			addressService.AddressDataService = nil
 
-			Ω(func() { addressService.ReadAll(tenantID, applicationID, addressID) }).Should(Panic())
+			Ω(func() { addressService.Read(tenantID, applicationID, addressID, validKeys) }).Should(Panic())
 		})
 	})
 
 	Describe("Input Parameters", func() {
 		It("should panic when empty tenant unique identifier provided", func() {
-			Ω(func() { addressService.ReadAll(system.EmptyUUID, applicationID, addressID) }).Should(Panic())
+			Ω(func() { addressService.Read(system.EmptyUUID, applicationID, addressID, validKeys) }).Should(Panic())
 		})
 
 		It("should panic when empty application unique identifier provided", func() {
-			Ω(func() { addressService.ReadAll(tenantID, system.EmptyUUID, addressID) }).Should(Panic())
+			Ω(func() { addressService.Read(tenantID, system.EmptyUUID, addressID, validKeys) }).Should(Panic())
 		})
 
 		It("should panic when empty address unique identifier provided", func() {
-			Ω(func() { addressService.ReadAll(tenantID, applicationID, system.EmptyUUID) }).Should(Panic())
+			Ω(func() { addressService.Read(tenantID, applicationID, system.EmptyUUID, validKeys) }).Should(Panic())
 		})
+
+		It("should panic when empty keys provided", func() {
+			Ω(func() { addressService.Read(tenantID, applicationID, addressID, emptyKeys) }).Should(Panic())
+		})
+
+		It("should panic when keys with empty value provided", func() {
+			Ω(func() { addressService.Read(tenantID, applicationID, addressID, keysWithEmptyValue) }).Should(Panic())
+		})
+
+		It("should panic when keys with whitespace only value provided", func() {
+			Ω(func() { addressService.Read(tenantID, applicationID, addressID, keysWithWhitespaceValue) }).Should(Panic())
+		})
+
 	})
 })
 
-var _ = Describe("ReadAll method behaviour", func() {
+var _ = Describe("Read method behaviour", func() {
 	var (
 		mockCtrl               *gomock.Controller
 		addressService         *service.AddressService
@@ -70,6 +99,7 @@ var _ = Describe("ReadAll method behaviour", func() {
 		tenantID               system.UUID
 		applicationID          system.UUID
 		addressID              system.UUID
+		validKeys              []string
 	)
 
 	BeforeEach(func() {
@@ -81,16 +111,20 @@ var _ = Describe("ReadAll method behaviour", func() {
 		tenantID, _ = system.RandomUUID()
 		applicationID, _ = system.RandomUUID()
 		addressID, _ = system.RandomUUID()
+
+		validKeys = make([]string, 1)
+		randomKey, _ := system.RandomUUID()
+		validKeys[0] = randomKey.String()
 	})
 
 	AfterEach(func() {
 		mockCtrl.Finish()
 	})
 
-	It("should call address data service ReadAll function", func() {
-		mockAddressDataService.EXPECT().ReadAll(tenantID, applicationID, addressID)
+	It("should call address data service Read function", func() {
+		mockAddressDataService.EXPECT().Read(tenantID, applicationID, addressID, validKeys)
 
-		addressService.ReadAll(tenantID, applicationID, addressID)
+		addressService.Read(tenantID, applicationID, addressID, validKeys)
 	})
 
 	Context("when address data service succeeds to read the requested address", func() {
@@ -104,13 +138,19 @@ var _ = Describe("ReadAll method behaviour", func() {
 				addressDetails[key.String()] = value.String()
 			}
 
+			keys := make([]string, 0, len(addressDetails))
+
+			for key := range addressDetails {
+				keys = append(keys, key)
+			}
+
 			expectedAddress := domain.Address{AddressDetails: addressDetails}
 			mockAddressDataService.
 				EXPECT().
-				ReadAll(tenantID, applicationID, addressID).
+				Read(tenantID, applicationID, addressID, keys).
 				Return(contract.Address{AddressDetails: expectedAddress.AddressDetails}, nil)
 
-			address, err := addressService.ReadAll(tenantID, applicationID, addressID)
+			address, err := addressService.Read(tenantID, applicationID, addressID, keys)
 
 			Expect(address).To(Equal(expectedAddress))
 			Expect(err).To(BeNil())
@@ -123,10 +163,10 @@ var _ = Describe("ReadAll method behaviour", func() {
 			expectedError := errors.New(expectedErrorID.String())
 			mockAddressDataService.
 				EXPECT().
-				ReadAll(tenantID, applicationID, addressID).
+				Read(tenantID, applicationID, addressID, validKeys).
 				Return(contract.Address{}, expectedError)
 
-			expectedAddress, err := addressService.ReadAll(tenantID, applicationID, addressID)
+			expectedAddress, err := addressService.Read(tenantID, applicationID, addressID, validKeys)
 
 			Expect(expectedAddress).To(Equal(domain.Address{}))
 			Expect(err).To(Equal(expectedError))
@@ -134,8 +174,8 @@ var _ = Describe("ReadAll method behaviour", func() {
 	})
 })
 
-func TestReadAll(t *testing.T) {
+func TestRead(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "ReadAll method input parameters and dependency test")
-	RunSpecs(t, "ReadAll method behaviour")
+	RunSpecs(t, "Read method input parameters and dependency test")
+	RunSpecs(t, "Read method behaviour")
 }
