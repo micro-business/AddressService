@@ -49,9 +49,10 @@ var _ = Describe("Read method behaviour", func() {
 			keys := make([]string, 1)
 			keys[0] = "Line1"
 
-			err := addressDataService.Read(tenantID, applicationID, addressID, keys)
+			address, err := addressDataService.Read(tenantID, applicationID, addressID, keys)
 
 			Expect(err).To(Equal(fmt.Errorf("Address not found. Address ID: %s", addressID.String())))
+			Expect(address).To(Equal(contract.Address{}))
 		})
 
 		It("should return the existing address keys and values", func() {

@@ -46,9 +46,10 @@ var _ = Describe("ReadAll method behaviour", func() {
 
 	Context("when reading existing address", func() {
 		It("should return error if address does not exist", func() {
-			err := addressDataService.ReadAll(tenantID, applicationID, addressID)
+			address, err := addressDataService.ReadAll(tenantID, applicationID, addressID)
 
 			Expect(err).To(Equal(fmt.Errorf("Address not found. Address ID: %s", addressID.String())))
+			Expect(address).To(Equal(contract.Address{}))
 		})
 
 		It("should return the existing address keys and values", func() {
