@@ -57,12 +57,6 @@ func (addressDataService AddressDataService) Create(tenantID, applicationID syst
 func (addressDataService AddressDataService) Update(tenantID, applicationID, addressID system.UUID, address contract.Address) error {
 	diagnostics.IsNotNil(addressDataService.ClusterConfig, "addressDataService.ClusterConfig", "ClusterConfig must be provided.")
 
-	err := addressDataService.Delete(tenantID, applicationID, addressID)
-
-	if err != nil {
-		return err
-	}
-
 	session, err := addressDataService.ClusterConfig.CreateSession()
 
 	if err != nil {
@@ -73,6 +67,10 @@ func (addressDataService AddressDataService) Update(tenantID, applicationID, add
 
 	if !doesAddressExist(tenantID, applicationID, addressID, session) {
 		return fmt.Errorf("Address not found. Address ID: %s", addressID.String())
+	}
+
+	if err := deleteExistingAddress(tenantID, applicationID, addressID, session); err != nil {
+		return err
 	}
 
 	return addNewAddress(tenantID, applicationID, address, addressID, session)
@@ -140,31 +138,7 @@ func (addressDataService AddressDataService) ReadAll(tenantID, applicationID, ad
 
 	defer session.Close()
 
-	iter := session.Query(
-		"SELECT address_key, address_value"+
-			" FROM address"+
-			" WHERE"+
-			" tenant_id = ?"+
-			" AND application_id = ?"+
-			" AND address_id = ?",
-		tenantID.String(),
-		applicationID.String(),
-		addressID.String()).Iter()
-
-	var key string
-	var value string
-
-	address := contract.Address{AddressDetails: make(map[string]string)}
-
-	for iter.Scan(&key, &value) {
-		address.AddressDetails[key] = value
-	}
-
-	if len(address.AddressDetails) == 0 {
-		return contract.Address{}, fmt.Errorf("Address not found. Address ID: %s", addressID.String())
-	}
-
-	return address, nil
+	return readAllAddressDetails(tenantID, applicationID, addressID, session)
 }
 
 // Delete deletes an existing address information.
@@ -174,12 +148,6 @@ func (addressDataService AddressDataService) ReadAll(tenantID, applicationID, ad
 // Returns error if something goes wrong.
 func (addressDataService AddressDataService) Delete(tenantID, applicationID, addressID system.UUID) error {
 	diagnostics.IsNotNil(addressDataService.ClusterConfig, "addressDataService.ClusterConfig", "ClusterConfig must be provided.")
-
-	address, err := addressDataService.ReadAll(tenantID, applicationID, addressID)
-
-	if err != nil {
-		return err
-	}
 
 	session, err := addressDataService.ClusterConfig.CreateSession()
 
@@ -193,7 +161,7 @@ func (addressDataService AddressDataService) Delete(tenantID, applicationID, add
 		return fmt.Errorf("Address not found. Address ID: %s", addressID.String())
 	}
 
-	return removeExistingAddress(tenantID, applicationID, address, addressID, session)
+	return deleteExistingAddress(tenantID, applicationID, addressID, session)
 }
 
 // mapSystemUUIDToGocqlUUID maps the system type UUID to gocql UUID type
@@ -453,4 +421,42 @@ func doesAddressExist(tenantID, applicationID, addressID system.UUID, session *g
 	var addressKey string
 
 	return iter.Scan(&addressKey)
+}
+
+func deleteExistingAddress(tenantID, applicationID, addressID system.UUID, session *gocql.Session) error {
+	address, err := readAllAddressDetails(tenantID, applicationID, addressID, session)
+
+	if err != nil {
+		return err
+	}
+
+	return removeExistingAddress(tenantID, applicationID, address, addressID, session)
+}
+
+func readAllAddressDetails(tenantID, applicationID, addressID system.UUID, session *gocql.Session) (contract.Address, error) {
+	iter := session.Query(
+		"SELECT address_key, address_value"+
+			" FROM address"+
+			" WHERE"+
+			" tenant_id = ?"+
+			" AND application_id = ?"+
+			" AND address_id = ?",
+		tenantID.String(),
+		applicationID.String(),
+		addressID.String()).Iter()
+
+	var key string
+	var value string
+
+	address := contract.Address{AddressDetails: make(map[string]string)}
+
+	for iter.Scan(&key, &value) {
+		address.AddressDetails[key] = value
+	}
+
+	if len(address.AddressDetails) == 0 {
+		return contract.Address{}, fmt.Errorf("Address not found. Address ID: %s", addressID.String())
+	}
+
+	return address, nil
 }
