@@ -106,6 +106,8 @@ func (addressDataService AddressDataService) Read(tenantID, applicationID, addre
 		applicationID.String(),
 		addressID.String()).Iter()
 
+	defer iter.Close()
+
 	var key string
 	var value string
 
@@ -418,6 +420,8 @@ func doesAddressExist(tenantID, applicationID, addressID system.UUID, session *g
 		applicationID.String(),
 		addressID.String()).Iter()
 
+	defer iter.Close()
+
 	var addressKey string
 
 	return iter.Scan(&addressKey)
@@ -444,6 +448,8 @@ func readAllAddressDetails(tenantID, applicationID, addressID system.UUID, sessi
 		tenantID.String(),
 		applicationID.String(),
 		addressID.String()).Iter()
+
+	defer iter.Close()
 
 	var key string
 	var value string
