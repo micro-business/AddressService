@@ -2,7 +2,7 @@
 package contract
 
 import (
-	"github.com/microbusinesses/Micro-Businesses-Core/system"
+	"github.com/micro-business/Micro-Business-Core/system"
 )
 
 // Address defines how an address should look like

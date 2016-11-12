@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/gocql/gocql"
-	"github.com/microbusinesses/Micro-Businesses-Core/system"
+	"github.com/micro-business/Micro-Business-Core/system"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

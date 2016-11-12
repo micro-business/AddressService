@@ -2,8 +2,8 @@
 package contract
 
 import (
-	"github.com/microbusinesses/AddressService/business/domain"
-	"github.com/microbusinesses/Micro-Businesses-Core/system"
+	"github.com/micro-business/AddressService/business/domain"
+	"github.com/micro-business/Micro-Business-Core/system"
 )
 
 // AddressService contract, it can add new address and update/retrieve/remove an existing address.

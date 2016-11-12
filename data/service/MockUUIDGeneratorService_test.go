@@ -5,7 +5,7 @@ package service_test
 
 import (
 	gomock "github.com/golang/mock/gomock"
-	system "github.com/microbusinesses/Micro-Businesses-Core/system"
+	system "github.com/micro-business/Micro-Business-Core/system"
 )
 
 // Mock of UUIDGeneratorService interface

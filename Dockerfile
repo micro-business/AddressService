@@ -1,4 +1,4 @@
 FROM ubuntu:latest
-MAINTAINER microbusinesses.inc@gmail.com
+MAINTAINER micro.business.limited@gmail.com
 ADD AddressService /
 CMD ["/AddressService"]

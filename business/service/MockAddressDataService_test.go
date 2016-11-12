@@ -5,8 +5,8 @@ package service_test
 
 import (
 	gomock "github.com/golang/mock/gomock"
-	. "github.com/microbusinesses/AddressService/data/contract"
-	system "github.com/microbusinesses/Micro-Businesses-Core/system"
+	. "github.com/micro-business/AddressService/data/contract"
+	system "github.com/micro-business/Micro-Business-Core/system"
 )
 
 // Mock of AddressDataService interface

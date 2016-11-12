@@ -6,10 +6,10 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/microbusinesses/AddressService/business/domain"
-	"github.com/microbusinesses/AddressService/business/service"
-	"github.com/microbusinesses/AddressService/data/contract"
-	"github.com/microbusinesses/Micro-Businesses-Core/system"
+	"github.com/micro-business/AddressService/business/domain"
+	"github.com/micro-business/AddressService/business/service"
+	"github.com/micro-business/AddressService/data/contract"
+	"github.com/micro-business/Micro-Business-Core/system"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

@@ -6,10 +6,10 @@ import (
 
 	"github.com/go-kit/kit/endpoint"
 	"github.com/graphql-go/graphql"
-	"github.com/microbusinesses/AddressService/business/contract"
-	"github.com/microbusinesses/AddressService/business/domain"
-	"github.com/microbusinesses/Micro-Businesses-Core/common/query"
-	"github.com/microbusinesses/Micro-Businesses-Core/system"
+	"github.com/micro-business/AddressService/business/contract"
+	"github.com/micro-business/AddressService/business/domain"
+	"github.com/micro-business/Micro-Business-Core/common/query"
+	"github.com/micro-business/Micro-Business-Core/system"
 	"golang.org/x/net/context"
 )
 

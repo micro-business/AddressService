@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/microbusinesses/Micro-Businesses-Core/common/config"
+	"github.com/micro-business/Micro-Business-Core/common/config"
 )
 
 // ConsulConfigurationReader implements ConfigurationReader using Consul to provide access to all configurations parameters required by the service.

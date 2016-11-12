@@ -7,10 +7,10 @@ import (
 	"strconv"
 
 	httptransport "github.com/go-kit/kit/transport/http"
-	"github.com/microbusinesses/AddressService/business/contract"
-	"github.com/microbusinesses/AddressService/config"
-	"github.com/microbusinesses/AddressService/endpoint/transport"
-	"github.com/microbusinesses/Micro-Businesses-Core/common/diagnostics"
+	"github.com/micro-business/AddressService/business/contract"
+	"github.com/micro-business/AddressService/config"
+	"github.com/micro-business/AddressService/endpoint/transport"
+	"github.com/micro-business/Micro-Business-Core/common/diagnostics"
 	"golang.org/x/net/context"
 )
 

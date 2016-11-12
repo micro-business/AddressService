@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/gocql/gocql"
-	"github.com/microbusinesses/AddressService/data/service"
-	"github.com/microbusinesses/Micro-Businesses-Core/system"
+	"github.com/micro-business/AddressService/data/service"
+	"github.com/micro-business/Micro-Business-Core/system"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

@@ -7,9 +7,9 @@ import (
 	"sync"
 
 	"github.com/gocql/gocql"
-	"github.com/microbusinesses/AddressService/data/contract"
-	"github.com/microbusinesses/Micro-Businesses-Core/common/diagnostics"
-	"github.com/microbusinesses/Micro-Businesses-Core/system"
+	"github.com/micro-business/AddressService/data/contract"
+	"github.com/micro-business/Micro-Business-Core/common/diagnostics"
+	"github.com/micro-business/Micro-Business-Core/system"
 )
 
 // AddressDataService provides access to add new address and update/retrieve/remove an existing address.
